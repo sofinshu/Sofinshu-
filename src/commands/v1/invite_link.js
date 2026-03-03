@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, PermissionFlagsBits, AttachmentBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createCoolEmbed, createErrorEmbed, createCustomEmbed } = require('../../utils/embeds');
+const { createCoolEmbed, createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
 const QRCode = require('qrcode');
 
 module.exports = {
@@ -10,7 +10,7 @@ module.exports = {
   async execute(interaction) {
     try {
       if (!interaction.guild.members.me.permissions.has(PermissionFlagsBits.CreateInstantInvite)) {
-        return interaction.reply({ embeds: [createErrorEmbed('I do not have permission to create invites in this server! Check my roles.')], ephemeral: true });
+        return interaction.editReply({ embeds: [createErrorEmbed('I do not have permission to create invites in this server! Check my roles.')], ephemeral: true });
       }
 
       await interaction.deferReply();
@@ -41,9 +41,9 @@ module.exports = {
       const errEmbed = createErrorEmbed('An error occurred while generating the invite link and QR code.');
       if (interaction.deferred || interaction.replied) {
         const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_invite_link').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
-        await interaction.editReply({ embeds: [errEmbed], components: [row] });
+        await return await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {
-        await interaction.reply({ embeds: [errEmbed], ephemeral: true });
+        await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
       }
     }
   }

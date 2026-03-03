@@ -1,6 +1,5 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createPremiumEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
-const { createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
+const { createCustomEmbed, createErrorEmbed, createPremiumEmbed, createSuccessEmbed } = require('../../utils/embeds');
 const { Activity } = require('../../database/mongo');
 
 module.exports = {
@@ -37,7 +36,7 @@ module.exports = {
 
       const chart = sorted.map(([date, count]) => {
         const intensity = Math.min(10, Math.floor((count / maxVal) * 10));
-        const bars = '¦'.repeat(intensity) + '¦'.repeat(10 - intensity);
+        const bars = 'ï¿½'.repeat(intensity) + 'ï¿½'.repeat(10 - intensity);
         const dayLabel = new Date(date).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
         return `\`${dayLabel}\` ${bars} **${count}**`;
       }).join('\n');
@@ -52,16 +51,16 @@ module.exports = {
           { name: '?? Mean Frequency', value: `\`${avgPerDay}\` / Day`, inline: true },
           { name: '?? Capture Vector', value: `\`${days} Days\``, inline: true }
         ],
-        footer: 'Metabolic Activity Visualization • V5 Executive Suite',
+        footer: 'Metabolic Activity Visualization ï¿½ V5 Executive Suite',
         color: 'premium'
       });
 
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_activity_heatmap').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_activity_heatmap').setLabel('ï¿½ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
     } catch (error) {
       console.error('Heatmap Error:', error);
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_activity_heatmap').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_activity_heatmap').setLabel('ï¿½ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('Heatmap Intelligence failure: Unable to plot spectral density matrices.')], components: [row] });
     }
   }

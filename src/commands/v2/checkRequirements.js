@@ -99,9 +99,9 @@ module.exports = {
       const errEmbed = createErrorEmbed('A database error occurred while calculating milestone eligibility.');
       if (interaction.deferred || interaction.replied) {
         const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_checkRequirements').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
-        await interaction.editReply({ embeds: [errEmbed], components: [row] });
+        await return await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {
-        await interaction.reply({ embeds: [errEmbed], ephemeral: true });
+        await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
       }
     }
   }

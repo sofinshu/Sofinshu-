@@ -8,7 +8,6 @@ const EMBED_COLORS = {
     info: '#3498db',
     premium: '#ff73fa',
     enterprise: '#f1c40f',
-    
     dark: '#2f3136',
     free: '#5865F2'
 };
@@ -17,8 +16,7 @@ const EMBED_COLORS = {
 const TIER_BRANDING = {
     free: { color: '#5865F2', prefix: '', footer: 'uwu-chan • Free Tier' },
     premium: { color: '#ff73fa', prefix: '✨ ', footer: 'uwu-chan • Premium Tier' },
-    enterprise: { color: '#f1c40f', prefix: '👑 ', footer: 'uwu-chan • Enterprise Tier' },
-    zenith: { color: '#00fff5', prefix: '💎 ', footer: 'uwu-chan • Zenith Hyper-Apex' }
+    enterprise: { color: '#f1c40f', prefix: '👑 ', footer: 'uwu-chan • Enterprise Tier' }
 };
 
 /**
@@ -36,7 +34,7 @@ function createProgressBar(percent, length = 15) {
 
 /**
  * Creates a tier-styled embed with consistent branding
- * @param {string} tier 'free' | 'premium' | 'enterprise' | 'zenith'
+ * @param {string} tier 'free' | 'premium' | 'enterprise'
  * @param {Object} options Embed options
  * @returns {EmbedBuilder}
  */
@@ -86,7 +84,6 @@ async function createCustomEmbed(interaction, options = {}) {
 
 function createCoolEmbed(options = {}) {
     const embed = new EmbedBuilder();
-
     const branding = options.branding || {};
 
     // Set color
@@ -177,16 +174,6 @@ function createEnterpriseEmbed(options = {}) {
 }
 
 /**
- * Creates a zenith-styled embed
- */
-) {
-    return createTierEmbed('zenith', {
-        ...options,
-        title: options.title || 'Zenith Feature'
-    });
-}
-
-/**
  * Creates a stat field object for use in embed.addFields()
  * @param {string} label Field name
  * @param {string|number} value Field value
@@ -208,7 +195,5 @@ module.exports = {
     createSuccessEmbed,
     createPremiumEmbed,
     createEnterpriseEmbed,
-    
     createStatField
 };
-

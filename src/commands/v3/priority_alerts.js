@@ -1,6 +1,5 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createPremiumEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
-const { createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
+const { createCustomEmbed, createErrorEmbed, createPremiumEmbed, createSuccessEmbed } = require('../../utils/embeds');
 const { Activity } = require('../../database/mongo');
 
 module.exports = {
@@ -64,17 +63,17 @@ module.exports = {
         embed.addFields({ name: `?? Target Filter: ${filter.toUpperCase()}`, value: '*No traces match indexing algorithms.*', inline: false });
       }
 
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_priority_alerts').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_priority_alerts').setLabel('ï¿½ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
     } catch (error) {
       console.error('Priority Alerts Error:', error);
       const errEmbed = createErrorEmbed('A database tracking error occurred resolving backend threat aggregators.');
       if (interaction.deferred || interaction.replied) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_priority_alerts').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [errEmbed], components: [row] });
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_priority_alerts').setLabel('ï¿½ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await return await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {
-        await interaction.reply({ embeds: [errEmbed], ephemeral: true });
+        await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
       }
     }
   }

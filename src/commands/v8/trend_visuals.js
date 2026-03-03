@@ -1,6 +1,5 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createEnterpriseEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
-const { createEnterpriseEmbed } = require('../../utils/embeds');
+const { createEnterpriseEmbed, createErrorEmbed, createSuccessEmbed } = require('../../utils/embeds');
 const { Activity } = require('../../database/mongo');
 
 module.exports = {
@@ -37,7 +36,7 @@ module.exports = {
       .setDescription(display)
       
       ;
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_trend_visuals').setLabel('ðŸ„ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_trend_visuals').setLabel('ï¿½ï¿½ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };

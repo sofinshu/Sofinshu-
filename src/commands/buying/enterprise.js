@@ -1,4 +1,4 @@
-﻿const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { createEnterpriseEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { Guild } = require('../../database/mongo');
 
@@ -38,7 +38,7 @@ module.exports = {
                         value: [
                             '**v6** — AI forecast (linear regression), server health score, engagement trends, role efficiency, productivity analysis',
                             '**v7** — Automation pulse, smart alerts (spike detection), auto-rewards (role grant), task completion, milestone tracking',
-                            '**v8** — Interactive dashboard (3-tab), Zenith passport (shift history), elite badge system (grant/view/list), growth forecast, custom branding'
+                            '**v8** — Interactive dashboard (3-tab), Enterprise passport (shift history), elite badge system (grant/view/list), growth forecast, custom branding'
                         ].join('\n'),
                         inline: false
                     },
@@ -64,7 +64,7 @@ module.exports = {
             console.error('[enterprise] Error:', error);
             const errEmbed = createErrorEmbed('Failed to load enterprise status.');
             if (interaction.deferred || interaction.replied) await interaction.editReply({ embeds: [errEmbed] });
-            else await interaction.reply({ embeds: [errEmbed], ephemeral: true });
+            else await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
         }
     }
 };

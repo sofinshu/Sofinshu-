@@ -21,7 +21,7 @@ module.exports = {
 
     const medals = ['??', '??', '??', '4??', '5??'];
     const list = users.map((u, i) =>
-      `${medals[i]} **${u.username || 'Unknown'}** — ${u.staff?.points || 0} pts total | +${weekMap[u.userId] || 0} this week`
+      `${medals[i]} **${u.username || 'Unknown'}** ï¿½ ${u.staff?.points || 0} pts total | +${weekMap[u.userId] || 0} this week`
     ).join('\n') || 'No data yet.';
 
     const embed = createEnterpriseEmbed()
@@ -35,7 +35,7 @@ module.exports = {
       
       ;
 
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_weekly_bonus').setLabel('ðŸ„ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_weekly_bonus').setLabel('ï¿½ï¿½ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };

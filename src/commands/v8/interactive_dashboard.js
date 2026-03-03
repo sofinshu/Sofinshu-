@@ -1,6 +1,5 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType } = require('discord.js');
-const { createEnterpriseEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
-const { createCustomEmbed, createErrorEmbed, createProgressBar } = require('../../utils/embeds');
+const { createCustomEmbed, createEnterpriseEmbed, createErrorEmbed, createProgressBar, createSuccessEmbed } = require('../../utils/embeds');
 const { validatePremiumLicense } = require('../../utils/premium_guard');
 const { Guild, Activity, User } = require('../../database/mongo');
 
@@ -15,7 +14,7 @@ module.exports = {
 
       const license = await validatePremiumLicense(interaction);
       if (!license.allowed) {
-        return interaction.editReply({ embeds: [license.embed], components: license.components });
+        return return await interaction.editReply({ embeds: [license.embed], components: license.components });
       }
 
       const guildId = interaction.guildId;
@@ -29,7 +28,7 @@ module.exports = {
           const users = await User.find({ userId: { $exists: true }, 'staff.points': { $gt: 0 } })
             .sort({ 'staff.points': -1 }).limit(10).lean();
           const topList = users.length > 0
-            ? users.map((u, i) => `\`${String(i + 1).padStart(2, '0')}\` **${u.username || u.userId}** — \`${(u.staff?.points || 0).toLocaleString()} pts\``)
+            ? users.map((u, i) => `\`${String(i + 1).padStart(2, '0')}\` **${u.username || u.userId}** ï¿½ \`${(u.staff?.points || 0).toLocaleString()} pts\``)
               .join('\n')
             : '`No staff data yet`';
           const avgConsistency = users.length > 0
@@ -37,7 +36,7 @@ module.exports = {
             : '100';
 
           return createCustomEmbed(interaction, {
-            title: `?? Staff Overview — ${interaction.guild.name}`,
+            title: `?? Staff Overview ï¿½ ${interaction.guild.name}`,
             thumbnail: interaction.guild.iconURL({ dynamic: true }),
             description: `Top staff members and performance metrics.`,
             fields: [
@@ -46,7 +45,7 @@ module.exports = {
               { name: '?? Total Tracked Staff', value: `\`${users.length}\``, inline: true }
             ],
             color: 'enterprise',
-            footer: 'uwu-chan • Enterprise Staff Tab'
+            footer: 'uwu-chan ï¿½ Enterprise Staff Tab'
           });
         }
 
@@ -60,7 +59,7 @@ module.exports = {
           const recentWarnUsers = [...new Set(weekWarnings.map(w => w.userId))];
 
           return createCustomEmbed(interaction, {
-            title: `??? Moderation Overview — ${interaction.guild.name}`,
+            title: `??? Moderation Overview ï¿½ ${interaction.guild.name}`,
             thumbnail: interaction.guild.iconURL({ dynamic: true }),
             description: `Real-time moderation statistics for the server.`,
             fields: [
@@ -70,12 +69,12 @@ module.exports = {
               { name: '?? Total Warnings (All Time)', value: `\`${totalWarnings.length}\``, inline: true },
               {
                 name: '??? Server Verification',
-                value: `\`${interaction.guild.verificationLevel}\` • Explicit Filter: \`${interaction.guild.explicitContentFilter}\``,
+                value: `\`${interaction.guild.verificationLevel}\` ï¿½ Explicit Filter: \`${interaction.guild.explicitContentFilter}\``,
                 inline: false
               }
             ],
             color: 'enterprise',
-            footer: 'uwu-chan • Enterprise Moderation Tab'
+            footer: 'uwu-chan ï¿½ Enterprise Moderation Tab'
           });
         }
 
@@ -94,7 +93,7 @@ module.exports = {
         const cmds = guild?.stats?.commandsUsed || weekActs.filter(a => a.type === 'command').length;
 
         return createCustomEmbed(interaction, {
-          title: `?? Server Dashboard — ${interaction.guild.name}`,
+          title: `?? Server Dashboard ï¿½ ${interaction.guild.name}`,
           thumbnail: interaction.guild.iconURL({ dynamic: true }),
           description: `Welcome to the Enterprise Interactive Dashboard. Navigate tabs below.`,
           fields: [
@@ -107,7 +106,7 @@ module.exports = {
             { name: '?? Server Created', value: `<t:${Math.floor(interaction.guild.createdTimestamp / 1000)}:D>`, inline: true }
           ],
           color: 'enterprise',
-          footer: 'uwu-chan • Enterprise Interactive Dashboard'
+          footer: 'uwu-chan ï¿½ Enterprise Interactive Dashboard'
         });
       };
 
@@ -141,7 +140,7 @@ module.exports = {
       console.error('[interactive_dashboard] Error:', error);
       const errEmbed = createErrorEmbed('Failed to load the interactive dashboard.');
       if (interaction.deferred || interaction.replied) await interaction.editReply({ embeds: [errEmbed] });
-      else await interaction.reply({ embeds: [errEmbed], ephemeral: true });
+      else await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
     }
   }
 };

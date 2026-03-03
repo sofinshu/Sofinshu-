@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, PermissionFlagsBits, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createErrorEmbed, createCustomEmbed } = require('../../utils/embeds');
+const { createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { User, Guild } = require('../../database/mongo');
 
 module.exports = {
@@ -84,9 +84,9 @@ module.exports = {
       const errEmbed = createErrorEmbed('An error occurred while demoting the user.');
       const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_demote').setLabel('🔄 Retry').setStyle(ButtonStyle.Secondary));
       if (interaction.deferred || interaction.replied) {
-        await interaction.editReply({ embeds: [errEmbed], components: [row] });
+        await return await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {
-        await interaction.reply({ embeds: [errEmbed], ephemeral: true });
+        await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
       }
     }
   }

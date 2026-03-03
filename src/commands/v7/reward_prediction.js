@@ -23,10 +23,10 @@ module.exports = {
 
     const needed = nextThreshold - points;
     const progress = Math.round((points / nextThreshold) * 100);
-    const bar = '¦'.repeat(Math.round(progress / 10)) + '¦'.repeat(10 - Math.round(progress / 10));
+    const bar = 'ï¿½'.repeat(Math.round(progress / 10)) + 'ï¿½'.repeat(10 - Math.round(progress / 10));
 
     const embed = createEnterpriseEmbed()
-      .setTitle(`?? Reward Prediction — ${target.username}`)
+      .setTitle(`?? Reward Prediction ï¿½ ${target.username}`)
       
       .setThumbnail(target.displayAvatarURL())
       .addFields(
@@ -38,7 +38,7 @@ module.exports = {
       
       ;
 
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_reward_prediction').setLabel('ðŸ„ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_reward_prediction').setLabel('ï¿½ï¿½ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };

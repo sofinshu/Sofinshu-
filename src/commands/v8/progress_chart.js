@@ -1,6 +1,5 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createEnterpriseEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
-const { createEnterpriseEmbed } = require('../../utils/embeds');
+const { createEnterpriseEmbed, createErrorEmbed, createSuccessEmbed } = require('../../utils/embeds');
 const { User } = require('../../database/mongo');
 
 module.exports = {
@@ -18,9 +17,9 @@ module.exports = {
       const rank = u.staff?.rank || 'trial';
       const pts = u.staff?.points || 0;
       const nextRank = RANK_ORDER[RANK_ORDER.indexOf(rank) + 1];
-      if (!nextRank) return `?? **${u.username || '?'}** — MAX`;
+      if (!nextRank) return `?? **${u.username || '?'}** ï¿½ MAX`;
       const pct = Math.min(100, Math.round((pts / THRESHOLDS[nextRank]) * 100));
-      const bar = '¦'.repeat(Math.round(pct / 10)) + '¦'.repeat(10 - Math.round(pct / 10));
+      const bar = 'ï¿½'.repeat(Math.round(pct / 10)) + 'ï¿½'.repeat(10 - Math.round(pct / 10));
       return `**${u.username || '?'}**: \`${bar}\` ${pct}% ? ${nextRank}`;
     }).join('\n');
     const embed = createEnterpriseEmbed()
@@ -29,7 +28,7 @@ module.exports = {
       .setDescription(lines)
       
       ;
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_progress_chart').setLabel('ðŸ„ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_progress_chart').setLabel('ï¿½ï¿½ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };

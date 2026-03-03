@@ -1,6 +1,5 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createEnterpriseEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
-const { createEnterpriseEmbed } = require('../../utils/embeds');
+const { createEnterpriseEmbed, createErrorEmbed, createSuccessEmbed } = require('../../utils/embeds');
 const { Guild } = require('../../database/mongo');
 
 module.exports = {
@@ -28,7 +27,7 @@ module.exports = {
 
     const fields = milestones.map(m => {
       const pct = Math.min(100, Math.round((m.val / m.target) * 100));
-      const bar = '¦'.repeat(Math.round(pct / 10)) + '¦'.repeat(10 - Math.round(pct / 10));
+      const bar = 'ï¿½'.repeat(Math.round(pct / 10)) + 'ï¿½'.repeat(10 - Math.round(pct / 10));
       return { name: `${m.val >= m.target ? '?' : '??'} ${m.label}`, value: `\`${bar}\` **${pct}%** (${m.val}/${m.target})`, inline: true };
     });
 
@@ -39,7 +38,7 @@ module.exports = {
       .addFields(fields)
       
       ;
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_milestone_tracker').setLabel('ðŸ„ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_milestone_tracker').setLabel('ï¿½ï¿½ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };

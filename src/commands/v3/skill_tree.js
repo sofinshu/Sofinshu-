@@ -1,30 +1,29 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createPremiumEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
-const { createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
+const { createCustomEmbed, createErrorEmbed, createPremiumEmbed, createSuccessEmbed } = require('../../utils/embeds');
 const { validatePremiumLicense } = require('../../utils/premium_guard');
 const { User } = require('../../database/mongo');
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('skill_tree')
-        .setDescription('Zenith Hyper-Apex: Macroscopic Proficiency Branches & Skill Mastery')
+        .setDescription('Enterprise Hyper-Apex: Macroscopic Proficiency Branches & Skill Mastery')
         .addUserOption(opt => opt.setName('user').setDescription('Sector Personnel (Optional)').setRequired(false)),
 
     async execute(interaction) {
         try {
             await interaction.deferReply();
 
-            // Zenith Hyper-Apex License Guard
+            // Enterprise Hyper-Apex License Guard
             const license = await validatePremiumLicense(interaction);
             if (!license.allowed) {
-                return interaction.editReply({ embeds: [license.embed], components: license.components });
+                return return await interaction.editReply({ embeds: [license.embed], components: license.components });
             }
 
             const targetUser = interaction.options.getUser('user') || interaction.user;
             const userData = await User.findOne({ userId: targetUser.id, guildId: interaction.guildId }).lean();
 
             if (!userData || !userData.staff) {
-                const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_skill_tree').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+                const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_skill_tree').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed(`No signal dossier found for <@${targetUser.id}>.`)], components: [row] });
             }
 
@@ -54,9 +53,9 @@ module.exports = {
             const tactical = Math.min(100, Math.round(points / 25));
 
             const embed = await createCustomEmbed(interaction, {
-                title: `🌳 Zenith Hyper-Apex: Proficiency Branches`,
+                title: `🌳 Enterprise Hyper-Apex: Proficiency Branches`,
                 thumbnail: targetUser.displayAvatarURL({ dynamic: true }),
-                description: `### 🛡️ Macroscopic Skill Matrix\nMapping neural proficiency branches and command specializations for **${targetUser.username}**.\n\n\`\`\`\n${skillMap}\`\`\`\n**💎 ZENITH HYPER-APEX EXCLUSIVE**`,
+                description: `### 🛡️ Macroscopic Skill Matrix\nMapping neural proficiency branches and command specializations for **${targetUser.username}**.\n\n\`\`\`\n${skillMap}\`\`\`\n**💎 Enterprise HYPER-APEX EXCLUSIVE**`,
                 fields: [
                     { name: '👑 Leadership Vector', value: `${generateRibbon(leadership)} **${leadership}%**`, inline: true },
                     { name: '⚙️ Technical Vector', value: `${generateRibbon(technical)} **${technical}%**`, inline: true },
@@ -69,12 +68,12 @@ module.exports = {
                 color: 'premium'
             });
 
-            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_skill_tree').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_skill_tree').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
         } catch (error) {
-            console.error('Zenith Skill Tree Error:', error);
-            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_skill_tree').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            console.error('Enterprise Skill Tree Error:', error);
+            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_skill_tree').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('Skill Matrix failure: Unable to map neural proficiency branches.')], components: [row] });
         }
     }

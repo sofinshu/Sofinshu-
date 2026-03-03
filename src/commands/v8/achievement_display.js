@@ -1,6 +1,5 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createEnterpriseEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
-const { createEnterpriseEmbed } = require('../../utils/embeds');
+const { createEnterpriseEmbed, createErrorEmbed, createSuccessEmbed } = require('../../utils/embeds');
 const { User } = require('../../database/mongo');
 
 module.exports = {
@@ -19,11 +18,11 @@ module.exports = {
 
     const rankEmojis = { owner: '??', admin: '??', manager: '??', senior: '??', staff: '?', trial: '??', member: '??' };
     const achieveDisplay = achievements.length
-      ? achievements.map(a => `• ${a}`).join('\n')
-      : '*No achievements yet — keep contributing!*';
+      ? achievements.map(a => `ï¿½ ${a}`).join('\n')
+      : '*No achievements yet ï¿½ keep contributing!*';
 
     const embed = createEnterpriseEmbed()
-      .setTitle(`?? Achievement Showcase — ${target.username}`)
+      .setTitle(`?? Achievement Showcase ï¿½ ${target.username}`)
       
       .setThumbnail(target.displayAvatarURL({ size: 256 }))
       .setDescription(achieveDisplay)
@@ -35,7 +34,7 @@ module.exports = {
       
       ;
 
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_achievement_display').setLabel('ðŸ„ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_achievement_display').setLabel('ï¿½ï¿½ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };

@@ -28,11 +28,11 @@ module.exports = {
     const medals = ['??', '??', '??', '4??', '5??'];
 
     const leaderboard = sorted.map(([uid, count], i) =>
-      `${medals[i]} <@${uid}> — **${count}** actions today`
+      `${medals[i]} <@${uid}> ï¿½ **${count}** actions today`
     ).join('\n');
 
     const embed = createEnterpriseEmbed()
-      .setTitle(`?? Daily Activity Standings — ${new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}`)
+      .setTitle(`?? Daily Activity Standings ï¿½ ${new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}`)
       
       .addFields(
         { name: '?? Today\'s Top Earner', value: `<@${topUser[0]}> with **${topUser[1]}** actions`, inline: false },
@@ -43,7 +43,7 @@ module.exports = {
       
       ;
 
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_daily_bonus').setLabel('ðŸ„ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_daily_bonus').setLabel('ï¿½ï¿½ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };

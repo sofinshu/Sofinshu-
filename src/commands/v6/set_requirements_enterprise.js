@@ -2,7 +2,7 @@ const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits, ActionRowBuilder
 const { createEnterpriseEmbed } = require('../../utils/embeds');
 const { Guild } = require('../../database/mongo');
 
-// v6 (ENTERPRISE) — All 10 requirements
+// v6 (ENTERPRISE) ï¿½ All 10 requirements
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('set_requirements_enterprise')
@@ -55,7 +55,7 @@ module.exports = {
         const off = (v) => v > 0 ? v.toString() : 'Disabled';
 
         const embed = createEnterpriseEmbed()
-            .setTitle(`?? Enterprise Full Requirements Set — ${rank.toUpperCase()}`)
+            .setTitle(`?? Enterprise Full Requirements Set ï¿½ ${rank.toUpperCase()}`)
             
             .setDescription('**Enterprise tier: All 10 requirements configured.**\nThis is the maximum customization level.')
             .addFields(
@@ -72,7 +72,7 @@ module.exports = {
             )
             ;
 
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_set_requirements_enterprise').setLabel('ðŸ„ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_set_requirements_enterprise').setLabel('ï¿½ï¿½ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
     }
 };

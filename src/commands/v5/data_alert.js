@@ -60,7 +60,7 @@ module.exports = {
         .setDescription('Use `/data_alert alert_type:... enabled:...` to configure alerts.')
         ;
 
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_data_alert').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_data_alert').setLabel('ï¿½ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
     }
   }

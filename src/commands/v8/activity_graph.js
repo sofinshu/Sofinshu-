@@ -1,6 +1,5 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createEnterpriseEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
-const { createEnterpriseEmbed } = require('../../utils/embeds');
+const { createEnterpriseEmbed, createErrorEmbed, createSuccessEmbed } = require('../../utils/embeds');
 const { Activity } = require('../../database/mongo');
 
 module.exports = {
@@ -20,7 +19,7 @@ module.exports = {
     const max = Math.max(...entries.map(e => e[1]), 1);
 
     const graph = entries.map(([date, count]) => {
-      const bar = '¦'.repeat(Math.round((count / max) * 12)).padEnd(12, '¦');
+      const bar = 'ï¿½'.repeat(Math.round((count / max) * 12)).padEnd(12, 'ï¿½');
       const d = new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
       return `${d}: ${bar} ${count}`;
     }).join('\n') || 'No activity data.';
@@ -37,7 +36,7 @@ module.exports = {
       
       ;
 
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_activity_graph').setLabel('ðŸ„ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_activity_graph').setLabel('ï¿½ï¿½ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };

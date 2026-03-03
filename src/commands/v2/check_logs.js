@@ -49,9 +49,9 @@ module.exports = {
       const errEmbed = createErrorEmbed('Failed to load activity logs.');
       const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_check_logs').setLabel('🔄 Retry').setStyle(ButtonStyle.Secondary));
       if (interaction.deferred || interaction.replied) {
-        await interaction.editReply({ embeds: [errEmbed], components: [row] });
+        await return await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {
-        await interaction.reply({ embeds: [errEmbed], ephemeral: true });
+        await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
       }
     }
   }

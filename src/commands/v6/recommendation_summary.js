@@ -44,12 +44,12 @@ module.exports = {
       .addFields(fields)
       .addFields({
         name: '?? Selection Criteria',
-        value: '• 50% Points weight\n• 30% Consistency weight\n• 20% Reputation weight'
+        value: 'ï¿½ 50% Points weight\nï¿½ 30% Consistency weight\nï¿½ 20% Reputation weight'
       })
       
       ;
 
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_recommendation_summary').setLabel('ðŸ„ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_recommendation_summary').setLabel('ï¿½ï¿½ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };

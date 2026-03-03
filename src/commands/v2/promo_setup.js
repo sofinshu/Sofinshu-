@@ -1,6 +1,6 @@
 const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder, PermissionFlagsBits } = require('discord.js');
-const { Guild } = require('../../database/mongo');
 const { createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
+const { Guild } = require('../../database/mongo');
 
 module.exports = {
     data: new SlashCommandBuilder()

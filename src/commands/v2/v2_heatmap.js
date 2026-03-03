@@ -19,7 +19,7 @@ module.exports = {
             console.error('[v2_heatmap] Critical Error:', error);
             const errEmbed = createErrorEmbed('Critical failure in heatmap visualization matrix.');
             if (interaction.deferred || interaction.replied) await interaction.editReply({ embeds: [errEmbed] });
-            else await interaction.reply({ embeds: [errEmbed], ephemeral: true });
+            else await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
         }
     }
 };

@@ -1,6 +1,5 @@
 const { SlashCommandBuilder, PermissionFlagsBits, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createPremiumEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
-const { createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
+const { createCustomEmbed, createErrorEmbed, createPremiumEmbed, createSuccessEmbed } = require('../../utils/embeds');
 const { Guild } = require('../../database/mongo');
 
 module.exports = {
@@ -37,7 +36,7 @@ module.exports = {
       if (enable && role) {
         // Prevent highest-role abuse recursively
         if (role.position >= interaction.member.roles.highest.position && interaction.user.id !== interaction.guild.ownerId) {
-          const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_auto_assign_roles').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+          const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_auto_assign_roles').setLabel('ï¿½ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('You cannot configure an automatic assignment for a role position that sits higher or equal to your own.')], components: [row] });
         }
 
@@ -46,7 +45,7 @@ module.exports = {
         }
         guild.settings.modules.autoRoles = true;
       } else if (enable && !role && guild.settings.autoRoles.length === 0) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_auto_assign_roles').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_auto_assign_roles').setLabel('ï¿½ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('You must map a target `role` when attempting to boot up an empty assignment array framework.')], components: [row] });
       } else if (!enable) {
         guild.settings.modules.autoRoles = false;
@@ -70,17 +69,17 @@ module.exports = {
         embed.addFields({ name: '??? Active Vectors', value: mapping, inline: true });
       }
 
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_auto_assign_roles').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_auto_assign_roles').setLabel('ï¿½ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
     } catch (error) {
       console.error('Auto Assign Roles Error:', error);
       const errEmbed = createErrorEmbed('A database configuration error blocked manipulating role-binding algorithms.');
       if (interaction.deferred || interaction.replied) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_auto_assign_roles').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [errEmbed], components: [row] });
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_auto_assign_roles').setLabel('ï¿½ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await return await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {
-        await interaction.reply({ embeds: [errEmbed], ephemeral: true });
+        await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
       }
     }
   }

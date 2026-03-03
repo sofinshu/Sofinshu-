@@ -28,7 +28,7 @@ module.exports = {
       return d >= today && a.type === 'command';
     }).length;
 
-    const bar = '¦'.repeat(Math.round(parseFloat(engagementRate) / 10)) + '¦'.repeat(10 - Math.round(parseFloat(engagementRate) / 10));
+    const bar = 'ï¿½'.repeat(Math.round(parseFloat(engagementRate) / 10)) + 'ï¿½'.repeat(10 - Math.round(parseFloat(engagementRate) / 10));
 
     const embed = createEnterpriseEmbed()
       .setTitle('?? Engagement Summary')
@@ -46,7 +46,7 @@ module.exports = {
       
       ;
 
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_engagement_summary').setLabel('ðŸ„ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_engagement_summary').setLabel('ï¿½ï¿½ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };

@@ -1,13 +1,12 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createPremiumEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
-const { createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
+const { createCustomEmbed, createErrorEmbed, createPremiumEmbed, createSuccessEmbed } = require('../../utils/embeds');
 const { validatePremiumLicense } = require('../../utils/premium_guard');
 const { Activity } = require('../../database/mongo');
 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('moderation_chart')
-    .setDescription('Zenith Apex: Macroscopic Threat Curves & Security Analytics')
+    .setDescription('Enterprise Apex: Macroscopic Threat Curves & Security Analytics')
     .addStringOption(option =>
       option.setName('period')
         .setDescription('Time period')
@@ -21,10 +20,10 @@ module.exports = {
     try {
       await interaction.deferReply();
 
-      // Zenith License Guard
+      // Enterprise License Guard
       const license = await validatePremiumLicense(interaction);
       if (!license.allowed) {
-        return interaction.editReply({ embeds: [license.embed], components: license.components });
+        return return await interaction.editReply({ embeds: [license.embed], components: license.components });
       }
 
       const period = interaction.options.getString('period') || 'week';
@@ -73,13 +72,13 @@ module.exports = {
       // 1. Generate Macroscopic Threat Curve (ASCII-style pulse)
       const pulseSegments = 10;
       const threatDensity = Math.min(pulseSegments, Math.ceil((total / (period === 'today' ? 10 : 50)) * pulseSegments));
-      const pulse = '¦'.repeat(threatDensity) + '¦'.repeat(pulseSegments - threatDensity);
+      const pulse = 'ï¿½'.repeat(threatDensity) + 'ï¿½'.repeat(pulseSegments - threatDensity);
       const threatCurve = `\`[${pulse}]\` **${total > 20 ? '?? HIGH PULSE' : '?? STABLE'}**`;
 
       const embed = await createCustomEmbed(interaction, {
-        title: '?? Zenith Guardian: Macroscopic Threat Curves',
+        title: '?? Enterprise Guardian: Macroscopic Threat Curves',
         thumbnail: interaction.guild.iconURL({ dynamic: true }),
-        description: `### ??? Sector Incident Intelligence\nHigh-fidelity trace of security interventions and system events for **${interaction.guild.name}**. Monitoring metabolic threat vectors.\n\n**?? ZENITH APEX EXCLUSIVE**`,
+        description: `### ??? Sector Incident Intelligence\nHigh-fidelity trace of security interventions and system events for **${interaction.guild.name}**. Monitoring metabolic threat vectors.\n\n**?? Enterprise APEX EXCLUSIVE**`,
         fields: [
           { name: '??? Macroscopic Threat Pulse', value: threatCurve, inline: false },
           { name: '?? Disciplinary (Warn)', value: `\`${stats.warn}\``, inline: true },
@@ -89,15 +88,15 @@ module.exports = {
           { name: '?? Infractions', value: `\`${stats.strike}\``, inline: true },
           { name: '??? Shield Status', value: '`ACTIVE`', inline: true }
         ],
-        footer: 'Guardian Intelligence Pulse • V4 Guardian Apex Suite',
+        footer: 'Guardian Intelligence Pulse ï¿½ V4 Guardian Apex Suite',
         color: total > 10 ? 'premium' : 'success'
       });
 
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v4_moderation_chart').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v4_moderation_chart').setLabel('ï¿½ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
     } catch (error) {
-      console.error('Zenith Moderation Chart Error:', error);
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v4_moderation_chart').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+      console.error('Enterprise Moderation Chart Error:', error);
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v4_moderation_chart').setLabel('ï¿½ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('Guardian Analytics failure: Unable to establish macroscopic threat curves.')], components: [row] });
     }
   }

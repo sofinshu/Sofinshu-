@@ -1,6 +1,5 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createPremiumEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
-const { createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
+const { createCustomEmbed, createErrorEmbed, createPremiumEmbed, createSuccessEmbed } = require('../../utils/embeds');
 const { Activity } = require('../../database/mongo');
 
 module.exports = {
@@ -40,7 +39,7 @@ module.exports = {
       const maxVal = Math.max(...chartData.map(([, d]) => d.total), 1);
       const chart = chartData.map(([date, d]) => {
         const barLen = Math.min(10, Math.floor((d.total / maxVal) * 10));
-        const bar = '¦'.repeat(barLen) + '¦'.repeat(10 - barLen);
+        const bar = 'ï¿½'.repeat(barLen) + 'ï¿½'.repeat(10 - barLen);
         const dayLabel = new Date(date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
         return `\`${dayLabel}\` ${bar} **${d.total}**`;
       }).join('\n');
@@ -58,16 +57,16 @@ module.exports = {
           { name: '? Total Pings', value: `\`${totalCommands.toLocaleString()}\` Cmds`, inline: true },
           { name: '?? Capture Vector', value: `\`${days} Days\``, inline: true }
         ],
-        footer: 'Strategic Engagement Modeling • V5 Executive Suite',
+        footer: 'Strategic Engagement Modeling ï¿½ V5 Executive Suite',
         color: 'enterprise'
       });
 
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_engagement_chart').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_engagement_chart').setLabel('ï¿½ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
     } catch (error) {
       console.error('Engagement Chart Error:', error);
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_engagement_chart').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_engagement_chart').setLabel('ï¿½ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('Engagement Intelligence failure: Unable to decode metabolic throughput charts.')], components: [row] });
     }
   }

@@ -1,6 +1,5 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createPremiumEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
-const { createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
+const { createCustomEmbed, createErrorEmbed, createPremiumEmbed, createSuccessEmbed } = require('../../utils/embeds');
 const { User, Guild } = require('../../database/mongo');
 
 module.exports = {
@@ -20,7 +19,7 @@ module.exports = {
 
       let user = await User.findOne({ userId: targetUser.id, guildId }).lean();
       if (!user || !user.staff) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_reward_summary').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_reward_summary').setLabel('ï¿½ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed(`Unregistered Target\n <@${targetUser.id}> isn't mapped inside **${interaction.guild.name}** database clusters.`)], components: [row] });
       }
 
@@ -32,7 +31,7 @@ module.exports = {
       // Dynamic Database Tier Polling instead of legacy Hardcoded Limits
       const guild = await Guild.findOne({ guildId }).lean();
       if (!guild || !guild.promotionRequirements) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_reward_summary').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_reward_summary').setLabel('ï¿½ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed(`This server has no backend hierarchy thresholds setup. Admin must map limits via \`/promo_setup\`.`)], components: [row] });
       }
 
@@ -75,17 +74,17 @@ module.exports = {
         ]
       });
 
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_reward_summary').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_reward_summary').setLabel('ï¿½ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
     } catch (error) {
       console.error('Reward Summary Error:', error);
       const errEmbed = createErrorEmbed('A database tracking error occurred generating hierarchical yield states.');
       if (interaction.deferred || interaction.replied) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_reward_summary').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [errEmbed], components: [row] });
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_reward_summary').setLabel('ï¿½ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await return await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {
-        await interaction.reply({ embeds: [errEmbed], ephemeral: true });
+        await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
       }
     }
   }
@@ -93,12 +92,12 @@ module.exports = {
 
 function generateProgressBar(points, nextTierPoints) {
   const total = 20;
-  if (!nextTierPoints || nextTierPoints === 0) return `\`¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦\` **LOCKED**`;
+  if (!nextTierPoints || nextTierPoints === 0) return `\`ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½\` **LOCKED**`;
 
   const progress = Math.min(total, Math.round((points / nextTierPoints) * total));
   let bar = '';
   for (let i = 0; i < total; i++) {
-    bar += i < progress ? '¦' : '¦';
+    bar += i < progress ? 'ï¿½' : 'ï¿½';
   }
   return `\`${bar}\` **${points} / ${nextTierPoints}**`;
 }

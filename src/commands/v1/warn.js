@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder } = require('discord.js');
-const { createCoolEmbed, createErrorEmbed, createCustomEmbed } = require('../../utils/embeds');
+const { createCoolEmbed, createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -83,7 +83,7 @@ module.exports = {
       if (interaction.deferred || interaction.replied) {
         await interaction.editReply({ embeds: [errEmbed] });
       } else {
-        await interaction.reply({ embeds: [errEmbed], ephemeral: true });
+        await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
       }
     }
   },
@@ -91,7 +91,7 @@ module.exports = {
   async handleQuickAction(interaction, client) {
     try {
       if (!interaction.member.permissions.has('ModerateMembers') && !interaction.member.permissions.has('ManageGuild')) {
-        return interaction.reply({ content: '❌ You don\'t have permission to perform moderation actions.', ephemeral: true });
+        return interaction.editReply({ content: '❌ You don\'t have permission to perform moderation actions.', ephemeral: true });
       }
 
       await interaction.deferReply({ ephemeral: true });

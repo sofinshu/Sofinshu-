@@ -5,7 +5,7 @@ const { User, Guild, Shift, Activity } = require('../../database/mongo');
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('promotion_predict')
-    .setDescription('Zenith Hyper-Apex: macroscopic Career Trajectory Mapping & Milestone Forecasting')
+    .setDescription('Enterprise Hyper-Apex: macroscopic Career Trajectory Mapping & Milestone Forecasting')
     .addUserOption(opt => opt.setName('user').setDescription('Personnel to model (Optional)').setRequired(false)),
 
   async execute(interaction) {
@@ -18,11 +18,11 @@ module.exports = {
       const guild = await Guild.findOne({ guildId: guildId }).lean();
 
       if (!userData || !userData.staff) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_promotion_predict').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_promotion_predict').setLabel('ï¿½ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed(`No staff records found for <@${targetUser.id}> in this sector.`)], components: [row] });
       }
       if (!guild || !guild.promotionRequirements) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_promotion_predict').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_promotion_predict').setLabel('ï¿½ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('No promotion requirements established in this sector.')], components: [row] });
       }
 
@@ -37,8 +37,8 @@ module.exports = {
       if (!nextRankName || !guild.promotionRequirements[nextRankName]) {
         return interaction.editReply({
           embeds: [await createCustomEmbed(interaction, {
-            title: `?? Zenith Hyper-Apex: Terminal Rank Achieved`,
-            description: `?? <@${targetUser.id}> has achieved the macroscopic peak rank of **${currentRank.toUpperCase()}**.\n\n**?? ZENITH HYPER-APEX EXCLUSIVE**`,
+            title: `?? Enterprise Hyper-Apex: Terminal Rank Achieved`,
+            description: `?? <@${targetUser.id}> has achieved the macroscopic peak rank of **${currentRank.toUpperCase()}**.\n\n**?? Enterprise HYPER-APEX EXCLUSIVE**`,
             thumbnail: targetUser.displayAvatarURL({ dynamic: true })
           })]
         });
@@ -54,32 +54,32 @@ module.exports = {
 
       // 2. Arrival Ribbon
       const barLength = 12;
-      const filled = '¦'.repeat(Math.round((pointsProgress / 100) * barLength));
-      const empty = '¦'.repeat(barLength - filled.length);
+      const filled = 'ï¿½'.repeat(Math.round((pointsProgress / 100) * barLength));
+      const empty = 'ï¿½'.repeat(barLength - filled.length);
       const arrivalRibbon = `\`[${filled}${empty}]\` **${pointsProgress.toFixed(1)}% ELIGIBILITY**`;
 
       const embed = await createCustomEmbed(interaction, {
-        title: `?? Zenith Hyper-Apex: Career Trajectory`,
+        title: `?? Enterprise Hyper-Apex: Career Trajectory`,
         thumbnail: targetUser.displayAvatarURL({ dynamic: true }),
-        description: `### ??? Macroscopic Milestone Modeling\nAnalyzing career velocity and eligibility vectors for personnel **${targetUser.username}**.\n\n\`\`\`\n${map}\n\`\`\`\n**?? ZENITH HYPER-APEX EXCLUSIVE**`,
+        description: `### ??? Macroscopic Milestone Modeling\nAnalyzing career velocity and eligibility vectors for personnel **${targetUser.username}**.\n\n\`\`\`\n${map}\n\`\`\`\n**?? Enterprise HYPER-APEX EXCLUSIVE**`,
         fields: [
           { name: '??? Current Arrival Vector', value: arrivalRibbon, inline: false },
           { name: '?? Milestone Target', value: `\`${nextRankName.toUpperCase()}\``, inline: true },
           { name: '? Merit Gap', value: `\`${pointsNeeded.toLocaleString()}\` pts`, inline: true },
           { name: '?? Velocity Sync', value: '`CONNECTED`', inline: true },
-          { name: '?? Data Fidelity', value: '`99.8% [ZENITH-AI]`', inline: true },
+          { name: '?? Data Fidelity', value: '`99.8% [Enterprise-AI]`', inline: true },
           { name: '? Intelligence Tier', value: '`PLATINUM [HYPER-APEX]`', inline: true }
         ],
-        footer: 'Career Trajectory Modeling • V2 Expansion Hyper-Apex Suite',
+        footer: 'Career Trajectory Modeling ï¿½ V2 Expansion Hyper-Apex Suite',
         color: 'premium'
       });
 
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_promotion_predict').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_promotion_predict').setLabel('ï¿½ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
     } catch (error) {
-      console.error('Zenith Promotion Predict Error:', error);
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_promotion_predict').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+      console.error('Enterprise Promotion Predict Error:', error);
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_promotion_predict').setLabel('ï¿½ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('Career Modeling failure: Unable to synchronized promotion trajectories.')], components: [row] });
     }
   }

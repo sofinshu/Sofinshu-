@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType } = require('discord.js');
-const { createCoolEmbed, createErrorEmbed, createCustomEmbed } = require('../../utils/embeds');
+const { createCoolEmbed, createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { Shift } = require('../../database/mongo');
 
 module.exports = {
@@ -144,7 +144,7 @@ module.exports = {
             if (interaction.deferred || interaction.replied) {
                 await interaction.editReply({ embeds: [errEmbed] });
             } else {
-                await interaction.reply({ embeds: [errEmbed], ephemeral: true });
+                await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
             }
         }
     }

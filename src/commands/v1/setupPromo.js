@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, PermissionFlagsBits, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createSuccessEmbed, createErrorEmbed, createCustomEmbed } = require('../../utils/embeds');
+const { createCustomEmbed, createErrorEmbed, createSuccessEmbed } = require('../../utils/embeds');
 const { Guild } = require('../../database/mongo');
 
 module.exports = {
@@ -16,7 +16,7 @@ module.exports = {
   async execute(interaction) {
     try {
       if (!interaction.member.permissions.has('ManageGuild')) {
-        return interaction.reply({ embeds: [createErrorEmbed('You need Manage Server permission!')], ephemeral: true });
+        return interaction.editReply({ embeds: [createErrorEmbed('You need Manage Server permission!')], ephemeral: true });
       }
 
       await interaction.deferReply({ ephemeral: true });
@@ -80,9 +80,9 @@ module.exports = {
       const errEmbed = createErrorEmbed('An error occurred during promotion setup.');
       if (interaction.deferred || interaction.replied) {
         const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_setupPromo').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
-        await interaction.editReply({ embeds: [errEmbed], components: [row] });
+        await return await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {
-        await interaction.reply({ embeds: [errEmbed], ephemeral: true });
+        await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
       }
     }
   }

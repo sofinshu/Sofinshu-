@@ -67,7 +67,7 @@ const CATEGORIES = {
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('help')
-    .setDescription('?? Interactive command directory — browse all available features')
+    .setDescription('?? Interactive command directory ï¿½ browse all available features')
     .addStringOption(opt =>
       opt.setName('command')
         .setDescription('Get details for a specific command')
@@ -82,8 +82,8 @@ module.exports = {
       if (commandName) {
         const embed = createTierEmbed('free', {
           title: `Help: /${commandName}`,
-          description: `Showing details for the \`${commandName}\` command.\nSome features require a higher license tier — use \`/buy\` to upgrade.`,
-          footer: 'uwu-chan • Type /help to see all categories'
+          description: `Showing details for the \`${commandName}\` command.\nSome features require a higher license tier ï¿½ use \`/buy\` to upgrade.`,
+          footer: 'uwu-chan ï¿½ Type /help to see all categories'
         });
         return interaction.editReply({ embeds: [embed], ephemeral: true });
       }
@@ -151,7 +151,7 @@ async function buildCategoryEmbed(interaction, categoryKey) {
   const cat = CATEGORIES[categoryKey] || CATEGORIES.general;
 
   const commandList = cat.commands
-    .map(c => `**${c.name}** — ${c.desc}`)
+    .map(c => `**${c.name}** ï¿½ ${c.desc}`)
     .join('\n');
 
   return createCustomEmbed(interaction, {
@@ -162,7 +162,7 @@ async function buildCategoryEmbed(interaction, categoryKey) {
       { name: '?? Commands Available', value: `\`${cat.commands.length}\` in this category`, inline: true },
       { name: '?? Total Categories', value: `\`${Object.keys(CATEGORIES).length}\` categories`, inline: true }
     ],
-    footer: `uwu-chan Help • Use /buy to unlock Premium & Enterprise`,
+    footer: `uwu-chan Help ï¿½ Use /buy to unlock Premium & Enterprise`,
     color: 'primary'
   });
 }

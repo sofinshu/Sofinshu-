@@ -1,22 +1,21 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createPremiumEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
-const { createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
+const { createCustomEmbed, createErrorEmbed, createPremiumEmbed, createSuccessEmbed } = require('../../utils/embeds');
 const { validatePremiumLicense } = require('../../utils/premium_guard');
 const { Activity, User } = require('../../database/mongo');
 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('staff_productivity')
-    .setDescription('Zenith Comparative: Personnel Productivity Correlation Matrix'),
+    .setDescription('Enterprise Comparative: Personnel Productivity Correlation Matrix'),
 
   async execute(interaction) {
     try {
       await interaction.deferReply();
 
-      // Strict Zenith License Guard
+      // Strict Enterprise License Guard
       const license = await validatePremiumLicense(interaction);
       if (!license.allowed) {
-        return interaction.editReply({ embeds: [license.embed], components: license.components });
+        return return await interaction.editReply({ embeds: [license.embed], components: license.components });
       }
 
       const guildId = interaction.guildId;
@@ -32,9 +31,9 @@ module.exports = {
       const avgSignalsPerStaff = staffCount > 0 ? (totalSignals / staffCount).toFixed(1) : 0;
 
       const embed = await createCustomEmbed(interaction, {
-        title: '?? Zenith Personnel Yield Correlation',
+        title: '?? Enterprise Personnel Yield Correlation',
         thumbnail: interaction.guild.iconURL({ dynamic: true }),
-        description: `### ??? Macroscopic Productivity Audit\nHigh-fidelity correlation between workforce density and operational throughput for **${interaction.guild.name}**.\n\n**?? ZENITH BUYER EXCLUSIVE**`,
+        description: `### ??? Macroscopic Productivity Audit\nHigh-fidelity correlation between workforce density and operational throughput for **${interaction.guild.name}**.\n\n**?? Enterprise BUYER EXCLUSIVE**`,
         fields: [
           { name: '?? Active Workforce', value: `\`${staffCount}\` Nodes`, inline: true },
           { name: '?? Signal Throughput', value: `\`${totalSignals.toLocaleString()}\``, inline: true },
@@ -43,16 +42,16 @@ module.exports = {
           { name: '? Velocity', value: '`CONSTANT`', inline: true },
           { name: '??? License', value: '`PLATINUM`', inline: true }
         ],
-        footer: 'Strategic Yield Correlation • V5 Executive Suite',
+        footer: 'Strategic Yield Correlation ï¿½ V5 Executive Suite',
         color: 'premium'
       });
 
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_staff_productivity').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_staff_productivity').setLabel('ï¿½ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
     } catch (error) {
-      console.error('Zenith Productivity Error:', error);
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_staff_productivity').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+      console.error('Enterprise Productivity Error:', error);
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_staff_productivity').setLabel('ï¿½ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('Yield Correlation failure: Unable to decode personnel efficiency clusters.')], components: [row] });
     }
   }

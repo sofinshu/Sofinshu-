@@ -44,7 +44,7 @@ module.exports = {
           { name: '?? Ended At', value: `<t:${Math.floor(Date.now() / 1000)}:f>`, inline: true }
         ],
         color: 'success',
-        footer: 'uwu-chan • Keep up the great work!'
+        footer: 'uwu-chan ï¿½ Keep up the great work!'
       });
 
       await interaction.editReply({ embeds: [embed] });
@@ -54,7 +54,7 @@ module.exports = {
       if (interaction.deferred || interaction.replied) {
         await interaction.editReply({ embeds: [errEmbed] });
       } else {
-        await interaction.reply({ embeds: [errEmbed], ephemeral: true });
+        await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
       }
     }
   },

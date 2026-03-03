@@ -1,13 +1,12 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createPremiumEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
-const { createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
+const { createCustomEmbed, createErrorEmbed, createPremiumEmbed, createSuccessEmbed } = require('../../utils/embeds');
 const { validatePremiumLicense } = require('../../utils/premium_guard');
 const { User, Activity } = require('../../database/mongo');
 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('efficiency_chart')
-    .setDescription('Zenith Apex: High-Fidelity Spectral Performance Analysis')
+    .setDescription('Enterprise Apex: High-Fidelity Spectral Performance Analysis')
     .addUserOption(option =>
       option.setName('user')
         .setDescription('User to view efficiency for')
@@ -25,10 +24,10 @@ module.exports = {
     try {
       await interaction.deferReply();
 
-      // Zenith License Guard
+      // Enterprise License Guard
       const license = await validatePremiumLicense(interaction);
       if (!license.allowed) {
-        return interaction.editReply({ embeds: [license.embed], components: license.components });
+        return return await interaction.editReply({ embeds: [license.embed], components: license.components });
       }
 
       const targetUser = interaction.options.getUser('user') || interaction.user;
@@ -44,7 +43,7 @@ module.exports = {
       ]);
 
       if (!user || !user.staff) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_efficiency_chart').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_efficiency_chart').setLabel('ï¿½ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed(`No analytics found. <@${targetUser.id}> is unmapped in this sector.`)], components: [row] });
       }
 
@@ -57,9 +56,9 @@ module.exports = {
       const spectralGauge = generateSpectralGauge(efficiencyScore);
 
       const embed = await createCustomEmbed(interaction, {
-        title: `?? Zenith Spectral Yield: ${targetUser.username}`,
+        title: `?? Enterprise Spectral Yield: ${targetUser.username}`,
         thumbnail: targetUser.displayAvatarURL({ dynamic: true }),
-        description: `### ??? Apex Performance Audit\nMacroscopic trace of personnel execution gathered over a **${period}-day** trajectory. High-fidelity spectral visualization of behavioral metabolism.\n\n**?? ZENITH APEX EXCLUSIVE**`,
+        description: `### ??? Apex Performance Audit\nMacroscopic trace of personnel execution gathered over a **${period}-day** trajectory. High-fidelity spectral visualization of behavioral metabolism.\n\n**?? Enterprise APEX EXCLUSIVE**`,
         fields: [
           { name: '? Spectral Efficiency Ribbon', value: spectralGauge, inline: false },
           { name: '? Command Module', value: `\`${commands}\` Pings`, inline: true },
@@ -69,16 +68,16 @@ module.exports = {
           { name: '?? Honorific Rating', value: `\`Rank [${getGrade(efficiencyScore)}]\``, inline: true },
           { name: '?? Intelligence Tier', value: '`PLATINUM (APEX)`', inline: true }
         ],
-        footer: 'Spectral Yield Visualization • V3 Strategic Apex Suite',
+        footer: 'Spectral Yield Visualization ï¿½ V3 Strategic Apex Suite',
         color: efficiencyScore >= 80 ? 'success' : 'premium'
       });
 
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_efficiency_chart').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_efficiency_chart').setLabel('ï¿½ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
     } catch (error) {
-      console.error('Zenith Efficiency Chart Error:', error);
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_efficiency_chart').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+      console.error('Enterprise Efficiency Chart Error:', error);
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_efficiency_chart').setLabel('ï¿½ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('Efficiency Analytics failure: Unable to synchronize spectral ribbons.')], components: [row] });
     }
   }
@@ -96,8 +95,8 @@ function calculateEfficiency(commands, warnings, messages, consistency) {
 function generateSpectralGauge(score) {
   const length = 15;
   const filledLength = Math.round((score / 100) * length);
-  const filled = '¦'.repeat(filledLength);
-  const pattern = '¦'.repeat(Math.max(0, length - filledLength));
+  const filled = 'ï¿½'.repeat(filledLength);
+  const pattern = 'ï¿½'.repeat(Math.max(0, length - filledLength));
   return `\`[${filled}${pattern}]\` **${score}% VELOCITY**`;
 }
 

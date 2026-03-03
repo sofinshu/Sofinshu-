@@ -1,13 +1,12 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createEnterpriseEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
-const { createCustomEmbed, createErrorEmbed, createProgressBar } = require('../../utils/embeds');
+const { createCustomEmbed, createEnterpriseEmbed, createErrorEmbed, createProgressBar, createSuccessEmbed } = require('../../utils/embeds');
 const { validatePremiumLicense } = require('../../utils/premium_guard');
 const { User, Shift } = require('../../database/mongo');
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('passport')
-        .setDescription('💎 Enterprise Divine Identity Passport — complete holographic staff profile with real shift history')
+        .setDescription('👑 Enterprise Identity Passport — complete staff profile with real shift history')
         .addUserOption(opt => opt.setName('user').setDescription('Staff member to view').setRequired(false)),
 
     async execute(interaction) {
@@ -16,7 +15,7 @@ module.exports = {
 
             const license = await validatePremiumLicense(interaction);
             if (!license.allowed) {
-                return interaction.editReply({ embeds: [license.embed], components: license.components });
+                return await return await interaction.editReply({ embeds: [license.embed], components: license.components });
             }
 
             const target = interaction.options.getUser('user') || interaction.user;
@@ -29,8 +28,16 @@ module.exports = {
             ]);
 
             if (!user || !user.staff) {
-                const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_zenith_passport').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [createErrorEmbed(`No staff record found for <@${target.id}>. They must use the bot first.`)], components: [row] });
+                const row = new ActionRowBuilder().addComponents(
+                    new ButtonBuilder()
+                        .setCustomId('auto_ent_passport')
+                        .setLabel('🔄 Sync Enterprise Data')
+                        .setStyle(ButtonStyle.Secondary)
+                );
+                return await interaction.editReply({
+                    embeds: [createErrorEmbed(`No staff record found for <@${target.id}>. They must use the bot first.`)],
+                    components: [row]
+                });
             }
 
             const staff = user.staff;
@@ -72,7 +79,7 @@ module.exports = {
             const sectorStatus = tiers.map((t, i) => pts > i * 125 ? `\`✅${t}\`` : `\`❌${t}\``).join(' ');
 
             const embed = await createCustomEmbed(interaction, {
-                title: `💎 Enterprise Passport: ${target.username}`,
+                title: `👑 Enterprise Passport: ${target.username}`,
                 thumbnail: target.displayAvatarURL({ dynamic: true, size: 256 }),
                 description: `The definitive identity record for **${target.username}** in **${interaction.guild.name}**.\n\n${identityRibbon}\n\n**Sector Access:**\n${sectorStatus}`,
                 fields: [
@@ -88,18 +95,28 @@ module.exports = {
                 footer: `uwu-chan • Enterprise Passport • ID: ${target.id}`
             });
 
-            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_zenith_passport').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [embed], components: [row] });
+            const row = new ActionRowBuilder().addComponents(
+                new ButtonBuilder()
+                    .setCustomId('auto_ent_passport')
+                    .setLabel('🔄 Sync Enterprise Data')
+                    .setStyle(ButtonStyle.Secondary)
+            );
+            return await interaction.editReply({ embeds: [embed], components: [row] });
         } catch (error) {
-            console.error('[zenith_passport] Error:', error);
+            console.error('[Enterprise_passport] Error:', error);
             const errEmbed = createErrorEmbed('Failed to load Enterprise Passport.');
-            if (interaction.deferred || interaction.replied) const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_zenith_passport').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [errEmbed], components: [row] });
-            else await interaction.reply({ embeds: [errEmbed], ephemeral: true });
+            const row = new ActionRowBuilder().addComponents(
+                new ButtonBuilder()
+                    .setCustomId('auto_ent_passport')
+                    .setLabel('🔄 Sync Enterprise Data')
+                    .setStyle(ButtonStyle.Secondary)
+            );
+
+            if (interaction.deferred || interaction.replied) {
+                return await return await interaction.editReply({ embeds: [errEmbed], components: [row] });
+            } else {
+                return await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
+            }
         }
     }
 };
-
-
-
-

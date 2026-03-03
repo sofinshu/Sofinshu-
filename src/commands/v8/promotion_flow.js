@@ -1,6 +1,5 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType } = require('discord.js');
-const { createEnterpriseEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
-const { createCustomEmbed, createErrorEmbed, createProgressBar } = require('../../utils/embeds');
+const { createCustomEmbed, createEnterpriseEmbed, createErrorEmbed, createProgressBar, createSuccessEmbed } = require('../../utils/embeds');
 const { validatePremiumLicense } = require('../../utils/premium_guard');
 const { User, Guild, Shift, Warning } = require('../../database/mongo');
 
@@ -26,7 +25,7 @@ module.exports = {
 
       const license = await validatePremiumLicense(interaction);
       if (!license.allowed) {
-        return interaction.editReply({ embeds: [license.embed], components: license.components });
+        return return await interaction.editReply({ embeds: [license.embed], components: license.components });
       }
 
       const target = interaction.options.getUser('user') || interaction.user;
@@ -61,7 +60,7 @@ module.exports = {
         else if (isCurrentRank) symbol = '??';
         else symbol = '?';
 
-        const emoji = RANK_EMOJIS[rank] || '•';
+        const emoji = RANK_EMOJIS[rank] || 'ï¿½';
         const label = `${symbol} ${emoji} **${rank.toUpperCase()}**`;
 
         if (isPast || rank === 'member') return `${label}`;
@@ -108,7 +107,7 @@ module.exports = {
       }
 
       const embed = await createCustomEmbed(interaction, {
-        title: `?? Rank Progression — ${target.username}`,
+        title: `?? Rank Progression ï¿½ ${target.username}`,
         thumbnail: target.displayAvatarURL({ dynamic: true }),
         description: ladder.join('\n\n'),
         fields: [
@@ -119,7 +118,7 @@ module.exports = {
           }
         ],
         color: currentRank === 'admin' ? '#f1c40f' : '#5865F2',
-        footer: `uwu-chan • Promotion Flow • Auto-checks every 15min if automation is enabled`
+        footer: `uwu-chan ï¿½ Promotion Flow ï¿½ Auto-checks every 15min if automation is enabled`
       });
 
       const row = new ActionRowBuilder().addComponents(
@@ -138,7 +137,7 @@ module.exports = {
       console.error('[promotion_flow] Error:', error);
       const errEmbed = createErrorEmbed('Failed to load promotion flow.');
       if (interaction.deferred || interaction.replied) await interaction.editReply({ embeds: [errEmbed] });
-      else await interaction.reply({ embeds: [errEmbed], ephemeral: true });
+      else await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
     }
   }
 };

@@ -34,7 +34,7 @@ module.exports = {
     const uniqueStaff = [...new Set(shifts.map(s => s.userId))].length;
 
     // Completion bar
-    const bar = '¦'.repeat(Math.round(parseFloat(completionRate) / 10)) + '¦'.repeat(10 - Math.round(parseFloat(completionRate) / 10));
+    const bar = 'ï¿½'.repeat(Math.round(parseFloat(completionRate) / 10)) + 'ï¿½'.repeat(10 - Math.round(parseFloat(completionRate) / 10));
 
     const embed = createEnterpriseEmbed()
       .setTitle('? Task & Shift Insights')
@@ -53,7 +53,7 @@ module.exports = {
       
       ;
 
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_task_insights').setLabel('ðŸ„ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_task_insights').setLabel('ï¿½ï¿½ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };

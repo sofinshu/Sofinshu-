@@ -90,7 +90,7 @@ module.exports = {
             console.error('[profile_card] Error:', error);
             const errEmbed = createErrorEmbed('Failed to load profile card. Make sure the user has used the bot before.');
             if (interaction.deferred || interaction.replied) await interaction.editReply({ embeds: [errEmbed] });
-            else await interaction.reply({ embeds: [errEmbed], ephemeral: true });
+            else await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
         }
     }
 };

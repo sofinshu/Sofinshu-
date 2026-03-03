@@ -1,6 +1,5 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createEnterpriseEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
-const { createEnterpriseEmbed } = require('../../utils/embeds');
+const { createEnterpriseEmbed, createErrorEmbed, createSuccessEmbed } = require('../../utils/embeds');
 const { User } = require('../../database/mongo');
 
 module.exports = {
@@ -16,7 +15,7 @@ module.exports = {
     const medals = ['??', '??', '??'];
     const rows = users.map((u, i) => {
       const pts = u.staff?.points || 0;
-      const bar = '¦'.repeat(Math.round(pts / maxPts * 10)).padEnd(10, '¦');
+      const bar = 'ï¿½'.repeat(Math.round(pts / maxPts * 10)).padEnd(10, 'ï¿½');
       const medal = medals[i] || `\`${String(i + 1).padStart(2)}\``;
       return `${medal} **${u.username || '?'}** [${u.staff?.rank || '?'}] \`${bar}\` **${pts}**`;
     }).join('\n');
@@ -26,7 +25,7 @@ module.exports = {
       .setDescription(rows)
       
       ;
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_visual_leaderboard').setLabel('ðŸ„ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_visual_leaderboard').setLabel('ï¿½ï¿½ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };

@@ -63,7 +63,7 @@ module.exports = {
             if (interaction.deferred || interaction.replied) {
                 await interaction.editReply({ embeds: [errEmbed] });
             } else {
-                await interaction.reply({ embeds: [errEmbed], ephemeral: true });
+                await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
             }
         }
     }

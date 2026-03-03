@@ -25,14 +25,14 @@ module.exports = {
     const typeEmoji = { promotion: '??', warning: '??' };
     const logLines = events.map(e => {
       const ts = Math.floor(new Date(e.createdAt).getTime() / 1000);
-      return `${typeEmoji[e.type] || '??'} <@${e.userId}> — **${e.type}** — <t:${ts}:R>`;
+      return `${typeEmoji[e.type] || '??'} <@${e.userId}> ï¿½ **${e.type}** ï¿½ <t:${ts}:R>`;
     }).join('\n');
 
     const promotions = events.filter(e => e.type === 'promotion').length;
     const warnings = events.filter(e => e.type === 'warning').length;
 
     const embed = createEnterpriseEmbed()
-      .setTitle(`?? Notification Log — Last ${limit} Events`)
+      .setTitle(`?? Notification Log ï¿½ Last ${limit} Events`)
       
       .addFields(
         { name: '?? Promotions', value: promotions.toString(), inline: true },
@@ -42,7 +42,7 @@ module.exports = {
       
       ;
 
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_notification_log').setLabel('ðŸ„ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_notification_log').setLabel('ï¿½ï¿½ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };

@@ -13,8 +13,8 @@ const {
     TextInputBuilder,
     TextInputStyle,
     EmbedBuilder
-} = require('discord.js');
-const { createCustomEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
+, ActionRowBuilder , ButtonBuilder , ButtonStyle } = require('discord.js');
+const { createCustomEmbed, createErrorEmbed, createSuccessEmbed } = require('../../utils/embeds');
 
 // In-memory storage
 const activityHistory = new Map();

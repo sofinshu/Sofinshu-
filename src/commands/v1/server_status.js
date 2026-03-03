@@ -72,9 +72,9 @@ module.exports = {
                 new ButtonBuilder().setCustomId('auto_v1_server_status').setLabel('🔄 Refresh').setStyle(ButtonStyle.Secondary),
                 new ButtonBuilder().setLabel('📈 Analytics').setStyle(ButtonStyle.Primary).setCustomId('analytics_btn')
             );
-                await interaction.editReply({ embeds: [errEmbed], components: [row] });
+                await return await interaction.editReply({ embeds: [errEmbed], components: [row] });
             } else {
-                await interaction.reply({ embeds: [errEmbed], ephemeral: true });
+                await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
             }
         }
     }

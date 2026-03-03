@@ -5,7 +5,7 @@ const { Activity, Shift, User } = require('../../database/mongo');
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('progress_report')
-    .setDescription('Zenith Hyper-Apex: 7-Day Macroscopic Operational Yield'),
+    .setDescription('Enterprise Hyper-Apex: 7-Day Macroscopic Operational Yield'),
 
   async execute(interaction) {
     try {
@@ -22,7 +22,7 @@ module.exports = {
       ]);
 
       if (!userData || !userData.staff) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_progress_report').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_progress_report').setLabel('ï¿½ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed(`No telemetry found for <@${targetUser.id}>.`)], components: [row] });
       }
 
@@ -33,14 +33,14 @@ module.exports = {
 
       // Metabolic Pulse ASCII (Heartbeat)
       const pulseSegments = 15;
-      const pulseFilled = '¦'.repeat(Math.min(pulseSegments, Math.max(1, Math.round(ptsGainedLast7Days / 100))));
-      const pulseEmpty = '¦'.repeat(pulseSegments - pulseFilled.length);
+      const pulseFilled = 'ï¿½'.repeat(Math.min(pulseSegments, Math.max(1, Math.round(ptsGainedLast7Days / 100))));
+      const pulseEmpty = 'ï¿½'.repeat(pulseSegments - pulseFilled.length);
       const metabolicPulse = `\`[${pulseFilled}${pulseEmpty}]\` **${momentum}**`;
 
       const embed = await createCustomEmbed(interaction, {
-        title: `?? Zenith Hyper-Apex: Operational Yield`,
+        title: `?? Enterprise Hyper-Apex: Operational Yield`,
         thumbnail: targetUser.displayAvatarURL({ dynamic: true }),
-        description: `### ??? 7-Day Performance Analytic\nComprehensive yield for **${targetUser.username}** in the **${interaction.guild.name}** sector. Metabolic pulse synchronization active.\n\n**?? ZENITH HYPER-APEX EXCLUSIVE**`,
+        description: `### ??? 7-Day Performance Analytic\nComprehensive yield for **${targetUser.username}** in the **${interaction.guild.name}** sector. Metabolic pulse synchronization active.\n\n**?? Enterprise HYPER-APEX EXCLUSIVE**`,
         fields: [
           { name: '? Metabolic Pulse', value: metabolicPulse, inline: false },
           { name: '? Command Throughput', value: `\`${commandTasks.toLocaleString()}\` signals`, inline: true },
@@ -49,16 +49,16 @@ module.exports = {
           { name: '? Pulse Resonance', value: '`?? OPTIMAL`', inline: true },
           { name: '?? Global Benchmark', value: '`?? ELITE PERFORMANCE`', inline: true }
         ],
-        footer: 'Reports generated from 7d macroscopic telemetry • V2 Expansion Hyper-Apex',
+        footer: 'Reports generated from 7d macroscopic telemetry ï¿½ V2 Expansion Hyper-Apex',
         color: 'premium'
       });
 
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_progress_report').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_progress_report').setLabel('ï¿½ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
     } catch (error) {
       console.error('Progress Report Error:', error);
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_progress_report').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_progress_report').setLabel('ï¿½ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('Yield failure: Unable to synchronize macroscopic performance report.')], components: [row] });
     }
   }

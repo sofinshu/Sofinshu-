@@ -1,6 +1,6 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { Guild } = require('../../database/mongo');
 const { createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
+const { Guild } = require('../../database/mongo');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -13,13 +13,13 @@ module.exports = {
             const guild = await Guild.findOne({ guildId: interaction.guildId }).lean();
 
             if (!guild || !guild.promotionRequirements) {
-                const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_promo_list').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+                const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_promo_list').setLabel('ï¿½ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('This server has not configured any promotion requirements.')], components: [row] });
             }
 
             const ranks = Object.keys(guild.promotionRequirements);
             if (ranks.length === 0) {
-                const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_promo_list').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+                const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_promo_list').setLabel('ï¿½ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('No ranks are currently established in the database.')], components: [row] });
             }
 
@@ -52,17 +52,17 @@ module.exports = {
 
             embed.setFooter({ text: 'Advancement protocols are strictly enforced based on target fulfillment.' });
 
-            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_promo_list').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_promo_list').setLabel('ï¿½ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
         } catch (error) {
             console.error('Promo List Error:', error);
             const errEmbed = createErrorEmbed('An error occurred while fetching the promotion requirements list.');
             if (interaction.deferred || interaction.replied) {
-                const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_promo_list').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [errEmbed], components: [row] });
+                const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_promo_list').setLabel('ï¿½ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await return await interaction.editReply({ embeds: [errEmbed], components: [row] });
             } else {
-                await interaction.reply({ embeds: [errEmbed], ephemeral: true });
+                await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
             }
         }
     }

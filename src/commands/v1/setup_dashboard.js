@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, ActionRowBuilder, ChannelSelectMenuBuilder, RoleSelectMenuBuilder, ChannelType } = require('discord.js');
-const { createCoolEmbed, createErrorEmbed, createCustomEmbed } = require('../../utils/embeds');
+const { createCoolEmbed, createCustomEmbed, createErrorEmbed, createSuccessEmbed } = require('../../utils/embeds');
 const { Guild } = require('../../database/mongo');
 
 module.exports = {
@@ -69,7 +69,7 @@ module.exports = {
             if (interaction.deferred || interaction.replied) {
                 await interaction.editReply({ embeds: [errEmbed] });
             } else {
-                await interaction.reply({ embeds: [errEmbed], ephemeral: true });
+                await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
             }
         }
     },
@@ -96,11 +96,10 @@ module.exports = {
 
             await Guild.findOneAndUpdate({ guildId: interaction.guildId }, { $set: updateQuery }, { upsert: true });
 
-            const { createSuccessEmbed } = require('../../utils/embeds');
-            await interaction.reply({ embeds: [createSuccessEmbed('Configuration Updated', `✅ Successfully mapped **${settingName}** to <#${channelId}>.`)], ephemeral: true });
+            await interaction.editReply({ embeds: [createSuccessEmbed('Configuration Updated', `✅ Successfully mapped **${settingName}** to <#${channelId}>.`)], ephemeral: true });
         } catch (error) {
             console.error('Config Menu Error:', error);
-            await interaction.reply({ content: '❌ Failed to save configuration.', ephemeral: true });
+            await interaction.editReply({ content: '❌ Failed to save configuration.', ephemeral: true });
         }
     },
 
@@ -113,12 +112,11 @@ module.exports = {
             if (type === 'duty_role') {
                 await Guild.findOneAndUpdate({ guildId: interaction.guildId }, { $set: { 'settings.onDutyRole': roleId } }, { upsert: true });
 
-                const { createSuccessEmbed } = require('../../utils/embeds');
-                await interaction.reply({ embeds: [createSuccessEmbed('Configuration Updated', `✅ Successfully mapped **On Duty Role** to <@&${roleId}>.`)], ephemeral: true });
+                await interaction.editReply({ embeds: [createSuccessEmbed('Configuration Updated', `✅ Successfully mapped **On Duty Role** to <@&${roleId}>.`)], ephemeral: true });
             }
         } catch (error) {
             console.error('Config Menu Error:', error);
-            await interaction.reply({ content: '❌ Failed to save role configuration.', ephemeral: true });
+            await interaction.editReply({ content: '❌ Failed to save role configuration.', ephemeral: true });
         }
     }
 };

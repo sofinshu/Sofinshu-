@@ -1,6 +1,5 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createEnterpriseEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
-const { createEnterpriseEmbed } = require('../../utils/embeds');
+const { createEnterpriseEmbed, createErrorEmbed, createSuccessEmbed } = require('../../utils/embeds');
 const { User, Shift, Activity } = require('../../database/mongo');
 
 module.exports = {
@@ -26,10 +25,10 @@ module.exports = {
     const consistency = user?.staff?.consistency || 100;
     const completedShifts = shifts.filter(s => s.endTime).length;
     const totalShiftHrs = shifts.filter(s => s.endTime).reduce((sum, s) => sum + (s.duration || (new Date(s.endTime) - new Date(s.startTime)) / 3600000), 0);
-    const consBar = '¦'.repeat(Math.round(consistency / 10)) + '¦'.repeat(10 - Math.round(consistency / 10));
+    const consBar = 'ï¿½'.repeat(Math.round(consistency / 10)) + 'ï¿½'.repeat(10 - Math.round(consistency / 10));
 
     const embed = createEnterpriseEmbed()
-      .setTitle(`?? Interactive Summary — ${target.username}`)
+      .setTitle(`?? Interactive Summary ï¿½ ${target.username}`)
       
       .setThumbnail(target.displayAvatarURL())
       .addFields(
@@ -44,7 +43,7 @@ module.exports = {
       
       ;
 
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_interactive_summary').setLabel('ðŸ„ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_interactive_summary').setLabel('ï¿½ï¿½ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };

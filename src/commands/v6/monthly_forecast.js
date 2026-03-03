@@ -1,22 +1,21 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createEnterpriseEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
-const { createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
+const { createCustomEmbed, createEnterpriseEmbed, createErrorEmbed, createSuccessEmbed } = require('../../utils/embeds');
 const { validatePremiumLicense } = require('../../utils/premium_guard');
 const { Activity } = require('../../database/mongo');
 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('monthly_forecast')
-    .setDescription('Zenith Hyper-Apex: Macroscopic 30-Day Growth Trajectory & Metabolic Heatmaps'),
+    .setDescription('Enterprise Hyper-Apex: Macroscopic 30-Day Growth Trajectory & Metabolic Heatmaps'),
 
   async execute(interaction) {
     try {
       await interaction.deferReply();
 
-      // Zenith License Guard
+      // Enterprise License Guard
       const license = await validatePremiumLicense(interaction);
       if (!license.allowed) {
-        return interaction.editReply({ embeds: [license.embed], components: license.components });
+        return return await interaction.editReply({ embeds: [license.embed], components: license.components });
       }
 
       const guildId = interaction.guildId;
@@ -24,7 +23,7 @@ module.exports = {
       const activities = await Activity.find({ guildId, createdAt: { $gte: sixtyDaysAgo } }).lean();
 
       if (activities.length < 30) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_monthly_forecast').setLabel('ðŸ„ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_monthly_forecast').setLabel('ï¿½ï¿½ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('Insufficient historical telemetry signals (min 30 events) to generate a macroscopic 30-day trajectory.')], components: [row] });
       }
 
@@ -43,7 +42,7 @@ module.exports = {
 
       // 1. Growth Trajectory Wave (ASCII modeling)
       const trajectorySegments = 15;
-      const waveChars = [' ', '?', '?', '¦', '?', '?'];
+      const waveChars = [' ', '?', '?', 'ï¿½', '?', '?'];
       const trajectoryWave = Array.from({ length: trajectorySegments }, (_, i) => {
         const val = Math.sin((i / trajectorySegments) * Math.PI) * 4;
         return waveChars[Math.max(0, Math.min(5, Math.round(val + (growthFactor * 5))))];
@@ -55,35 +54,35 @@ module.exports = {
       const heatmap = Array.from({ length: 4 }, (_, row) => {
         return Array.from({ length: 8 }, () => {
           const val = Math.random() + (growthFactor * 0.5);
-          return val > 0.8 ? '¦' : (val > 0.5 ? '¦' : (val > 0.2 ? '¦' : '¦'));
+          return val > 0.8 ? 'ï¿½' : (val > 0.5 ? 'ï¿½' : (val > 0.2 ? 'ï¿½' : 'ï¿½'));
         }).join('');
       }).join('\n');
 
       const monthlyTotal = Math.round(recentAvg * 30);
 
       const embed = await createCustomEmbed(interaction, {
-        title: '?? Zenith Hyper-Apex: 30-Day Metabolic Forecast',
+        title: '?? Enterprise Hyper-Apex: 30-Day Metabolic Forecast',
         thumbnail: interaction.guild.iconURL({ dynamic: true }),
-        description: `### ?? Macroscopic Trajectory Modeling\nPredicting energy density and metabolic signal distribution for sector **${interaction.guild.name}**.\n\n**?? Signal Heatmap (30-Day Projection)**\n\`\`\`\n${heatmap}\`\`\`\n**?? ZENITH HYPER-APEX EXCLUSIVE**`,
+        description: `### ?? Macroscopic Trajectory Modeling\nPredicting energy density and metabolic signal distribution for sector **${interaction.guild.name}**.\n\n**?? Signal Heatmap (30-Day Projection)**\n\`\`\`\n${heatmap}\`\`\`\n**?? Enterprise HYPER-APEX EXCLUSIVE**`,
         fields: [
           { name: '? Growth Trajectory Wave', value: trajectoryRibbon, inline: false },
           { name: '?? Projected Capacity', value: `\`${monthlyTotal.toLocaleString()}\` signals`, inline: true },
           { name: '?? Baseline Sync', value: `\`${baselineAvg.toFixed(1)}\` sig/day`, inline: true },
           { name: '?? Current Pulse', value: `\`${recentAvg.toFixed(1)}\` sig/day`, inline: true },
-          { name: '? Model Integrity', value: '`99.9% [ZENITH-AI]`', inline: true },
+          { name: '? Model Integrity', value: '`99.9% [Enterprise-AI]`', inline: true },
           { name: '?? Omni-Sync', value: '`CONNECTED`', inline: true },
           { name: '?? Index Status', value: growthFactor > 0 ? '`?? EXPANDING`' : '`? STABLE`', inline: true }
         ],
-        footer: 'Metabolic Trajectory Modeling • V6 Enterprise Hyper-Apex Suite',
+        footer: 'Metabolic Trajectory Modeling ï¿½ V6 Enterprise Hyper-Apex Suite',
         color: 'premium'
       });
 
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_monthly_forecast').setLabel('ðŸ„ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_monthly_forecast').setLabel('ï¿½ï¿½ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
     } catch (error) {
-      console.error('Zenith Forecast Error:', error);
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_monthly_forecast').setLabel('ðŸ„ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+      console.error('Enterprise Forecast Error:', error);
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_monthly_forecast').setLabel('ï¿½ï¿½ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('Enterprise Intelligence failure: Unable to decode macroscopic metabolic waves.')], components: [row] });
     }
   }

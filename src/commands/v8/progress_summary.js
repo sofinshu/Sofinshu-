@@ -1,6 +1,5 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createEnterpriseEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
-const { createEnterpriseEmbed } = require('../../utils/embeds');
+const { createEnterpriseEmbed, createErrorEmbed, createSuccessEmbed } = require('../../utils/embeds');
 const { User, Shift } = require('../../database/mongo');
 
 module.exports = {
@@ -19,9 +18,9 @@ module.exports = {
     const rank = user?.staff?.rank || 'member';
     const consistency = user?.staff?.consistency || 100;
     const shiftHrs = shifts.reduce((s, sh) => s + (sh.duration || (new Date(sh.endTime) - new Date(sh.startTime)) / 3600000), 0);
-    const bar = (v, max, len = 10) => '¦'.repeat(Math.round(Math.min(v, max) / max * len)) + '¦'.repeat(len - Math.round(Math.min(v, max) / max * len));
+    const bar = (v, max, len = 10) => 'ï¿½'.repeat(Math.round(Math.min(v, max) / max * len)) + 'ï¿½'.repeat(len - Math.round(Math.min(v, max) / max * len));
     const embed = createEnterpriseEmbed()
-      .setTitle(`?? Progress Summary — ${target.username}`)
+      .setTitle(`?? Progress Summary ï¿½ ${target.username}`)
       
       .setThumbnail(target.displayAvatarURL())
       .addFields(
@@ -35,7 +34,7 @@ module.exports = {
       )
       
       ;
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_progress_summary').setLabel('ðŸ„ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_progress_summary').setLabel('ï¿½ï¿½ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };

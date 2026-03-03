@@ -54,7 +54,7 @@ module.exports = {
         
         ;
 
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v4_kick_user').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v4_kick_user').setLabel('ï¿½ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
       const logChannel = guild.channels.cache.find(c => 

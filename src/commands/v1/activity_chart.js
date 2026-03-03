@@ -1,12 +1,12 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
 const QuickChart = require('quickchart-js');
 const { Activity } = require('../../database/mongo');
-const { createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('activity_chart')
-        .setDescription('Zenith Hyper-Apex: Macroscopic Peak Intensity Ribbons & 7D Analytics'),
+        .setDescription('Enterprise Hyper-Apex: Macroscopic Peak Intensity Ribbons & 7D Analytics'),
 
     async execute(interaction) {
         try {
@@ -76,9 +76,9 @@ module.exports = {
             const chartUrl = await chart.getShortUrl();
 
             const embed = await createCustomEmbed(interaction, {
-                title: '📈 Zenith Hyper-Apex: Engagement Analytics',
+                title: '📈 Enterprise Hyper-Apex: Engagement Analytics',
                 thumbnail: interaction.guild.iconURL({ dynamic: true }),
-                description: `### 🚀 Macroscopic Signal Intensity\nHigh-fidelity telemetry showing sector activity thresholds over the trailing 7-day cycle.\n\n**💎 ZENITH HYPER-APEX EXCLUSIVE**`,
+                description: `### 🚀 Macroscopic Signal Intensity\nHigh-fidelity telemetry showing sector activity thresholds over the trailing 7-day cycle.\n\n**💎 Enterprise HYPER-APEX EXCLUSIVE**`,
                 fields: [
                     { name: '🔥 Peak Intensity Ribbon', value: peakIntensityRibbon, inline: false },
                     { name: '📊 Total Velocity', value: `\`${totalActivity.toLocaleString()}\` events`, inline: true },
@@ -95,7 +95,7 @@ module.exports = {
             const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_activity_chart').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
         } catch (error) {
-            console.error('Zenith Activity Chart Error:', error);
+            console.error('Enterprise Activity Chart Error:', error);
             const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_activity_chart').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('Engagement Analytics failure: Unable to synchronize signal intensity.')], components: [row] });
         }

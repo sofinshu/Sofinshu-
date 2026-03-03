@@ -1,6 +1,5 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createEnterpriseEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
-const { createEnterpriseEmbed } = require('../../utils/embeds');
+const { createEnterpriseEmbed, createErrorEmbed, createSuccessEmbed } = require('../../utils/embeds');
 const { Activity, Guild } = require('../../database/mongo');
 
 module.exports = {
@@ -22,7 +21,7 @@ module.exports = {
 
     const membersActive = [...new Set(weekActs.map(a => a.userId))].length;
     const engRate = Math.min(100, Math.round((membersActive / Math.max(interaction.guild.memberCount, 1)) * 100));
-    const engBar = '¦'.repeat(Math.round(engRate / 10)) + '¦'.repeat(10 - Math.round(engRate / 10));
+    const engBar = 'ï¿½'.repeat(Math.round(engRate / 10)) + 'ï¿½'.repeat(10 - Math.round(engRate / 10));
 
     const embed = createEnterpriseEmbed()
       .setTitle('?? Activity Summary Dashboard')
@@ -40,7 +39,7 @@ module.exports = {
       
       ;
 
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_activity_summary').setLabel('ðŸ„ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_activity_summary').setLabel('ï¿½ï¿½ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };

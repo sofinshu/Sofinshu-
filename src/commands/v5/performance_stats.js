@@ -1,6 +1,5 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createPremiumEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
-const { createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
+const { createCustomEmbed, createErrorEmbed, createPremiumEmbed, createSuccessEmbed } = require('../../utils/embeds');
 const { User } = require('../../database/mongo');
 
 module.exports = {
@@ -19,7 +18,7 @@ module.exports = {
       if (userId) {
         const user = await User.findOne({ userId, guildId }).lean();
         if (!user) {
-          const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_performance_stats').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+          const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_performance_stats').setLabel('ï¿½ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed(`No performance logs retrieved. <@${targetUser.id}> isn't mapped inside this server.`)], components: [row] });
         }
 
@@ -39,11 +38,11 @@ module.exports = {
             { name: '?? Peer Honor', value: `\`${staff.reputation || 0}\` Comms`, inline: true },
             { name: '?? Integrity Rating', value: '`?? OPTIMIZED` | `Executive V5 Standard`', inline: true }
           ],
-          footer: 'Personnel Yield Modeling • V5 Executive Suite',
+          footer: 'Personnel Yield Modeling ï¿½ V5 Executive Suite',
           color: 'premium'
         });
 
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_performance_stats').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_performance_stats').setLabel('ï¿½ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
       } else {
         const users = await User.find({ guildId, 'staff.points': { $exists: true } }).lean();
@@ -67,16 +66,16 @@ module.exports = {
             { name: '?? Mean Yield Consistency', value: `\`${avgConsistency.toFixed(1)}%\``, inline: true },
             { name: '?? Sector Tier', value: '`V5 EXECUTIVE (PLATINUM)`', inline: true }
           ],
-          footer: 'Macroscopic Sector Modeling • V5 Executive Suite',
+          footer: 'Macroscopic Sector Modeling ï¿½ V5 Executive Suite',
           color: 'enterprise'
         });
 
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_performance_stats').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_performance_stats').setLabel('ï¿½ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
       }
     } catch (error) {
       console.error('Performance Stats Error:', error);
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_performance_stats').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_performance_stats').setLabel('ï¿½ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('Yield Intelligence failure: Unable to decode personnel efficiency matrices.')], components: [row] });
     }
   }

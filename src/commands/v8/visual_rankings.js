@@ -1,6 +1,5 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createEnterpriseEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
-const { createEnterpriseEmbed } = require('../../utils/embeds');
+const { createEnterpriseEmbed, createErrorEmbed, createSuccessEmbed } = require('../../utils/embeds');
 const { User } = require('../../database/mongo');
 
 module.exports = {
@@ -21,8 +20,8 @@ module.exports = {
       rankGroups[r].push(u.username || 'Unknown');
     });
     const fields = RANK_ORDER.filter(r => rankGroups[r]?.length).map(r => ({
-      name: `${rankEmojis[r] || '??'} ${r.toUpperCase()} — ${rankGroups[r].length} member(s)`,
-      value: rankGroups[r].slice(0, 5).map(n => `• **${n}**`).join('\n') + (rankGroups[r].length > 5 ? `\n*+${rankGroups[r].length - 5} more*` : ''),
+      name: `${rankEmojis[r] || '??'} ${r.toUpperCase()} ï¿½ ${rankGroups[r].length} member(s)`,
+      value: rankGroups[r].slice(0, 5).map(n => `ï¿½ **${n}**`).join('\n') + (rankGroups[r].length > 5 ? `\n*+${rankGroups[r].length - 5} more*` : ''),
       inline: true
     }));
     const embed = createEnterpriseEmbed()
@@ -36,7 +35,7 @@ module.exports = {
       )
       
       ;
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_visual_rankings').setLabel('ðŸ„ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_visual_rankings').setLabel('ï¿½ï¿½ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };

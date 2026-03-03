@@ -1,22 +1,21 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createPremiumEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
-const { createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
+const { createCustomEmbed, createErrorEmbed, createPremiumEmbed, createSuccessEmbed } = require('../../utils/embeds');
 const { validatePremiumLicense } = require('../../utils/premium_guard');
 const { Activity, User } = require('../../database/mongo');
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('roi_calculator')
-        .setDescription('Zenith Hyper-Apex: Personnel Yield Analysis & Macroscopic ROI Modeling'),
+        .setDescription('Enterprise Hyper-Apex: Personnel Yield Analysis & Macroscopic ROI Modeling'),
 
     async execute(interaction) {
         try {
             await interaction.deferReply();
 
-            // Zenith Hyper-Apex License Guard
+            // Enterprise Hyper-Apex License Guard
             const license = await validatePremiumLicense(interaction);
             if (!license.allowed) {
-                return interaction.editReply({ embeds: [license.embed], components: license.components });
+                return return await interaction.editReply({ embeds: [license.embed], components: license.components });
             }
 
             const guildId = interaction.guildId;
@@ -35,9 +34,9 @@ module.exports = {
             const macroscopicROI = (yieldCoefficient / (burnRate / 10)).toFixed(2);
 
             const embed = await createCustomEmbed(interaction, {
-                title: '📊 Zenith Hyper-Apex: Personnel ROI Analyzer',
+                title: '📊 Enterprise Hyper-Apex: Personnel ROI Analyzer',
                 thumbnail: interaction.guild.iconURL({ dynamic: true }),
-                description: `### ⚖️ Macroscopic Yield Modeling\nAnalyzing personnel merit against infrastructure metabolic costs for the **${interaction.guild.name}** sector.\n\n**💎 ZENITH HYPER-APEX EXCLUSIVE**`,
+                description: `### ⚖️ Macroscopic Yield Modeling\nAnalyzing personnel merit against infrastructure metabolic costs for the **${interaction.guild.name}** sector.\n\n**💎 Enterprise HYPER-APEX EXCLUSIVE**`,
                 fields: [
                     { name: '💎 Personnel Yield Coefficient', value: `${generateYieldBar(Math.min(100, yieldCoefficient * 10))} **${yieldCoefficient}x**`, inline: false },
                     { name: '🔥 Infrastructure Signal Burn', value: `${generateYieldBar(burnRate * 3)} **${burnRate}%**`, inline: false },
@@ -50,12 +49,12 @@ module.exports = {
                 color: macroscopicROI > 1 ? 'success' : 'premium'
             });
 
-            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_roi_calculator').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_roi_calculator').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
         } catch (error) {
-            console.error('Zenith ROI Calculator Error:', error);
-            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_roi_calculator').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            console.error('Enterprise ROI Calculator Error:', error);
+            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_roi_calculator').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('ROI Matrix failure: Unable to model macroscopic personnel yield.')], components: [row] });
         }
     }

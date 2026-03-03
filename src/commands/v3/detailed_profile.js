@@ -1,13 +1,12 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createPremiumEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
-const { createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
+const { createCustomEmbed, createErrorEmbed, createPremiumEmbed, createSuccessEmbed } = require('../../utils/embeds');
 const { validatePremiumLicense } = require('../../utils/premium_guard');
 const { User, Activity, Shift } = require('../../database/mongo');
 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('detailed_profile')
-    .setDescription('Zenith Personnel Dossier: High-Fidelity identity verification')
+    .setDescription('Enterprise Personnel Dossier: High-Fidelity identity verification')
     .addUserOption(option =>
       option.setName('user')
         .setDescription('User to view profile for')
@@ -17,10 +16,10 @@ module.exports = {
     try {
       await interaction.deferReply();
 
-      // Strict Zenith License Guard
+      // Strict Enterprise License Guard
       const license = await validatePremiumLicense(interaction);
       if (!license.allowed) {
-        return interaction.editReply({ embeds: [license.embed], components: license.components });
+        return return await interaction.editReply({ embeds: [license.embed], components: license.components });
       }
 
       const targetUser = interaction.options.getUser('user') || interaction.user;
@@ -29,7 +28,7 @@ module.exports = {
       const user = await User.findOne({ userId: targetUser.id, guildId }).lean();
 
       if (!user || !user.staff) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_detailed_profile').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_detailed_profile').setLabel('ï¿½ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed(`No high-fidelity personnel records found for <@${targetUser.id}>.`)], components: [row] });
       }
 
@@ -44,11 +43,11 @@ module.exports = {
 
       const totalHours = shifts.reduce((acc, s) => acc + (s.duration || 0), 0) / 3600;
 
-      // Zenith Aesthetic: Custom Watermarked Profile
+      // Enterprise Aesthetic: Custom Watermarked Profile
       const embed = await createCustomEmbed(interaction, {
-        title: `??? Zenith Personnel Dossier: ${targetUser.username}`,
+        title: `??? Enterprise Personnel Dossier: ${targetUser.username}`,
         thumbnail: targetUser.displayAvatarURL({ dynamic: true }),
-        description: `### ?? Zenith Identity Authentication\nAuthenticated high-fidelity trace for **${targetUser.tag}**. Integrating V2 Ultra metrics and behavioral consistency mapping.\n\n**Verified Premium Operative**`,
+        description: `### ?? Enterprise Identity Authentication\nAuthenticated high-fidelity trace for **${targetUser.tag}**. Integrating V2 Ultra metrics and behavioral consistency mapping.\n\n**Verified Premium Operative**`,
         fields: [
           { name: '?? Operational Rank', value: `\`${staff.rank?.toUpperCase() || 'MEMBER'}\``, inline: true },
           { name: '? Mastery Level', value: `\`LVL ${staff.level || 1}\``, inline: true },
@@ -58,7 +57,7 @@ module.exports = {
           { name: '?? Peer Honorific', value: `\`${staff.honorific || 'COMMENDABLE'}\``, inline: true },
           { name: '??? Tactical Tagline', value: `*"${staff.tagline || 'Operational Personnel'}"*`, inline: false }
         ],
-        footer: 'Zenith Identity Matrix • V3 Strategic Executive Suite',
+        footer: 'Enterprise Identity Matrix ï¿½ V3 Strategic Executive Suite',
         color: 'enterprise'
       });
 
@@ -72,13 +71,13 @@ module.exports = {
         embed.addFields({ name: '?? Recent Ledger Footprints', value: activityList, inline: false });
       }
 
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_detailed_profile').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_detailed_profile').setLabel('ï¿½ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
     } catch (error) {
-      console.error('Zenith Detailed Profile Error:', error);
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_detailed_profile').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [createErrorEmbed('Zenith Identity failure: Unable to decode high-fidelity dossiers.')], components: [row] });
+      console.error('Enterprise Detailed Profile Error:', error);
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_detailed_profile').setLabel('ï¿½ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [createErrorEmbed('Enterprise Identity failure: Unable to decode high-fidelity dossiers.')], components: [row] });
     }
   }
 };

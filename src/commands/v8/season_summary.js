@@ -1,6 +1,5 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createEnterpriseEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
-const { createEnterpriseEmbed } = require('../../utils/embeds');
+const { createEnterpriseEmbed, createErrorEmbed, createSuccessEmbed } = require('../../utils/embeds');
 const { User, Activity } = require('../../database/mongo');
 
 module.exports = {
@@ -21,10 +20,10 @@ module.exports = {
     ]);
 
     const promotions = acts.filter(a => a.type === 'promotion').length;
-    const top = users.map((u, i) => `${['??', '??', '??'][i]} **${u.username || '?'}** — ${u.staff?.points || 0} pts`).join('\n');
+    const top = users.map((u, i) => `${['??', '??', '??'][i]} **${u.username || '?'}** ï¿½ ${u.staff?.points || 0} pts`).join('\n');
 
     const embed = createEnterpriseEmbed()
-      .setTitle(`${season} Season Summary — ${now.getFullYear()}`)
+      .setTitle(`${season} Season Summary ï¿½ ${now.getFullYear()}`)
       
       .addFields(
         { name: '?? Season', value: season, inline: true },
@@ -35,7 +34,7 @@ module.exports = {
       )
       
       ;
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_season_summary').setLabel('ðŸ„ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_season_summary').setLabel('ï¿½ï¿½ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };

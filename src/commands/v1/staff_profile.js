@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createCoolEmbed, createErrorEmbed, createCustomEmbed } = require('../../utils/embeds');
+const { createCoolEmbed, createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -32,8 +32,8 @@ module.exports = {
 
       const xpPercent = Math.min(100, Math.floor((xp / 1000) * 100));
       const barLength = 15;
-      const filled = '¦'.repeat(Math.round((xpPercent / 100) * barLength));
-      const empty = '¦'.repeat(barLength - filled.length);
+      const filled = 'ï¿½'.repeat(Math.round((xpPercent / 100) * barLength));
+      const empty = 'ï¿½'.repeat(barLength - filled.length);
       const resonanceRibbon = `\`[${filled}${empty}]\` **LVL ${level}**`;
 
       const meritDensity = (points / Math.max(1, level)).toFixed(1);
@@ -52,10 +52,10 @@ module.exports = {
       );
 
       const embed = await createCustomEmbed(interaction, {
-        title: `?? Zenith Hyper-Apex: Staff Dossier`,
+        title: `?? Enterprise Hyper-Apex: Staff Dossier`,
         thumbnail: user.displayAvatarURL({ dynamic: true }),
         image: chartUrl,
-        description: `### ??? Macroscopic Personnel Registry\nAuthenticated signal dossier for **${user.username}**. Resonance synchronization active.\n\n**?? ZENITH HYPER-APEX EXCLUSIVE**`,
+        description: `### ??? Macroscopic Personnel Registry\nAuthenticated signal dossier for **${user.username}**. Resonance synchronization active.\n\n**?? Enterprise HYPER-APEX EXCLUSIVE**`,
         fields: [
           { name: '?? Identity', value: `**Tag:** ${user.tag}\n**Nick:** ${member?.nickname || 'None'}`, inline: true },
           { name: '? Resonance Ribbon', value: resonanceRibbon, inline: false },
@@ -65,7 +65,7 @@ module.exports = {
           { name: '??? Achievements', value: trophyDisplay || 'None', inline: false },
           { name: '?? Omni-Bridge', value: '`SYNCHRONIZED`', inline: true }
         ],
-        footer: 'Blockchain-verified Operational Identity • V1 Foundation Hyper-Apex',
+        footer: 'Blockchain-verified Operational Identity ï¿½ V1 Foundation Hyper-Apex',
         color: 'premium'
       });
 
@@ -83,7 +83,7 @@ module.exports = {
       if (interaction.deferred || interaction.replied) {
         await interaction.editReply({ embeds: [errEmbed] });
       } else {
-        await interaction.reply({ embeds: [errEmbed], ephemeral: true });
+        await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
       }
     }
   },
@@ -111,7 +111,7 @@ module.exports = {
       });
 
       const buffer = Buffer.from(csvContent, 'utf-8');
-      const { AttachmentBuilder } = require('discord.js');
+      const { AttachmentBuilder , ActionRowBuilder , ButtonBuilder , ButtonStyle } = require('discord.js');
       const attachment = new AttachmentBuilder(buffer, { name: `staff_export_${requestedUserId}.csv` });
 
       await interaction.editReply({ content: '?? System Record Dump:', files: [attachment] });

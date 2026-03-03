@@ -1,6 +1,5 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createPremiumEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
-const { createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
+const { createCustomEmbed, createErrorEmbed, createPremiumEmbed, createSuccessEmbed } = require('../../utils/embeds');
 const { User, Activity, Shift } = require('../../database/mongo');
 
 module.exports = {
@@ -24,7 +23,7 @@ module.exports = {
       if (targetUser) {
         const user = await User.findOne({ userId: targetUser.id, guildId }).lean();
         if (!user || !user.staff) {
-          const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_staff_efficiency').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+          const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_staff_efficiency').setLabel('ï¿½ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed(`No performance logs retrieved. <@${targetUser.id}> isn't mapped inside this server.`)], components: [row] });
         }
 
@@ -47,8 +46,8 @@ module.exports = {
         const staff = user.staff || {};
         const efficiency = calculateEfficiency(commands, warnings, completedShifts, staff.consistency || 100);
         const bars = Math.round(efficiency / 10);
-        const barChar = '¦';
-        const emptyChar = '¦';
+        const barChar = 'ï¿½';
+        const emptyChar = 'ï¿½';
         const visual = `\`${barChar.repeat(bars)}${emptyChar.repeat(10 - bars)}\` **${efficiency}%**`;
 
         // Elite Grading System
@@ -69,11 +68,11 @@ module.exports = {
             { name: '?? Retention Yield', value: `\`${completedShifts}\` Patrols`, inline: true },
             { name: '? Level Clearance', value: `\`LVL ${staff.level || 1}\``, inline: true }
           ],
-          footer: 'Predictive Efficiency Modeling • V3 Strategic',
+          footer: 'Predictive Efficiency Modeling ï¿½ V3 Strategic',
           color: efficiency >= 80 ? 'success' : 'premium'
         });
 
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_staff_efficiency').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_staff_efficiency').setLabel('ï¿½ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
       } else {
@@ -84,7 +83,7 @@ module.exports = {
         }).lean();
 
         if (!users.length) {
-          const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_staff_efficiency').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+          const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_staff_efficiency').setLabel('ï¿½ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('No staff database queries detected mapped securely to this operational bounds.')], components: [row] });
         }
 
@@ -135,17 +134,17 @@ module.exports = {
             { name: '?? Model Operatives', value: rankStrings.join('\n') || '*No authenticated entries resolved.*', inline: false },
             { name: '?? Sector Baseline', value: `\`Relative Efficient Threshold: ${avgEfficiency}%\``, inline: false }
           ],
-          footer: 'Rankings authenticated against 30-day tracking vector • V3 Strategic',
+          footer: 'Rankings authenticated against 30-day tracking vector ï¿½ V3 Strategic',
           color: 'enterprise'
         });
 
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_staff_efficiency').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_staff_efficiency').setLabel('ï¿½ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
       }
 
     } catch (error) {
       console.error('Staff Efficiency Error:', error);
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_staff_efficiency').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_staff_efficiency').setLabel('ï¿½ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('Efficiency Matrix failure: Unable to decode server-wide performance comparisons.')], components: [row] });
     }
   }

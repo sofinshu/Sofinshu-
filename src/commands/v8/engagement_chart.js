@@ -1,6 +1,5 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createEnterpriseEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
-const { createEnterpriseEmbed } = require('../../utils/embeds');
+const { createEnterpriseEmbed, createErrorEmbed, createSuccessEmbed } = require('../../utils/embeds');
 const { Activity } = require('../../database/mongo');
 
 module.exports = {
@@ -22,7 +21,7 @@ module.exports = {
     }
     const max = Math.max(...weeks.map(w => w.count), 1);
     const chart = weeks.map(w => {
-      const bar = '¦'.repeat(Math.round((w.count / max) * 12)).padEnd(12, '¦');
+      const bar = 'ï¿½'.repeat(Math.round((w.count / max) * 12)).padEnd(12, 'ï¿½');
       return `${w.label}: ${bar} ${w.count}`;
     }).join('\n');
 
@@ -39,7 +38,7 @@ module.exports = {
       
       ;
 
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_engagement_chart').setLabel('ðŸ„ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_engagement_chart').setLabel('ï¿½ï¿½ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };

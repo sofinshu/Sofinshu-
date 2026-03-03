@@ -55,7 +55,7 @@ module.exports = {
           color: 'primary'
         });
 
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_task_assign').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_task_assign').setLabel('ï¿½ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
       }
 
@@ -63,7 +63,7 @@ module.exports = {
         const tasks = guildData.tasks.filter(t => t.status === 'pending');
 
         if (tasks.length === 0) {
-          const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_task_assign').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+          const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_task_assign').setLabel('ï¿½ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('Operational failure: No pending objectives detected within the current sector.')], components: [row] });
         }
 
@@ -77,7 +77,7 @@ module.exports = {
           color: 'premium'
         });
 
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_task_assign').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_task_assign').setLabel('ï¿½ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
       }
 
@@ -86,12 +86,12 @@ module.exports = {
         const task = guildData.tasks.find(t => t.id === taskId);
 
         if (!task) {
-          const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_task_assign').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+          const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_task_assign').setLabel('ï¿½ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed(`Search failed: No tactical requirement designated **#${taskId}** exists.`)], components: [row] });
         }
 
         if (task.status === 'completed') {
-          const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_task_assign').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+          const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_task_assign').setLabel('ï¿½ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed(`Audit failure: Objective **#${taskId}** is already marked as fulfilled.`)], components: [row] });
         }
 
@@ -105,7 +105,7 @@ module.exports = {
           color: 'success'
         });
 
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_task_assign').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_task_assign').setLabel('ï¿½ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
       }
 
@@ -113,10 +113,10 @@ module.exports = {
       console.error('Task Assign Error:', error);
       const errEmbed = createErrorEmbed('A database error occurred while modifying the assignment logs.');
       if (interaction.deferred || interaction.replied) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_task_assign').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [errEmbed], components: [row] });
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_task_assign').setLabel('ï¿½ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await return await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {
-        await interaction.reply({ embeds: [errEmbed], ephemeral: true });
+        await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
       }
     }
   }

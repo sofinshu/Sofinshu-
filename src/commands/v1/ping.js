@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, ButtonBuilder, ButtonStyle, ActionRowBuilder, ComponentType, EmbedBuilder } = require('discord.js');
-const { createCustomEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
+const { createCustomEmbed, createErrorEmbed, createSuccessEmbed } = require('../../utils/embeds');
 const os = require('os');
 
 module.exports = {
@@ -137,7 +137,7 @@ function generateStatsEmbed(client, message, interaction, isRefresh = false) {
       },
       {
         name: '🛠️ Environment',
-        value: `**Node.js:** \`${process.versions.node}\`\n**Discord.js:** \`${require('discord.js').version}\`\n**Platform:** \`${os.platform()}\``,
+        value: `**Node.js:** \`${process.versions.node, ActionRowBuilder , ButtonBuilder , ButtonStyle }\`\n**Discord.js:** \`${require('discord.js').version, ActionRowBuilder , ButtonBuilder , ButtonStyle }\`\n**Platform:** \`${os.platform(), ActionRowBuilder , ButtonBuilder , ButtonStyle }\``,
         inline: true
       }
     )

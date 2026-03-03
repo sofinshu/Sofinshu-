@@ -10,13 +10,13 @@ module.exports = {
     async execute(interaction, client) {
         try {
             if (!interaction.member.permissions.has('ModerateMembers') && !interaction.member.permissions.has('ManageGuild')) {
-                return interaction.reply({ embeds: [createErrorEmbed('You do not have permission to warn users.')], ephemeral: true });
+                return interaction.editReply({ embeds: [createErrorEmbed('You do not have permission to warn users.')], ephemeral: true });
             }
 
             const targetUser = interaction.targetUser;
 
             if (targetUser.id === interaction.user.id) {
-                return interaction.reply({ embeds: [createErrorEmbed('You cannot warn yourself.')], ephemeral: true });
+                return interaction.editReply({ embeds: [createErrorEmbed('You cannot warn yourself.')], ephemeral: true });
             }
 
             const modal = new ModalBuilder()
@@ -49,7 +49,7 @@ module.exports = {
             if (interaction.deferred || interaction.replied) {
                 await interaction.followUp({ content: '❌ Failed to open warn modal.', ephemeral: true });
             } else {
-                await interaction.reply({ content: '❌ Failed to open warn modal.', ephemeral: true });
+                await interaction.editReply({ content: '❌ Failed to open warn modal.', ephemeral: true });
             }
         }
     }

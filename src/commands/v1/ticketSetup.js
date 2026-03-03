@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, TextInputBuilder, TextInputStyle, ModalBuilder, PermissionFlagsBits } = require('discord.js');
-const { createCoolEmbed, createErrorEmbed, createSuccessEmbed, createCustomEmbed } = require('../../utils/embeds');
+const { createCoolEmbed, createCustomEmbed, createErrorEmbed, createSuccessEmbed } = require('../../utils/embeds');
 const { Ticket, Guild } = require('../../database/mongo');
 
 module.exports = {
@@ -515,7 +515,7 @@ module.exports.handleCloseTicket = async (interaction, client) => {
       color: 'dark'
     });
 
-    const { AttachmentBuilder } = require('discord.js');
+    const { AttachmentBuilder , ActionRowBuilder , ButtonBuilder , ButtonStyle } = require('discord.js');
     let transcriptContent = `Transcript for Ticket #${ticketNum}\nReported by: ${ticket.username}\nClosed by: ${interaction.user.tag}\n-----------------------------------\n\n`;
 
     ticket.messages.forEach(m => {

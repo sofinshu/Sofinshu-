@@ -1,6 +1,5 @@
-const { SlashCommandBuilder } = require('discord.js');
-const { createEnterpriseEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
-const { createCustomEmbed, createErrorEmbed, createProgressBar } = require('../../utils/embeds');
+const { SlashCommandBuilder , ActionRowBuilder , ButtonBuilder , ButtonStyle } = require('discord.js');
+const { createCustomEmbed, createEnterpriseEmbed, createErrorEmbed, createProgressBar, createSuccessEmbed } = require('../../utils/embeds');
 const { validatePremiumLicense } = require('../../utils/premium_guard');
 const { User, Warning } = require('../../database/mongo');
 
@@ -9,7 +8,7 @@ const REWARD_TIERS = [
   { threshold: 150, id: 'silver', label: '?? Silver', reward: 'Silver role + 25 bonus points', roleKey: 'silverRole' },
   { threshold: 300, id: 'gold', label: '?? Gold', reward: 'Gold role + 50 bonus points', roleKey: 'goldRole' },
   { threshold: 500, id: 'diamond', label: '?? Diamond', reward: 'Diamond role + Elite Badge', roleKey: 'diamondRole' },
-  { threshold: 1000, id: 'zenith', label: '?? Zenith Elite', reward: 'Zenith role + Permanent Legacy', roleKey: 'zenithRole' }
+  { threshold: 1000, id: 'Enterprise', label: '?? Enterprise Elite', reward: 'Enterprise role + Permanent Legacy', roleKey: 'EnterpriseRole' }
 ];
 
 module.exports = {
@@ -24,11 +23,10 @@ module.exports = {
 
       const license = await validatePremiumLicense(interaction);
       if (!license.allowed) {
-        return interaction.editReply({ embeds: [license.embed], components: license.components });
+        return return await interaction.editReply({ embeds: [license.embed], components: license.components });
       }
 
       const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createEnterpriseEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
       const target = interaction.options.getUser('user') || interaction.user;
       const user = await User.findOne({ userId: target.id, 'guilds.guildId': interaction.guildId }).lean();
       const points = user?.staff?.points || 0;
@@ -49,7 +47,7 @@ const { createEnterpriseEmbed, createSuccessEmbed, createErrorEmbed } = require(
       const allUnlocked = !nextTier;
       const trajectory = allUnlocked
         ? '?? All reward tiers unlocked! Maximum merit achieved.'
-        : `Next: **${nextTier.label}** — \`${nextTier.threshold - points}\` more points needed`;
+        : `Next: **${nextTier.label}** ï¿½ \`${nextTier.threshold - points}\` more points needed`;
 
       const embed = await createCustomEmbed(interaction, {
         title: `?? Merit Reward Tiers: ${target.username}`,
@@ -57,7 +55,7 @@ const { createEnterpriseEmbed, createSuccessEmbed, createErrorEmbed } = require(
         description: `**Current Merit:** \`${points.toLocaleString()} points\`\n\n${trajectory}`,
         fields: [...tierFields],
         color: 'enterprise',
-        footer: 'uwu-chan • Enterprise Auto-Rewards System'
+        footer: 'uwu-chan ï¿½ Enterprise Auto-Rewards System'
       });
 
       // Add claim button if next tier is achievable
@@ -81,7 +79,7 @@ const { createEnterpriseEmbed, createSuccessEmbed, createErrorEmbed } = require(
       console.error('[auto_rewards] Error:', error);
       const errEmbed = createErrorEmbed('Failed to load reward tiers.');
       if (interaction.deferred || interaction.replied) await interaction.editReply({ embeds: [errEmbed] });
-      else await interaction.reply({ embeds: [errEmbed], ephemeral: true });
+      else await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
     }
   }
 };

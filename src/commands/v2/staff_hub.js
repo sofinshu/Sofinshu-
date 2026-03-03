@@ -11,8 +11,8 @@ module.exports = {
             await interaction.deferReply({ ephemeral: true });
 
             const embed = await createCustomEmbed(interaction, {
-                title: '🕹️ Zenith Hyper-Apex: Strategic Control Center',
-                description: `### 🛡️ Authorized Access: ${interaction.user.username}\nWelcome to the unified terminal for **${interaction.guild.name}**. Select an operational module below to engage macroscopic telemetry.\n\n**💎 ZENITH HYPER-APEX EXCLUSIVE**`,
+                title: '🕹️ Enterprise Hyper-Apex: Strategic Control Center',
+                description: `### 🛡️ Authorized Access: ${interaction.user.username}\nWelcome to the unified terminal for **${interaction.guild.name}**. Select an operational module below to engage macroscopic telemetry.\n\n**💎 Enterprise HYPER-APEX EXCLUSIVE**`,
                 thumbnail: interaction.guild.iconURL({ dynamic: true }),
                 fields: [
                     { name: '📇 Identity Matrix', value: '`🟢 RESONANCE ACTIVE`', inline: true },

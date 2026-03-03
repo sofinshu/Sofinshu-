@@ -18,12 +18,12 @@ module.exports = {
     ]);
 
     const noNotesList = noNotes.slice(0, 5).map(s =>
-      `• <@${s.userId}> — <t:${Math.floor(new Date(s.startTime).getTime() / 1000)}:d> — No notes`
+      `ï¿½ <@${s.userId}> ï¿½ <t:${Math.floor(new Date(s.startTime).getTime() / 1000)}:d> ï¿½ No notes`
     ).join('\n') || '? All shifts have notes.';
 
     const stuckList = stuck.slice(0, 5).map(s => {
       const hrs = ((Date.now() - new Date(s.startTime).getTime()) / 3600000).toFixed(1);
-      return `• <@${s.userId}> — Open **${hrs}h**`;
+      return `ï¿½ <@${s.userId}> ï¿½ Open **${hrs}h**`;
     }).join('\n') || '? No stuck shifts.';
 
     const embed = createEnterpriseEmbed()
@@ -38,7 +38,7 @@ module.exports = {
       
       ;
 
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_task_alerts').setLabel('ðŸ„ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_task_alerts').setLabel('ï¿½ï¿½ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };

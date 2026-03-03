@@ -1,6 +1,5 @@
 const { SlashCommandBuilder, PermissionFlagsBits, AuditLogEvent, ComponentType, ButtonBuilder, ActionRowBuilder, ButtonStyle } = require('discord.js');
-const { createPremiumEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
-const { createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
+const { createCustomEmbed, createErrorEmbed, createPremiumEmbed, createSuccessEmbed } = require('../../utils/embeds');
 
 const ACTION_MAP = {
   all: null,
@@ -62,11 +61,11 @@ module.exports = {
           const target = e.target?.username ? `? **${e.target.username}**` : '';
           const reason = e.reason ? `*"${e.reason.substring(0, 40)}"*` : '';
           const timeAgo = `<t:${Math.floor(e.createdTimestamp / 1000)}:R>`;
-          return `${executor} ${target} — \`${e.actionType}\` ${timeAgo}${reason ? `\n> ${reason}` : ''}`;
+          return `${executor} ${target} ï¿½ \`${e.actionType}\` ${timeAgo}${reason ? `\n> ${reason}` : ''}`;
         });
 
         return createCustomEmbed(interaction, {
-          title: `?? Audit Logs — ${interaction.guild.name}`,
+          title: `?? Audit Logs ï¿½ ${interaction.guild.name}`,
           description: lines.join('\n\n') || '*No entries*',
           thumbnail: interaction.guild.iconURL({ dynamic: true }),
           fields: [
@@ -75,7 +74,7 @@ module.exports = {
             { name: '?? Page', value: `\`${p + 1} / ${totalPages}\``, inline: true }
           ],
           color: 'premium',
-          footer: 'uwu-chan • Real Discord Audit Log'
+          footer: 'uwu-chan ï¿½ Real Discord Audit Log'
         });
       };
 
@@ -109,7 +108,7 @@ module.exports = {
       console.error('[audit_logs] Error:', error);
       const errEmbed = createErrorEmbed('Failed to fetch audit logs. Check my permissions (`View Audit Log`).');
       if (interaction.deferred || interaction.replied) await interaction.editReply({ embeds: [errEmbed] });
-      else await interaction.reply({ embeds: [errEmbed], ephemeral: true });
+      else await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
     }
   }
 };

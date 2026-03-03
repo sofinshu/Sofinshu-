@@ -1,6 +1,5 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createPremiumEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
-const { createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
+const { createCustomEmbed, createErrorEmbed, createPremiumEmbed, createSuccessEmbed } = require('../../utils/embeds');
 const { User, Activity, Shift } = require('../../database/mongo');
 
 module.exports = {
@@ -20,7 +19,7 @@ module.exports = {
 
       const user = await User.findOne({ userId: targetUser.id, guildId }).lean();
       if (!user || !user.staff) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_performance_score').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_performance_score').setLabel('ï¿½ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed(`No staff records found for <@${targetUser.id}> inside this server.`)], components: [row] });
       }
 
@@ -53,7 +52,7 @@ module.exports = {
       const grade = getGrade(performanceScore);
 
       const filledScore = Math.min(10, Math.floor(performanceScore / 10));
-      const progressBar = `\`${'¦'.repeat(filledScore)}${'¦'.repeat(10 - filledScore)}\``;
+      const progressBar = `\`${'ï¿½'.repeat(filledScore)}${'ï¿½'.repeat(10 - filledScore)}\``;
 
       const embed = await createCustomEmbed(interaction, {
         title: `?? Operational Performance: ${targetUser.username}`,
@@ -71,17 +70,17 @@ module.exports = {
         footer: 'Analytic output derived against true Guild mapping constraints.'
       });
 
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_performance_score').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_performance_score').setLabel('ï¿½ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
     } catch (error) {
       console.error('Performance Score Error:', error);
       const errEmbed = createErrorEmbed('A database error occurred plotting performance trajectory charts.');
       if (interaction.deferred || interaction.replied) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_performance_score').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [errEmbed], components: [row] });
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_performance_score').setLabel('ï¿½ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await return await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {
-        await interaction.reply({ embeds: [errEmbed], ephemeral: true });
+        await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
       }
     }
   }

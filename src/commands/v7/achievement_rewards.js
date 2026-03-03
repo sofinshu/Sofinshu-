@@ -32,7 +32,7 @@ module.exports = {
     }));
 
     const embed = createEnterpriseEmbed()
-      .setTitle(`?? Achievement Rewards — ${target.username}`)
+      .setTitle(`?? Achievement Rewards ï¿½ ${target.username}`)
       
       .setThumbnail(target.displayAvatarURL())
       .addFields(
@@ -44,7 +44,7 @@ module.exports = {
       
       ;
 
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_achievement_rewards').setLabel('ðŸ„ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_achievement_rewards').setLabel('ï¿½ï¿½ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };

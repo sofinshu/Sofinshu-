@@ -1,22 +1,21 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createPremiumEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
-const { createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
+const { createCustomEmbed, createErrorEmbed, createPremiumEmbed, createSuccessEmbed } = require('../../utils/embeds');
 const { validatePremiumLicense } = require('../../utils/premium_guard');
 const { User, Activity } = require('../../database/mongo');
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('workforce_hub')
-        .setDescription('Zenith Hyper-Apex: Workforce Strategic Command Center'),
+        .setDescription('Enterprise Hyper-Apex: Workforce Strategic Command Center'),
 
     async execute(interaction) {
         try {
             await interaction.deferReply();
 
-            // Zenith Hyper-Apex License Guard
+            // Enterprise Hyper-Apex License Guard
             const license = await validatePremiumLicense(interaction);
             if (!license.allowed) {
-                return interaction.editReply({ embeds: [license.embed], components: license.components });
+                return return await interaction.editReply({ embeds: [license.embed], components: license.components });
             }
 
             const guildId = interaction.guildId;
@@ -37,9 +36,9 @@ module.exports = {
             const benchmarkRibbon = `\`[${filled}${empty}]\` **${sectorPerformance}% OF GLOBAL**`;
 
             const embed = await createCustomEmbed(interaction, {
-                title: '🏢 Zenith Hyper-Apex: Workforce Command Hub',
+                title: '🏢 Enterprise Hyper-Apex: Workforce Command Hub',
                 thumbnail: interaction.guild.iconURL({ dynamic: true }),
-                description: `### 🚀 Operational Control Center\nMacroscopic personnel management terminal for sector **${interaction.guild.name}**. Real-time industry benchmarks active.\n\n**💎 ZENITH HYPER-APEX EXCLUSIVE**`,
+                description: `### 🚀 Operational Control Center\nMacroscopic personnel management terminal for sector **${interaction.guild.name}**. Real-time industry benchmarks active.\n\n**💎 Enterprise HYPER-APEX EXCLUSIVE**`,
                 fields: [
                     { name: '🌐 Industry Benchmark', value: benchmarkRibbon, inline: false },
                     { name: '📉 Sector Pulse', value: `\`${(signals24h / 24).toFixed(1)}\` signals/hr`, inline: true },
@@ -52,12 +51,12 @@ module.exports = {
                 color: 'premium'
             });
 
-            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_workforce_hub').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_workforce_hub').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
         } catch (error) {
-            console.error('Zenith Workforce Hub Error:', error);
-            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_workforce_hub').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            console.error('Enterprise Workforce Hub Error:', error);
+            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_workforce_hub').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('Hub failure: Unable to synchronize workforce telemetry.')], components: [row] });
         }
     }

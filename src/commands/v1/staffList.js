@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType } = require('discord.js');
-const { createCoolEmbed, createErrorEmbed, createCustomEmbed } = require('../../utils/embeds');
+const { createCoolEmbed, createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { User } = require('../../database/mongo');
 
 module.exports = {
@@ -42,13 +42,13 @@ module.exports = {
         const list = staffPage.map((u, i) => {
           const rank = u.staff?.rank || 'trial';
           const points = u.staff?.points || 0;
-          return `\`${String(start + i + 1).padStart(2)}.\` **${u.username || 'Unknown'}** • \`${rank.toUpperCase()}\` • ${points} pts`;
+          return `\`${String(start + i + 1).padStart(2)}.\` **${u.username || 'Unknown'}** ï¿½ \`${rank.toUpperCase()}\` ï¿½ ${points} pts`;
         }).join('\n');
 
         return await createCustomEmbed(interaction, {
           title: `?? Server Staff Index (${users.length} Records)`,
           description: list || 'No staff identified within this sector.',
-          footer: `Page ${page} / ${totalPages} • Real-time database dump`
+          footer: `Page ${page} / ${totalPages} ï¿½ Real-time database dump`
         });
       };
 
@@ -107,7 +107,7 @@ module.exports = {
       if (interaction.deferred || interaction.replied) {
         await interaction.editReply({ embeds: [errEmbed] });
       } else {
-        await interaction.reply({ embeds: [errEmbed], ephemeral: true });
+        await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
       }
     }
   }

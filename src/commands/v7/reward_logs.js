@@ -23,7 +23,7 @@ module.exports = {
     const logLines = rewards.map((r, i) => {
       const ts = Math.floor(new Date(r.createdAt).getTime() / 1000);
       const pts = r.data?.bonusPoints || 'N/A';
-      return `\`${String(i + 1).padStart(2)}\` ?? <@${r.userId}> — +${pts} pts — <t:${ts}:R>`;
+      return `\`${String(i + 1).padStart(2)}\` ?? <@${r.userId}> ï¿½ +${pts} pts ï¿½ <t:${ts}:R>`;
     }).join('\n');
 
     const embed = createEnterpriseEmbed()
@@ -36,7 +36,7 @@ module.exports = {
       
       ;
 
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_reward_logs').setLabel('ðŸ„ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_reward_logs').setLabel('ï¿½ï¿½ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };

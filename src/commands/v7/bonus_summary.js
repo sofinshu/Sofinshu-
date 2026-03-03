@@ -31,11 +31,11 @@ module.exports = {
     const totalBonus = Object.values(bonusByUser).reduce((s, v) => s + v, 0);
 
     const leaderboard = sorted.map(([uid, pts], i) =>
-      `\`${String(i + 1).padStart(2)}\` <@${uid}> — **+${pts}** bonus pts`
+      `\`${String(i + 1).padStart(2)}\` <@${uid}> ï¿½ **+${pts}** bonus pts`
     ).join('\n');
 
     const embed = createEnterpriseEmbed()
-      .setTitle('?? Bonus Point Summary — This Month')
+      .setTitle('?? Bonus Point Summary ï¿½ This Month')
       
       .addFields(
         { name: '?? Total Bonus Events', value: bonusActivities.length.toString(), inline: true },
@@ -46,7 +46,7 @@ module.exports = {
       
       ;
 
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_bonus_summary').setLabel('ðŸ„ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_bonus_summary').setLabel('ï¿½ï¿½ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };

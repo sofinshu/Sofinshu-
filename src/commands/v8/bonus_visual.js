@@ -1,6 +1,5 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createEnterpriseEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
-const { createEnterpriseEmbed } = require('../../utils/embeds');
+const { createEnterpriseEmbed, createErrorEmbed, createSuccessEmbed } = require('../../utils/embeds');
 const { User } = require('../../database/mongo');
 
 module.exports = {
@@ -16,8 +15,8 @@ module.exports = {
     const maxPts = users[0]?.staff?.points || 1;
     const chart = users.map((u, i) => {
       const pts = u.staff?.points || 0;
-      const bar = '¦'.repeat(Math.round((pts / maxPts) * 10)).padEnd(10, '¦');
-      return `\`${String(i + 1).padStart(2)}\` ${bar} **${pts}** — ${u.username || '?'}`;
+      const bar = 'ï¿½'.repeat(Math.round((pts / maxPts) * 10)).padEnd(10, 'ï¿½');
+      return `\`${String(i + 1).padStart(2)}\` ${bar} **${pts}** ï¿½ ${u.username || '?'}`;
     }).join('\n');
 
     const totalPts = users.reduce((s, u) => s + (u.staff?.points || 0), 0);
@@ -34,7 +33,7 @@ module.exports = {
       
       ;
 
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_bonus_visual').setLabel('ðŸ„ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_bonus_visual').setLabel('ï¿½ï¿½ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };

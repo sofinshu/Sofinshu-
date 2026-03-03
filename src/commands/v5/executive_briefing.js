@@ -1,22 +1,21 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createPremiumEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
-const { createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
+const { createCustomEmbed, createErrorEmbed, createPremiumEmbed, createSuccessEmbed } = require('../../utils/embeds');
 const { validatePremiumLicense } = require('../../utils/premium_guard');
 const { Activity, User } = require('../../database/mongo');
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('executive_briefing')
-        .setDescription('Zenith Hyper-Apex: Macroscopic "State of the Sector" AI Intelligence Briefing'),
+        .setDescription('Enterprise Hyper-Apex: Macroscopic "State of the Sector" AI Intelligence Briefing'),
 
     async execute(interaction) {
         try {
             await interaction.deferReply();
 
-            // Zenith Hyper-Apex License Guard
+            // Enterprise Hyper-Apex License Guard
             const license = await validatePremiumLicense(interaction);
             if (!license.allowed) {
-                return interaction.editReply({ embeds: [license.embed], components: license.components });
+                return return await interaction.editReply({ embeds: [license.embed], components: license.components });
             }
 
             const guildId = interaction.guildId;
@@ -47,9 +46,9 @@ module.exports = {
                 : `Sector resonance is **STABLE**. Operational signals are nominal. Intelligence suggests increasing personnel engagement to maximize yield.`;
 
             const embed = await createCustomEmbed(interaction, {
-                title: '📊 Zenith Hyper-Apex: Executive Intelligence Briefing',
+                title: '📊 Enterprise Hyper-Apex: Executive Intelligence Briefing',
                 thumbnail: interaction.guild.iconURL({ dynamic: true }),
-                description: `### 🔮 Macroscopic Sector Briefing: ${interaction.guild.name}\nHigh-fidelity strategic summary compiled from trailing 7-day macroscopic telemetry.\n\n**💎 ZENITH HYPER-APEX EXCLUSIVE**`,
+                description: `### 🔮 Macroscopic Sector Briefing: ${interaction.guild.name}\nHigh-fidelity strategic summary compiled from trailing 7-day macroscopic telemetry.\n\n**💎 Enterprise HYPER-APEX EXCLUSIVE**`,
                 fields: [
                     { name: '✨ Performance Trajectory', value: trajectoryRibbon, inline: false },
                     { name: '🧠 Strategic AI Logic', value: briefSummary, inline: false },
@@ -63,12 +62,12 @@ module.exports = {
                 color: 'premium'
             });
 
-            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_executive_briefing').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_executive_briefing').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
         } catch (error) {
-            console.error('Zenith Executive Briefing Error:', error);
-            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_executive_briefing').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            console.error('Enterprise Executive Briefing Error:', error);
+            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_executive_briefing').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('Intelligence failure: Unable to compile executive macroscopic briefing.')], components: [row] });
         }
     }

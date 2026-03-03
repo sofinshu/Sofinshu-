@@ -1,6 +1,5 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createPremiumEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
-const { createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
+const { createCustomEmbed, createErrorEmbed, createPremiumEmbed, createSuccessEmbed } = require('../../utils/embeds');
 const { Activity } = require('../../database/mongo');
 
 module.exports = {
@@ -48,16 +47,16 @@ module.exports = {
           { name: '?? Security Incidents', value: `\`${curr.warning}\` | **${getTrajectory(curr.warning, prev.warning)}**`, inline: false },
           { name: '?? Active Operatives', value: `\`${curr.activeUsers}\` | **${getTrajectory(curr.activeUsers, prev.activeUsers)}**`, inline: false }
         ],
-        footer: 'Periodic Intelligence Comparison • V5 Executive Suite',
+        footer: 'Periodic Intelligence Comparison ï¿½ V5 Executive Suite',
         color: 'enterprise'
       });
 
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_weekly_insights').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_weekly_insights').setLabel('ï¿½ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
     } catch (error) {
       console.error('Weekly Insights Error:', error);
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_weekly_insights').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_weekly_insights').setLabel('ï¿½ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('Periodic Intelligence failure: Unable to synchronize comparison matrices.')], components: [row] });
     }
   }

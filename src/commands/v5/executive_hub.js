@@ -1,27 +1,26 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createPremiumEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
-const { createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
+const { createCustomEmbed, createErrorEmbed, createPremiumEmbed, createSuccessEmbed } = require('../../utils/embeds');
 const { validatePremiumLicense } = require('../../utils/premium_guard');
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('executive_hub')
-        .setDescription('Zenith Hyper-Apex: Executive Macroscopic Intelligence Nexus'),
+        .setDescription('Enterprise Hyper-Apex: Executive Macroscopic Intelligence Nexus'),
 
     async execute(interaction) {
         try {
             await interaction.deferReply();
 
-            // Zenith License Guard
+            // Enterprise License Guard
             const license = await validatePremiumLicense(interaction);
             if (!license.allowed) {
-                return interaction.editReply({ embeds: [license.embed], components: license.components });
+                return return await interaction.editReply({ embeds: [license.embed], components: license.components });
             }
 
             const embed = await createCustomEmbed(interaction, {
-                title: '🏢 Zenith Executive Hyper-Apex: Intelligence Hub',
+                title: '🏢 Enterprise Executive Hyper-Apex: Intelligence Hub',
                 thumbnail: interaction.guild.iconURL({ dynamic: true }),
-                description: `### 🔮 High-Fidelity Strategic Terminal\nMacroscopic intelligence interface for the **${interaction.guild.name}** sector. Access AI briefings, ROI yield modeling, and global market tickers.\n\n**💎 ZENITH HYPER-APEX EXCLUSIVE**`,
+                description: `### 🔮 High-Fidelity Strategic Terminal\nMacroscopic intelligence interface for the **${interaction.guild.name}** sector. Access AI briefings, ROI yield modeling, and global market tickers.\n\n**💎 Enterprise HYPER-APEX EXCLUSIVE**`,
                 fields: [
                     { name: '🧠 Briefing AI', value: 'Performance Trajectory Signaling', inline: true },
                     { name: '⚖️ ROI Matrix', value: 'Personnel Yield & Burn Modeling', inline: true },
@@ -30,7 +29,7 @@ module.exports = {
                     { name: '🌐 Global Grid', value: '`ENCRYPTED & SYNCED`', inline: true },
                     { name: '✨ Visual Tier', value: '`DIVINE [APEX]`', inline: true }
                 ],
-                footer: 'Zenith Hyper-Apex Executive Intelligence • V5 Strategic Suite',
+                footer: 'Enterprise Hyper-Apex Executive Intelligence • V5 Strategic Suite',
                 color: 'premium'
             });
 

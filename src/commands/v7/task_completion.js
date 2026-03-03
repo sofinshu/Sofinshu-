@@ -19,7 +19,7 @@ module.exports = {
     const withNotes = shifts.filter(s => s.endTime && s.notes && s.notes.trim() !== '').length;
     const rate = ((completed / shifts.length) * 100).toFixed(1);
     const noteRate = completed > 0 ? ((withNotes / completed) * 100).toFixed(1) : '0';
-    const bar = '¦'.repeat(Math.round(parseFloat(rate) / 10)) + '¦'.repeat(10 - Math.round(parseFloat(rate) / 10));
+    const bar = 'ï¿½'.repeat(Math.round(parseFloat(rate) / 10)) + 'ï¿½'.repeat(10 - Math.round(parseFloat(rate) / 10));
 
     const uniqueStaff = [...new Set(shifts.map(s => s.userId))].length;
     const avgDuration = completed > 0
@@ -43,7 +43,7 @@ module.exports = {
       
       ;
 
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_task_completion').setLabel('ðŸ„ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_task_completion').setLabel('ï¿½ï¿½ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };

@@ -198,12 +198,12 @@ async function renderInventoryPage(interaction, replyMessage, inventory) {
         ? inventory.map(item => `• ${invMap[item] || item}`).join('\n')
         : '*No enhancements allocated yet.*';
 
-    // We use a zenith embed for a "cool" inventory interface
+    // We use a Enterprise embed for a "cool" inventory interface
     const invEmbed = await createCustomEmbed(interaction, {
         title: '🎒 Active Personnel Loadout',
         description: `Confirmed authentications tied to \`${interaction.user.tag}\`:\n\n${ownedList}`,
         thumbnail: interaction.user.displayAvatarURL(),
-        color: 'zenith',
+        color: 'Enterprise',
         footer: 'Loadout inspection complete.'
     });
 

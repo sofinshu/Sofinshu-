@@ -1,22 +1,21 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createPremiumEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
-const { createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
+const { createCustomEmbed, createErrorEmbed, createPremiumEmbed, createSuccessEmbed } = require('../../utils/embeds');
 const { validatePremiumLicense } = require('../../utils/premium_guard');
 const { Activity, Shift } = require('../../database/mongo');
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('threat_forecast')
-        .setDescription('Zenith Hyper-Apex: macroscopic AI-Simulated Security Risk Trajectory Modeling'),
+        .setDescription('Enterprise Hyper-Apex: macroscopic AI-Simulated Security Risk Trajectory Modeling'),
 
     async execute(interaction) {
         try {
             await interaction.deferReply();
 
-            // Zenith Hyper-Apex License Guard
+            // Enterprise Hyper-Apex License Guard
             const license = await validatePremiumLicense(interaction);
             if (!license.allowed) {
-                return interaction.editReply({ embeds: [license.embed], components: license.components });
+                return return await interaction.editReply({ embeds: [license.embed], components: license.components });
             }
 
             const guildId = interaction.guildId;
@@ -52,27 +51,27 @@ module.exports = {
             const riskStatus = forecastedRisk > 75 ? '🔴 CRITICAL BREACH RISK' : (forecastedRisk > 45 ? '🟡 ELEVATED NOISE' : '🟢 STABLE SECTOR');
 
             const embed = await createCustomEmbed(interaction, {
-                title: '🛡️ Zenith Hyper-Apex: Threat Forecasting',
+                title: '🛡️ Enterprise Hyper-Apex: Threat Forecasting',
                 thumbnail: interaction.guild.iconURL({ dynamic: true }),
-                description: `### 🔮 Predictive Trajectory Modeling\nMacroscopic 48-hour security projection for sector **${interaction.guild.name}**. Cross-referencing real-time signal volume vs deterrence volume.\n\n**💎 ZENITH HYPER-APEX EXCLUSIVE**`,
+                description: `### 🔮 Predictive Trajectory Modeling\nMacroscopic 48-hour security projection for sector **${interaction.guild.name}**. Cross-referencing real-time signal volume vs deterrence volume.\n\n**💎 Enterprise HYPER-APEX EXCLUSIVE**`,
                 fields: [
                     { name: '🛰️ Macroscopic Risk Trajectory', value: riskRibbon, inline: false },
                     { name: '⚖️ Predicted Pulse', value: `\`${riskStatus}\``, inline: true },
                     { name: '📉 Variance', value: `\`±${(randomFactor / 2).toFixed(1)}%\``, inline: true },
                     { name: '🛡️ Active Deterrence', value: `\`${activeShifts} units\``, inline: true },
-                    { name: '📡 Model Fidelity', value: '`99.4% [ZENITH-AI]`', inline: true },
+                    { name: '📡 Model Fidelity', value: '`99.4% [Enterprise-AI]`', inline: true },
                     { name: '⏱️ Refresh Cycle', value: '`120 minutes`', inline: true }
                 ],
                 footer: 'Predictive Threat Modeling • V4 Guardian Hyper-Apex Suite',
                 color: forecastedRisk > 60 ? 'premium' : (forecastedRisk > 30 ? 'enterprise' : 'success')
             });
 
-            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v4_threat_forecast').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v4_threat_forecast').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
         } catch (error) {
-            console.error('Zenith Threat Forecast Error:', error);
-            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v4_threat_forecast').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            console.error('Enterprise Threat Forecast Error:', error);
+            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v4_threat_forecast').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('Security Intelligence failure: Unable to compute 48h risk models.')], components: [row] });
         }
     }

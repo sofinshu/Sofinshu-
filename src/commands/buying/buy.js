@@ -1,4 +1,4 @@
-﻿const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { createCoolEmbed, createTierEmbed } = require('../../utils/embeds');
 const { Guild } = require('../../database/mongo');
 
@@ -42,9 +42,9 @@ const PLAN_FEATURES = {
             '✅ AI forecasting (linear regression)',
             '✅ Server health score & smart alerts',
             '✅ Automation pulse dashboard',
-            '✅ Zenith interactive dashboard (3 tabs)',
+            '✅ Enterprise interactive dashboard (3 tabs)',
             '✅ Elite badges grant system',
-            '✅ Zenith passport & visual rankings',
+            '✅ Enterprise passport & visual rankings',
             '✅ Custom branding & white-label embeds'
         ]
     }
@@ -110,10 +110,10 @@ module.exports = {
                     .setURL('https://github.com/Reyrey-mibombo/uwu-chan-saas')
             );
 
-            await interaction.reply({ embeds: [embed], components: [row] });
+            await interaction.editReply({ embeds: [embed], components: [row] });
         } catch (error) {
             console.error('[buy] Error:', error);
-            await interaction.reply({ content: '❌ Failed to load the upgrade menu.', ephemeral: true });
+            await interaction.editReply({ content: '❌ Failed to load the upgrade menu.', ephemeral: true });
         }
     }
 };

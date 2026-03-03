@@ -1,6 +1,5 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createPremiumEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
-const { createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
+const { createCustomEmbed, createErrorEmbed, createPremiumEmbed, createSuccessEmbed } = require('../../utils/embeds');
 const { User } = require('../../database/mongo');
 
 module.exports = {
@@ -20,7 +19,7 @@ module.exports = {
 
       let user = await User.findOne({ userId: targetUser.id, guildId: guildId }).lean();
       if (!user || !user.staff) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_achievement_tracker').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_achievement_tracker').setLabel('ï¿½ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed(`No staff records exist for <@${targetUser.id}> in this server.`)], components: [row] });
       }
 
@@ -40,7 +39,7 @@ module.exports = {
 
       const progress = Math.round((unlockedCount / achievementList.length) * 100);
       const filled = Math.floor(progress / 10);
-      const progressBar = `\`${'¦'.repeat(filled)}${'?'.repeat(10 - filled)}\` **${progress}%**`;
+      const progressBar = `\`${'ï¿½'.repeat(filled)}${'?'.repeat(10 - filled)}\` **${progress}%**`;
 
       const embed = await createCustomEmbed(interaction, {
         title: `?? Personnel Achievement Matrix: ${targetUser.username}`,
@@ -53,16 +52,16 @@ module.exports = {
           { name: '? Operational Unlocks', value: unlockedAchievements.join('\n') || '*No authenticated milestones detected.*', inline: false },
           { name: '?? Classified Objectives', value: lockedAchievements.join('\n'), inline: false }
         ],
-        footer: 'Continuous operational execution required for high-tier unlocks. • V3 Strategic',
+        footer: 'Continuous operational execution required for high-tier unlocks. ï¿½ V3 Strategic',
         color: 'premium'
       });
 
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_achievement_tracker').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_achievement_tracker').setLabel('ï¿½ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
     } catch (error) {
       console.error('Achievement Tracker Error:', error);
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_achievement_tracker').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_achievement_tracker').setLabel('ï¿½ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('Milestone Registry failure: Unable to decode personnel achievement arrays.')], components: [row] });
     }
   }

@@ -27,11 +27,11 @@ module.exports = {
     else if (medWarnings.length > 2 || stuckShifts.length > 0) alertLevel = '?? Medium';
 
     const warningText = recentWarnings.length
-      ? recentWarnings.slice(0, 3).map(w => `• <@${w.userId}> — ${w.reason?.slice(0, 40) || 'No reason'} (${w.severity})`).join('\n')
+      ? recentWarnings.slice(0, 3).map(w => `ï¿½ <@${w.userId}> ï¿½ ${w.reason?.slice(0, 40) || 'No reason'} (${w.severity})`).join('\n')
       : '? No warnings this week';
 
     const shiftText = stuckShifts.length
-      ? stuckShifts.slice(0, 3).map(s => `• <@${s.userId}> — Started <t:${Math.floor(new Date(s.startTime).getTime() / 1000)}:R>`).join('\n')
+      ? stuckShifts.slice(0, 3).map(s => `ï¿½ <@${s.userId}> ï¿½ Started <t:${Math.floor(new Date(s.startTime).getTime() / 1000)}:R>`).join('\n')
       : '? No stuck shifts';
 
     const embed = createEnterpriseEmbed()
@@ -50,7 +50,7 @@ module.exports = {
       
       ;
 
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_alerts_dashboard').setLabel('ðŸ„ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_alerts_dashboard').setLabel('ï¿½ï¿½ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };

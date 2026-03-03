@@ -1,22 +1,21 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createPremiumEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
-const { createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
+const { createCustomEmbed, createErrorEmbed, createPremiumEmbed, createSuccessEmbed } = require('../../utils/embeds');
 const { validatePremiumLicense } = require('../../utils/premium_guard');
 const { User, Activity } = require('../../database/mongo');
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('team_synergy')
-        .setDescription('Zenith Hyper-Apex: Macroscopic Collaborative Resonance & Heatmap Ribbons'),
+        .setDescription('Enterprise Hyper-Apex: Macroscopic Collaborative Resonance & Heatmap Ribbons'),
 
     async execute(interaction) {
         try {
             await interaction.deferReply();
 
-            // Zenith Hyper-Apex License Guard
+            // Enterprise Hyper-Apex License Guard
             const license = await validatePremiumLicense(interaction);
             if (!license.allowed) {
-                return interaction.editReply({ embeds: [license.embed], components: license.components });
+                return return await interaction.editReply({ embeds: [license.embed], components: license.components });
             }
 
             const guildId = interaction.guildId;
@@ -70,9 +69,9 @@ module.exports = {
             });
 
             const embed = await createCustomEmbed(interaction, {
-                title: '🤝 Zenith Hyper-Apex: Collaborative Synergy Matrix',
+                title: '🤝 Enterprise Hyper-Apex: Collaborative Synergy Matrix',
                 thumbnail: interaction.guild.iconURL({ dynamic: true }),
-                description: `### 🚀 Macroscopic Resonator Analytics\nAnalyzing collaborative frequency and cross-role signal density for sector **${interaction.guild.name}**.\n\n**💎 ZENITH HYPER-APEX EXCLUSIVE**`,
+                description: `### 🚀 Macroscopic Resonator Analytics\nAnalyzing collaborative frequency and cross-role signal density for sector **${interaction.guild.name}**.\n\n**💎 Enterprise HYPER-APEX EXCLUSIVE**`,
                 fields: [
                     { name: '✨ Resonance Heatmap Ribbon', value: synergyRibbon, inline: false },
                     ...fields,
@@ -84,12 +83,12 @@ module.exports = {
                 color: 'premium'
             });
 
-            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_team_synergy').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_team_synergy').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
         } catch (error) {
-            console.error('Zenith Team Synergy Error:', error);
-            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_team_synergy').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            console.error('Enterprise Team Synergy Error:', error);
+            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_team_synergy').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('Synergy Matrix failure: Unable to compute collaborative resonance.')], components: [row] });
         }
     }

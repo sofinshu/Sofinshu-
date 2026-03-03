@@ -23,7 +23,7 @@ module.exports = {
     const leaderboard = users.map((u, i) => {
       const medal = medals[i] || `\`${String(i + 1).padStart(2)}\``;
       const rankBadge = u.staff?.rank ? `[${u.staff.rank}]` : '';
-      return `${medal} **${u.username || 'Unknown'}** ${rankBadge} — **${u.staff?.points || 0}** pts | ${u.staff?.consistency || 100}% consistency`;
+      return `${medal} **${u.username || 'Unknown'}** ${rankBadge} ï¿½ **${u.staff?.points || 0}** pts | ${u.staff?.consistency || 100}% consistency`;
     }).join('\n');
 
     const totalPoints = users.reduce((s, u) => s + (u.staff?.points || 0), 0);
@@ -41,7 +41,7 @@ module.exports = {
       
       ;
 
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_scoreboard').setLabel('ðŸ„ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_scoreboard').setLabel('ï¿½ï¿½ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };

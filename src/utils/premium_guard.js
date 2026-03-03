@@ -17,13 +17,13 @@ async function validatePremiumLicense(interaction) {
         const embed = await createCustomEmbed(interaction, {
             title: '🚫 Access Denied: Premium Subscription Required',
             thumbnail: interaction.guild.iconURL({ dynamic: true }),
-            description: `### 🔐 Restricted High-Tier Analytics\nThe **Zenith Executive Suite (V3-V5)** is an exclusive operational deck reserved for authorized buyers and premium server instances.\n\nYour current sector is operating on a **Free Tier** license. Macroscopic intelligence and advanced threat neutralization require a valid upgrade.`,
+            description: `### 🔐 Restricted High-Tier Analytics\nThe **Enterprise Operations Suite (V1-V8)** is an exclusive operational deck reserved for authorized buyers and premium server instances.\n\nYour current sector is operating on a **Free Tier** license. Macroscopic intelligence and advanced threat neutralization require a valid upgrade.`,
             fields: [
                 { name: '⚖️ License Status', value: '`🔴 UNAUTHORIZED`', inline: true },
-                { name: '💎 Required Tier', value: '`Premium` or `Enterprise`', inline: true },
+                { name: '👑 Required Tier', value: '`Premium` or `Enterprise`', inline: true },
                 { name: '🛠️ Resolution', value: 'Upgrade your sector license via the dashboard.', inline: false }
             ],
-            footer: 'Zenith Premium Enforcement • V5 Infrastructure',
+            footer: 'Enterprise License Enforcement • Infrastructure',
             color: 'premium'
         });
 

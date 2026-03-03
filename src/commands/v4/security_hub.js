@@ -1,27 +1,26 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createPremiumEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
-const { createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
+const { createCustomEmbed, createErrorEmbed, createPremiumEmbed, createSuccessEmbed } = require('../../utils/embeds');
 const { validatePremiumLicense } = require('../../utils/premium_guard');
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('security_hub')
-        .setDescription('Zenith Hyper-Apex: Guardian Strategic Security Control Portal'),
+        .setDescription('Enterprise Hyper-Apex: Guardian Strategic Security Control Portal'),
 
     async execute(interaction) {
         try {
             await interaction.deferReply();
 
-            // Zenith License Guard
+            // Enterprise License Guard
             const license = await validatePremiumLicense(interaction);
             if (!license.allowed) {
-                return interaction.editReply({ embeds: [license.embed], components: license.components });
+                return return await interaction.editReply({ embeds: [license.embed], components: license.components });
             }
 
             const embed = await createCustomEmbed(interaction, {
-                title: '🛡️ Zenith Guardian Hyper-Apex: Security Nexus',
+                title: '🛡️ Enterprise Guardian Hyper-Apex: Security Nexus',
                 thumbnail: interaction.guild.iconURL({ dynamic: true }),
-                description: `### 🔒 Macroscopic Deterrence Control\nUnified security interface for the **${interaction.guild.name}** sector. Access predictive threat modeling, armor density audits, and macroscopic sentinel status.\n\n**💎 ZENITH HYPER-APEX EXCLUSIVE**`,
+                description: `### 🔒 Macroscopic Deterrence Control\nUnified security interface for the **${interaction.guild.name}** sector. Access predictive threat modeling, armor density audits, and macroscopic sentinel status.\n\n**💎 Enterprise HYPER-APEX EXCLUSIVE**`,
                 fields: [
                     { name: '🔮 Forecast', value: 'Predictive Risk Trajectory', inline: true },
                     { name: '🧱 Armor Density', value: 'Layered Shield Integrity', inline: true },
@@ -30,7 +29,7 @@ module.exports = {
                     { name: '🌐 Global Grid', value: '`ENCRYPTED`', inline: true },
                     { name: '✨ Visual Tier', value: '`DIVINE [APEX]`', inline: true }
                 ],
-                footer: 'Zenith Hyper-Apex Security Orchestration • V4 Guardian Suite',
+                footer: 'Enterprise Hyper-Apex Security Orchestration • V4 Guardian Suite',
                 color: 'premium'
             });
 

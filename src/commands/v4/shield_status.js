@@ -1,22 +1,21 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createPremiumEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
-const { createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
+const { createCustomEmbed, createErrorEmbed, createPremiumEmbed, createSuccessEmbed } = require('../../utils/embeds');
 const { validatePremiumLicense } = require('../../utils/premium_guard');
 const { Activity, Shift } = require('../../database/mongo');
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('shield_status')
-        .setDescription('Zenith Hyper-Apex: Macroscopic Security Layer Audit & Armor Density'),
+        .setDescription('Enterprise Hyper-Apex: Macroscopic Security Layer Audit & Armor Density'),
 
     async execute(interaction) {
         try {
             await interaction.deferReply();
 
-            // Zenith Hyper-Apex License Guard
+            // Enterprise Hyper-Apex License Guard
             const license = await validatePremiumLicense(interaction);
             if (!license.allowed) {
-                return interaction.editReply({ embeds: [license.embed], components: license.components });
+                return return await interaction.editReply({ embeds: [license.embed], components: license.components });
             }
 
             const guildId = interaction.guildId;
@@ -34,9 +33,9 @@ module.exports = {
             const deterrenceLevel = Math.min(100, staffCount * 15 + 20);
 
             const embed = await createCustomEmbed(interaction, {
-                title: '🛡️ Zenith Hyper-Apex: Shield Status',
+                title: '🛡️ Enterprise Hyper-Apex: Shield Status',
                 thumbnail: interaction.guild.iconURL({ dynamic: true }),
-                description: `### 🔒 Macroscopic Armor Density Audit\nAnalyzing active security layers and structural integrity for sector **${interaction.guild.name}**.\n\n**💎 ZENITH HYPER-APEX EXCLUSIVE**`,
+                description: `### 🔒 Macroscopic Armor Density Audit\nAnalyzing active security layers and structural integrity for sector **${interaction.guild.name}**.\n\n**💎 Enterprise HYPER-APEX EXCLUSIVE**`,
                 fields: [
                     { name: '🧱 Perimeter Integrity', value: `${generateArmorRibbon(perimeterIntegrity)} **${perimeterIntegrity}%**`, inline: false },
                     { name: '📡 Signal Filtration', value: `${generateArmorRibbon(signalFiltration)} **${signalFiltration}%**`, inline: false },
@@ -49,12 +48,12 @@ module.exports = {
                 color: 'premium'
             });
 
-            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v4_shield_status').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v4_shield_status').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
         } catch (error) {
-            console.error('Zenith Shield Status Error:', error);
-            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v4_shield_status').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            console.error('Enterprise Shield Status Error:', error);
+            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v4_shield_status').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('Shield Matrix failure: Unable to audit macroscopic armor density.')], components: [row] });
         }
     }

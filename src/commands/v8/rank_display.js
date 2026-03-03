@@ -1,6 +1,5 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createEnterpriseEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
-const { createEnterpriseEmbed } = require('../../utils/embeds');
+const { createEnterpriseEmbed, createErrorEmbed, createSuccessEmbed } = require('../../utils/embeds');
 const { User } = require('../../database/mongo');
 
 module.exports = {
@@ -19,7 +18,7 @@ module.exports = {
     const rankEmojis = { owner: '??', admin: '??', manager: '??', senior: '??', staff: '?', trial: '??', member: '??' };
     const colors = { owner: 0xffd700, admin: 0x9b59b6, manager: 0x00bfff, senior: 0x2ecc71, staff: 0x3498db, trial: 0x95a5a6, member: 0x7f8c8d };
     const embed = createEnterpriseEmbed()
-      .setTitle(`${rankEmojis[rank] || '??'} Rank Display — ${target.username}`)
+      .setTitle(`${rankEmojis[rank] || '??'} Rank Display ï¿½ ${target.username}`)
       
       .setThumbnail(target.displayAvatarURL({ size: 256 }))
       .setDescription(`**${rankEmojis[rank] || ''} ${rank.toUpperCase()}**`)
@@ -30,7 +29,7 @@ module.exports = {
       )
       
       ;
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_rank_display').setLabel('ðŸ„ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_rank_display').setLabel('ï¿½ï¿½ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };

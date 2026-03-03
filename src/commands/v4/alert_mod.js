@@ -53,7 +53,7 @@ module.exports = {
       await modChannel.send({ embeds: [embed] });
       await interaction.editReply({ content: 'Moderators have been alerted!', ephemeral: true });
     } else {
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v4_alert_mod').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v4_alert_mod').setLabel('ï¿½ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
     }
   }

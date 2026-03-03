@@ -1,6 +1,5 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createEnterpriseEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
-const { createEnterpriseEmbed } = require('../../utils/embeds');
+const { createEnterpriseEmbed, createErrorEmbed, createSuccessEmbed } = require('../../utils/embeds');
 const { Activity } = require('../../database/mongo');
 
 module.exports = {
@@ -22,12 +21,12 @@ module.exports = {
     const timeline = events.length
       ? events.map(e => {
         const ts = Math.floor(new Date(e.createdAt).getTime() / 1000);
-        return `${typeEmojis[e.type]} <@${e.userId}> — <t:${ts}:R>`;
+        return `${typeEmojis[e.type]} <@${e.userId}> ï¿½ <t:${ts}:R>`;
       }).join('\n')
       : '?? No events this week.';
 
     const embed = createEnterpriseEmbed()
-      .setTitle('?? Event Visuals — Last 7 Days')
+      .setTitle('?? Event Visuals ï¿½ Last 7 Days')
       
       .addFields(
         { name: '?? Promotions', value: promotions.length.toString(), inline: true },
@@ -38,7 +37,7 @@ module.exports = {
       
       ;
 
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_event_visuals').setLabel('ðŸ„ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_event_visuals').setLabel('ï¿½ï¿½ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
