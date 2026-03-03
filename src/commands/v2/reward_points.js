@@ -45,7 +45,7 @@ module.exports = {
     } catch (error) {
       console.error('Reward Points Error:', error);
       const errEmbed = createErrorEmbed('An error occurred while fetching reward point algorithms.');
-      if (interaction.deferred || interaction.replied) {
+            if (interaction.deferred || interaction.replied) {
         const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_reward_points').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
             await return await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {

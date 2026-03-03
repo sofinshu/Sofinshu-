@@ -16,7 +16,7 @@ module.exports = {
             const userData = await User.findOne({ userId: targetUser.id, 'guilds.guildId': interaction.guildId }).lean();
 
             if (!userData || !userData.staff || !userData.staff.commandUsage) {
-                const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_mastery').setLabel('🔄 Refresh').setStyle(ButtonStyle.Secondary));
+                const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_mastery').setLabel('  Refresh').setStyle(ButtonStyle.Secondary));
                 return await interaction.editReply({ embeds: [createErrorEmbed('No mastery data found for this user.')], components: [row] });
             }
 
@@ -24,7 +24,7 @@ module.exports = {
             const sortedKeys = Object.keys(mastery).sort((a, b) => mastery[b] - mastery[a]).slice(0, 6);
 
             if (sortedKeys.length === 0) {
-                const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_mastery').setLabel('🔄 Refresh').setStyle(ButtonStyle.Secondary));
+                const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_mastery').setLabel('  Refresh').setStyle(ButtonStyle.Secondary));
                 return await interaction.editReply({ embeds: [createErrorEmbed('No command usage data found.')], components: [row] });
             }
 
@@ -51,12 +51,12 @@ module.exports = {
                 color: 'primary'
             });
 
-            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_mastery').setLabel('🔄 Refresh').setStyle(ButtonStyle.Secondary));
+            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_mastery').setLabel('  Refresh').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
         } catch (error) {
             console.error('Mastery Error:', error);
-            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_mastery').setLabel('🔄 Retry').setStyle(ButtonStyle.Secondary));
+            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_mastery').setLabel('  Retry').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('Failed to load mastery data.')], components: [row] });
         }
     }

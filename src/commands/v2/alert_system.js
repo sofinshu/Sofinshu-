@@ -99,7 +99,7 @@ module.exports = {
     } catch (error) {
       console.error('Alert System Error:', error);
       const errEmbed = createErrorEmbed('A database error occurred while modifying the alert configuration matrix.');
-      if (interaction.deferred || interaction.replied) {
+            if (interaction.deferred || interaction.replied) {
         const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_alert_system').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
             await return await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {

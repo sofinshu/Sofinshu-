@@ -57,7 +57,7 @@ module.exports = {
                     { name: '👤 Level Clearance', value: `\`LVL ${level}\``, inline: true },
                     { name: '🔍 Performance Insights', value: insights.join('\n'), inline: false },
                     { name: '⭐ Aggregate Score', value: `\`${points.toLocaleString()}\` Tactical Points`, inline: true },
-                    { name: '🔄 Operational Yield', value: `\`${totalShifts}\` Processed Patrols`, inline: true }
+                    { name: '  Operational Yield', value: `\`${totalShifts}\` Processed Patrols`, inline: true }
                 ],
                 footer: 'AI-Simulated Behavioral Analysis • Authorized Intelligence Suite',
                 color: color

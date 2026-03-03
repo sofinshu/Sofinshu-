@@ -83,7 +83,7 @@ module.exports = {
                         inline: false
                     },
                     {
-                        name: '🔄 Operational Engagements (Shifts)',
+                        name: '  Operational Engagements (Shifts)',
                         value: `${generateProgressBar(stats.shifts, nextReq.shifts)}\n*Status:* \`${stats.shifts.toLocaleString()}\` / \`${nextReq.shifts.toLocaleString()}\``,
                         inline: false
                     },

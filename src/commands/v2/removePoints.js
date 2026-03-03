@@ -53,7 +53,7 @@ module.exports = {
     } catch (error) {
       console.error('Remove Points Error:', error);
       const errEmbed = createErrorEmbed('An error occurred while removing user points.');
-      if (interaction.deferred || interaction.replied) {
+            if (interaction.deferred || interaction.replied) {
         const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_removePoints').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
             await return await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {

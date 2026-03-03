@@ -61,7 +61,7 @@ module.exports = {
                 { name: '🛠️ Metadata', value: `Roles: **${rolesCount}**\nEmojis: **${emojisCount}**`, inline: true }
             );
 
-            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_server_status').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
+            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_server_status').setLabel('  Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
         } catch (error) {
@@ -69,7 +69,7 @@ module.exports = {
             const errEmbed = createErrorEmbed('An error occurred while analyzing the server cache.');
             if (interaction.deferred || interaction.replied) {
             const row = new ActionRowBuilder().addComponents(
-                new ButtonBuilder().setCustomId('auto_v1_server_status').setLabel('🔄 Refresh').setStyle(ButtonStyle.Secondary),
+                new ButtonBuilder().setCustomId('auto_v1_server_status').setLabel('  Refresh').setStyle(ButtonStyle.Secondary),
                 new ButtonBuilder().setLabel('📈 Analytics').setStyle(ButtonStyle.Primary).setCustomId('analytics_btn')
             );
                 await return await interaction.editReply({ embeds: [errEmbed], components: [row] });

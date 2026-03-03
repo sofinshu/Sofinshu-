@@ -25,9 +25,9 @@ module.exports = {
       await interaction.deferReply();
 
       // Enterprise License Guard
-      const license = await validatePremiumLicense(interaction);
+      const license = await validatePremiumLicense(interaction, 'premium');
       if (!license.allowed) {
-        return return await interaction.editReply({ embeds: [license.embed], components: license.components });
+        return await interaction.editReply({ embeds: [license.embed], components: license.components });
       }
 
       const targetUser = interaction.options.getUser('user') || interaction.user;

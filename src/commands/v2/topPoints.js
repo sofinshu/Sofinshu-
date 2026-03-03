@@ -59,7 +59,7 @@ module.exports = {
     } catch (error) {
       console.error('Top Points Error:', error);
       const errEmbed = createErrorEmbed('An error occurred while rendering the points leaderboard.');
-      if (interaction.deferred || interaction.replied) {
+            if (interaction.deferred || interaction.replied) {
         await interaction.editReply({ embeds: [errEmbed] });
       } else {
         await interaction.editReply({ embeds: [errEmbed], ephemeral: true });

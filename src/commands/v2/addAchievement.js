@@ -100,7 +100,7 @@ module.exports = {
     } catch (error) {
       console.error('Add Achievement Error:', error);
       const errEmbed = createErrorEmbed('An error occurred while attempting to grant the achievement in the database.');
-      if (interaction.deferred || interaction.replied) {
+            if (interaction.deferred || interaction.replied) {
         const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_addAchievement').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
             await return await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {

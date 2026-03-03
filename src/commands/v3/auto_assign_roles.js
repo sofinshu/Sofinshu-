@@ -1,5 +1,6 @@
 const { SlashCommandBuilder, PermissionFlagsBits, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { createCustomEmbed, createErrorEmbed, createPremiumEmbed, createSuccessEmbed } = require('../../utils/embeds');
+const { validatePremiumLicense } = require('../../utils/premium_guard');
 const { Guild } = require('../../database/mongo');
 
 module.exports = {
@@ -19,6 +20,11 @@ module.exports = {
   async execute(interaction) {
     try {
       await interaction.deferReply();
+
+            const license = await validatePremiumLicense(interaction, 'premium');
+            if (!license.allowed) {
+                return await interaction.editReply({ embeds: [license.embed], components: [license.components] });
+            }
       const enable = interaction.options.getBoolean('enable');
       const role = interaction.options.getRole('role');
       const guildId = interaction.guildId;
@@ -75,7 +81,7 @@ module.exports = {
     } catch (error) {
       console.error('Auto Assign Roles Error:', error);
       const errEmbed = createErrorEmbed('A database configuration error blocked manipulating role-binding algorithms.');
-      if (interaction.deferred || interaction.replied) {
+            if (interaction.deferred || interaction.replied) {
         const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_auto_assign_roles').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
             await return await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {

@@ -1,5 +1,6 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { createCustomEmbed, createErrorEmbed, createPremiumEmbed, createSuccessEmbed } = require('../../utils/embeds');
+const { validatePremiumLicense } = require('../../utils/premium_guard');
 const { Activity, User } = require('../../database/mongo');
 
 module.exports = {
@@ -19,6 +20,11 @@ module.exports = {
   async execute(interaction) {
     try {
       await interaction.deferReply();
+
+            const license = await validatePremiumLicense(interaction, 'premium');
+            if (!license.allowed) {
+                return await interaction.editReply({ embeds: [license.embed], components: [license.components] });
+            }
       const guildId = interaction.guildId;
       const period = parseInt(interaction.options.getString('period') || '14');
 
@@ -102,7 +108,7 @@ module.exports = {
     } catch (error) {
       console.error('Task Optimizer Error:', error);
       const errEmbed = createErrorEmbed('A database tracking error occurred generating hierarchical yield optimization states.');
-      if (interaction.deferred || interaction.replied) {
+            if (interaction.deferred || interaction.replied) {
         const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_task_optimizer').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
             await return await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {

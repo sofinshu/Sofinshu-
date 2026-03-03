@@ -15,9 +15,9 @@ module.exports = {
             await interaction.deferReply();
 
             // Enterprise Hyper-Apex License Guard
-            const license = await validatePremiumLicense(interaction);
+            const license = await validatePremiumLicense(interaction, 'enterprise');
             if (!license.allowed) {
-                return return await interaction.editReply({ embeds: [license.embed], components: license.components });
+                return await interaction.editReply({ embeds: [license.embed], components: license.components });
             }
 
             const title = interaction.options.getString('title');

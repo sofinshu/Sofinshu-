@@ -13,9 +13,9 @@ module.exports = {
             await interaction.deferReply();
 
             // Enterprise Hyper-Apex License Guard
-            const license = await validatePremiumLicense(interaction);
+            const license = await validatePremiumLicense(interaction, 'premium');
             if (!license.allowed) {
-                return return await interaction.editReply({ embeds: [license.embed], components: license.components });
+                return await interaction.editReply({ embeds: [license.embed], components: license.components });
             }
 
             const guildId = interaction.guildId;
@@ -42,7 +42,7 @@ module.exports = {
                     { name: '🔥 Infrastructure Signal Burn', value: `${generateYieldBar(burnRate * 3)} **${burnRate}%**`, inline: false },
                     { name: '⚖️ Macroscopic ROI Factor', value: `\`${macroscopicROI} Ratio\``, inline: true },
                     { name: '🏢 Sector Equity', value: `\`${totalPoints.toLocaleString()} Merit\``, inline: true },
-                    { name: '🔄 Net Trajectory', value: macroscopicROI > 1 ? '`📈 EXPANDING`' : '`📉 DECAY`', inline: true },
+                    { name: '  Net Trajectory', value: macroscopicROI > 1 ? '`📈 EXPANDING`' : '`📉 DECAY`', inline: true },
                     { name: '✨ Intelligence Tier', value: '`DIVINE [APEX]`', inline: true }
                 ],
                 footer: 'Personnel ROI Analyzer • V5 Executive Hyper-Apex Suite',

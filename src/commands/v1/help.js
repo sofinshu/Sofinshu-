@@ -138,7 +138,7 @@ module.exports = {
     } catch (error) {
       console.error('[help] Error:', error);
       const errEmbed = createErrorEmbed('An error occurred while loading the help menu.');
-      if (interaction.deferred || interaction.replied) {
+            if (interaction.deferred || interaction.replied) {
         await interaction.editReply({ embeds: [errEmbed] });
       } else {
         await interaction.editReply({ embeds: [errEmbed], ephemeral: true });

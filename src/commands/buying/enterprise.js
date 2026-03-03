@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+﻿const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { createEnterpriseEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { Guild } = require('../../database/mongo');
 
@@ -63,8 +63,7 @@ module.exports = {
         } catch (error) {
             console.error('[enterprise] Error:', error);
             const errEmbed = createErrorEmbed('Failed to load enterprise status.');
-            if (interaction.deferred || interaction.replied) await interaction.editReply({ embeds: [errEmbed] });
-            else await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
+            if (interaction.deferred || interaction.replied) { return await interaction.editReply({ embeds: [errEmbed], components: [row] }); } else await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
         }
     }
 };

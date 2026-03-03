@@ -1,5 +1,6 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { createCustomEmbed, createErrorEmbed, createPremiumEmbed, createSuccessEmbed } = require('../../utils/embeds');
+const { validatePremiumLicense } = require('../../utils/premium_guard');
 const { Activity } = require('../../database/mongo');
 
 module.exports = {
@@ -10,6 +11,11 @@ module.exports = {
   async execute(interaction) {
     try {
       await interaction.deferReply();
+
+            const license = await validatePremiumLicense(interaction, 'premium');
+            if (!license.allowed) {
+                return await interaction.editReply({ embeds: [license.embed], components: [license.components] });
+            }
       const guildId = interaction.guildId;
       const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
       const twoWeeksAgo = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000);

@@ -4,37 +4,52 @@ const { Guild } = require('../database/mongo');
 
 /**
  * Enforces Premium/Enterprise license checks for high-tier commands.
- * Returns { allowed: boolean, embed: Embed, components: ActionRow[] }
+ * @param {object} interaction The command interaction.
+ * @param {string} requiredTier 'premium' | 'enterprise'
+ * @returns {Promise<{ allowed: boolean, embed?: object, components?: object[] }>}
  */
-async function validatePremiumLicense(interaction) {
+async function validatePremiumLicense(interaction, requiredTier = 'premium') {
     const guildId = interaction.guildId;
     const guildData = await Guild.findOne({ guildId }).lean();
 
     const isPremium = guildData?.premium?.isActive || false;
     const tier = guildData?.premium?.tier || 'free';
 
+    // Logic: 
+    // - If enterprise is required, must be enterprise.
+    // - If premium is required, can be premium or enterprise.
+    let accessDenied = false;
     if (!isPremium || tier === 'free') {
+        accessDenied = true;
+    } else if (requiredTier === 'enterprise' && tier !== 'enterprise') {
+        accessDenied = true;
+    }
+
+    if (accessDenied) {
+        const tierName = requiredTier.charAt(0).toUpperCase() + requiredTier.slice(1);
+        const icon = requiredTier === 'enterprise' ? '👑' : '✨';
+
         const embed = await createCustomEmbed(interaction, {
-            title: '🚫 Access Denied: Premium Subscription Required',
+            title: `🚫 Access Denied: ${tierName} Subscription Required`,
             thumbnail: interaction.guild.iconURL({ dynamic: true }),
-            description: `### 🔐 Restricted High-Tier Analytics\nThe **Enterprise Operations Suite (V1-V8)** is an exclusive operational deck reserved for authorized buyers and premium server instances.\n\nYour current sector is operating on a **Free Tier** license. Macroscopic intelligence and advanced threat neutralization require a valid upgrade.`,
+            description: `### 🔐 Restricted ${tierName} Operations\nThe requested command belongs to the **${tierName} Suite**, which requires an active ${tierName} license.\n\nYour current sector is operating on a **${tier.toUpperCase()} Tier** license. Macroscopic intelligence and advanced sector management require a valid upgrade.`,
             fields: [
-                { name: '⚖️ License Status', value: '`🔴 UNAUTHORIZED`', inline: true },
-                { name: '👑 Required Tier', value: '`Premium` or `Enterprise`', inline: true },
-                { name: '🛠️ Resolution', value: 'Upgrade your sector license via the dashboard.', inline: false }
+                { name: '⚖️ License Status', value: `\`🔴 UNAUTHORIZED\``, inline: true },
+                { name: `${icon} Required Tier`, value: `\`${tierName}\``, inline: true },
+                { name: '🛠️ Resolution', value: 'Upgrade your sector license via the dashboard or use `/buy`.', inline: false }
             ],
-            footer: 'Enterprise License Enforcement • Infrastructure',
+            footer: `${tierName} License Enforcement • Enterprise Infrastructure`,
             color: 'premium'
         });
 
         const row = new ActionRowBuilder().addComponents(
             new ButtonBuilder()
-                .setLabel('Upgrade License')
+                .setLabel(`Upgrade to ${tierName}`)
                 .setStyle(ButtonStyle.Link)
-                .setURL('https://example.com/premium') // Placeholder for real buy link
-                .setEmoji('💎'),
+                .setURL('https://example.com/premium')
+                .setEmoji(icon),
             new ButtonBuilder()
-                .setLabel('View Features')
+                .setLabel('View Tier Comparison')
                 .setStyle(ButtonStyle.Secondary)
                 .setCustomId('view_premium_features')
                 .setEmoji('📊')

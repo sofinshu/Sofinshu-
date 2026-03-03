@@ -41,14 +41,14 @@ module.exports = {
         color: 'primary'
       });
 
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_check_logs').setLabel('🔄 Refresh').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_check_logs').setLabel('  Refresh').setStyle(ButtonStyle.Secondary));
       await interaction.editReply({ embeds: [embed], components: [row] });
 
     } catch (error) {
       console.error('Check Logs Error:', error);
       const errEmbed = createErrorEmbed('Failed to load activity logs.');
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_check_logs').setLabel('🔄 Retry').setStyle(ButtonStyle.Secondary));
-      if (interaction.deferred || interaction.replied) {
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_check_logs').setLabel('  Retry').setStyle(ButtonStyle.Secondary));
+            if (interaction.deferred || interaction.replied) {
         await return await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {
         await interaction.editReply({ embeds: [errEmbed], ephemeral: true });

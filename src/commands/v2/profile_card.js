@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+﻿const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { createCustomEmbed, createErrorEmbed, createProgressBar } = require('../../utils/embeds');
 const { User, Warning, Shift, Activity } = require('../../database/mongo');
 
@@ -89,8 +89,7 @@ module.exports = {
         } catch (error) {
             console.error('[profile_card] Error:', error);
             const errEmbed = createErrorEmbed('Failed to load profile card. Make sure the user has used the bot before.');
-            if (interaction.deferred || interaction.replied) await interaction.editReply({ embeds: [errEmbed] });
-            else await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
+            if (interaction.deferred || interaction.replied) { return await interaction.editReply({ embeds: [errEmbed], components: [row] }); } else await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
         }
     }
 };

@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+﻿const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { createErrorEmbed, createPremiumEmbed, createSuccessEmbed } = require('../../utils/embeds');
 const { Guild } = require('../../database/mongo');
 
@@ -60,8 +60,7 @@ module.exports = {
         } catch (error) {
             console.error('[premium] Error:', error);
             const errEmbed = createErrorEmbed('Failed to load premium status.');
-            if (interaction.deferred || interaction.replied) await interaction.editReply({ embeds: [errEmbed] });
-            else await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
+            if (interaction.deferred || interaction.replied) { return await interaction.editReply({ embeds: [errEmbed], components: [row] }); } else await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
         }
     }
 };

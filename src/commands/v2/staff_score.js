@@ -14,7 +14,7 @@ module.exports = {
       const staffSystem = client.systems.staff;
 
       if (!staffSystem) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_staff_score').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_staff_score').setLabel('  Sync Live Data').setStyle(ButtonStyle.Secondary));
         return await interaction.editReply({ embeds: [createErrorEmbed('Staff system is currently offline.')], components: [row] });
       }
 
@@ -43,14 +43,14 @@ module.exports = {
         footer: `Disciplinary Warnings Impact Quality: [${warnings.total} Strikes recorded]`
       });
 
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_staff_score').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_staff_score').setLabel('  Sync Live Data').setStyle(ButtonStyle.Secondary));
       await interaction.editReply({ embeds: [embed], components: [row] });
 
     } catch (error) {
       console.error('Staff Score Error:', error);
       const errEmbed = createErrorEmbed('An error occurred while running the grading algorithm.');
-      if (interaction.deferred || interaction.replied) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_staff_score').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
+            if (interaction.deferred || interaction.replied) {
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_staff_score').setLabel('  Sync Live Data').setStyle(ButtonStyle.Secondary));
         await return await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {
         await interaction.editReply({ embeds: [errEmbed], ephemeral: true });

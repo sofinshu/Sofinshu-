@@ -1,5 +1,6 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { createCustomEmbed, createErrorEmbed, createPremiumEmbed, createSuccessEmbed } = require('../../utils/embeds');
+const { validatePremiumLicense } = require('../../utils/premium_guard');
 const { User } = require('../../database/mongo');
 
 module.exports = {
@@ -11,6 +12,11 @@ module.exports = {
   async execute(interaction) {
     try {
       await interaction.deferReply();
+
+            const license = await validatePremiumLicense(interaction, 'premium');
+            if (!license.allowed) {
+                return await interaction.editReply({ embeds: [license.embed], components: [license.components] });
+            }
       const guildId = interaction.guildId;
       const targetUser = interaction.options.getUser('user');
       const userId = targetUser?.id;

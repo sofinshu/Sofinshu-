@@ -21,7 +21,7 @@ module.exports = {
     const row = new ActionRowBuilder().addComponents(
       new ButtonBuilder()
         .setCustomId('refresh_ping')
-        .setLabel('🔄 Refresh Stats')
+        .setLabel('  Refresh Stats')
         .setStyle(ButtonStyle.Primary)
     );
 

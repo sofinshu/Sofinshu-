@@ -51,7 +51,7 @@ module.exports = {
     } catch (error) {
       console.error('[shift_end] Error:', error);
       const errEmbed = createErrorEmbed('An error occurred while ending your shift.');
-      if (interaction.deferred || interaction.replied) {
+            if (interaction.deferred || interaction.replied) {
         await interaction.editReply({ embeds: [errEmbed] });
       } else {
         await interaction.editReply({ embeds: [errEmbed], ephemeral: true });

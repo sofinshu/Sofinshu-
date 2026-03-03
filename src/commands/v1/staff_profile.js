@@ -80,7 +80,7 @@ module.exports = {
     } catch (error) {
       console.error(error);
       const errEmbed = createErrorEmbed('An error occurred while fetching the staff profile.');
-      if (interaction.deferred || interaction.replied) {
+            if (interaction.deferred || interaction.replied) {
         await interaction.editReply({ embeds: [errEmbed] });
       } else {
         await interaction.editReply({ embeds: [errEmbed], ephemeral: true });

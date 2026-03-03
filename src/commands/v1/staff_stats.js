@@ -15,7 +15,7 @@ module.exports = {
       const staffSystem = client.systems.staff;
 
       if (!staffSystem) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_staff_stats').setLabel('🔄 Refresh').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_staff_stats').setLabel('  Refresh').setStyle(ButtonStyle.Secondary));
         return await interaction.editReply({ embeds: [createErrorEmbed('Staff system is currently offline.')], components: [row] });
       }
 
@@ -68,13 +68,13 @@ module.exports = {
       });
 
       const row = new ActionRowBuilder().addComponents(
-        new ButtonBuilder().setCustomId('auto_v1_staff_stats').setLabel('🔄 Refresh').setStyle(ButtonStyle.Secondary),
+        new ButtonBuilder().setCustomId('auto_v1_staff_stats').setLabel('  Refresh').setStyle(ButtonStyle.Secondary),
         new ButtonBuilder().setLabel('🏆 Leaderboard').setStyle(ButtonStyle.Link).setURL(`https://discord.com/channels/${interaction.guildId}`)
       );
       await interaction.editReply({ embeds: [embed], components: [row] });
     } catch (error) {
       console.error('Staff Stats Error:', error);
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_staff_stats').setLabel('🔄 Retry').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_staff_stats').setLabel('  Retry').setStyle(ButtonStyle.Secondary));
       await interaction.editReply({ embeds: [createErrorEmbed('Failed to fetch staff statistics.')], components: [row] });
     }
   }

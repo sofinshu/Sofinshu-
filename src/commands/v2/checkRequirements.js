@@ -24,11 +24,11 @@ module.exports = {
       const guild = await Guild.findOne({ guildId: guildId }).lean();
 
       if (!userData || !userData.staff) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_checkRequirements').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_checkRequirements').setLabel('  Sync Live Data').setStyle(ButtonStyle.Secondary));
         return await interaction.editReply({ embeds: [createErrorEmbed(`The user <@${targetUser.id}> is not enrolled as staff in this server.`)], components: [row] });
       }
       if (!guild || !guild.promotionRequirements) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_checkRequirements').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_checkRequirements').setLabel('  Sync Live Data').setStyle(ButtonStyle.Secondary));
         return await interaction.editReply({ embeds: [createErrorEmbed('No promotion requirements have been established in this server.')], components: [row] });
       }
 
@@ -52,7 +52,7 @@ module.exports = {
           description: `⭐ <@${targetUser.id}> is already at the maximum achievable rank in this server!`,
           thumbnail: targetUser.displayAvatarURL()
         });
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_checkRequirements').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_checkRequirements').setLabel('  Sync Live Data').setStyle(ButtonStyle.Secondary));
         return await interaction.editReply({ embeds: [maxEmbed], components: [row] });
       }
 
@@ -91,14 +91,14 @@ module.exports = {
         color: canPromote ? 'success' : 'primary'
       });
 
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_checkRequirements').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_checkRequirements').setLabel('  Sync Live Data').setStyle(ButtonStyle.Secondary));
       await interaction.editReply({ embeds: [embed], components: [row] });
 
     } catch (error) {
       console.error('Check Requirements Error:', error);
       const errEmbed = createErrorEmbed('A database error occurred while calculating milestone eligibility.');
-      if (interaction.deferred || interaction.replied) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_checkRequirements').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
+            if (interaction.deferred || interaction.replied) {
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_checkRequirements').setLabel('  Sync Live Data').setStyle(ButtonStyle.Secondary));
         await return await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {
         await interaction.editReply({ embeds: [errEmbed], ephemeral: true });

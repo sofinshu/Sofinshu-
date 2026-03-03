@@ -110,7 +110,7 @@ module.exports = {
         );
 
         const row2 = new ActionRowBuilder().addComponents(
-            new ButtonBuilder().setCustomId('refresh').setLabel('🔄 Refresh').setStyle(ButtonStyle.Primary),
+            new ButtonBuilder().setCustomId('refresh').setLabel('  Refresh').setStyle(ButtonStyle.Primary),
             new ButtonBuilder().setLabel('👤 Profile').setStyle(ButtonStyle.Link).setURL(`https://discord.com/users/${targetUser.id}`),
             new ButtonBuilder().setCustomId('join_position').setLabel('🚪 Join Pos').setStyle(ButtonStyle.Secondary),
             new ButtonBuilder().setCustomId('mutual_servers').setLabel('🤝 Mutuals').setStyle(ButtonStyle.Secondary),

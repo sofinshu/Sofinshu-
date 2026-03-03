@@ -46,7 +46,7 @@ module.exports = {
     } catch (error) {
       console.error('Bonus Points Error:', error);
       const errEmbed = createErrorEmbed('An error occurred while awarding bonus points.');
-      if (interaction.deferred || interaction.replied) {
+            if (interaction.deferred || interaction.replied) {
         const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_bonus_points').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
             await return await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {

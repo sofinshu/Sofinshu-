@@ -49,7 +49,7 @@ module.exports = {
                     description: `Weekly workload analysis for **${target.username}** in **${interaction.guild.name}**.\n\n${riskLabel}`,
                     fields: [
                         { name: '⏱️ Weekly Hours', value: `\`${weeklyHours.toFixed(1)}h\` / \`${BURNOUT_THRESHOLD_HOURS}h max\``, inline: true },
-                        { name: '🔄 Shifts This Week', value: `\`${shiftCount}\` shifts`, inline: true },
+                        { name: '  Shifts This Week', value: `\`${shiftCount}\` shifts`, inline: true },
                         { name: '📊 Consistency Score', value: `\`${createProgressBar(consistency)}\` ${consistency}%`, inline: false },
                         { name: '📈 Workload Meter', value: `\`${bar}\` ${pct}%`, inline: false },
                         {
@@ -65,7 +65,7 @@ module.exports = {
                     footer: 'uwu-chan • Burnout Analysis • Last 7 Days'
                 });
 
-                const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_burnout_check').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
+                const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_burnout_check').setLabel('  Sync Live Data').setStyle(ButtonStyle.Secondary));
                 return await interaction.editReply({ embeds: [embed], components: [row] });
             }
 
@@ -107,13 +107,13 @@ module.exports = {
                 footer: 'uwu-chan • Server Burnout Analysis • Last 7 Days'
             });
 
-            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_burnout_check').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
+            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_burnout_check').setLabel('  Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
         } catch (error) {
             console.error('[burnout_check] Error:', error);
             const errEmbed = createErrorEmbed('Failed to run burnout analysis. Please try again.');
             if (interaction.deferred || interaction.replied) {
-                const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_burnout_check').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
+                const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_burnout_check').setLabel('  Sync Live Data').setStyle(ButtonStyle.Secondary));
                 await return await interaction.editReply({ embeds: [errEmbed], components: [row] });
             } else {
                 await interaction.editReply({ embeds: [errEmbed], ephemeral: true });

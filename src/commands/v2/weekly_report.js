@@ -78,13 +78,13 @@ module.exports = {
         footer: 'uwu-chan � Weekly Report � Real DB Data'
       });
 
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_weekly_report').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_weekly_report').setLabel('  Sync Live Data').setStyle(ButtonStyle.Secondary));
       await interaction.editReply({ embeds: [embed], components: [row] });
     } catch (error) {
       console.error('[weekly_report] Error:', error);
       const errEmbed = createErrorEmbed('Failed to generate weekly report.');
-      if (interaction.deferred || interaction.replied) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_weekly_report').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
+            if (interaction.deferred || interaction.replied) {
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_weekly_report').setLabel('  Sync Live Data').setStyle(ButtonStyle.Secondary));
         await return await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {
         await interaction.editReply({ embeds: [errEmbed], ephemeral: true });

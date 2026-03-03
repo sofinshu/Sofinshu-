@@ -49,7 +49,7 @@ module.exports = {
     } catch (error) {
       console.error('Add Rep Error:', error);
       const errEmbed = createErrorEmbed('An error occurred while managing user reputation.');
-      if (interaction.deferred || interaction.replied) {
+            if (interaction.deferred || interaction.replied) {
         const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_addReputation').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
             await return await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {

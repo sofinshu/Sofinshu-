@@ -91,12 +91,12 @@ module.exports = {
                 color: 'premium'
             });
 
-            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_server_growth').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
+            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_server_growth').setLabel('  Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
         } catch (error) {
             console.error('Enterprise Server Growth Error:', error);
-            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_server_growth').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
+            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_server_growth').setLabel('  Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('Growth Analytics failure: Unable to compute macroscopic velocity models.')], components: [row] });
         }
     }

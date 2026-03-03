@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType } = require('discord.js');
+﻿const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType } = require('discord.js');
 const { createCustomEmbed, createEnterpriseEmbed, createErrorEmbed, createProgressBar, createSuccessEmbed } = require('../../utils/embeds');
 const { validatePremiumLicense } = require('../../utils/premium_guard');
 const { Guild, Activity, User } = require('../../database/mongo');
@@ -12,9 +12,9 @@ module.exports = {
     try {
       await interaction.deferReply();
 
-      const license = await validatePremiumLicense(interaction);
+      const license = await validatePremiumLicense(interaction, 'enterprise');
       if (!license.allowed) {
-        return return await interaction.editReply({ embeds: [license.embed], components: license.components });
+        return await interaction.editReply({ embeds: [license.embed], components: license.components });
       }
 
       const guildId = interaction.guildId;
@@ -139,8 +139,7 @@ module.exports = {
     } catch (error) {
       console.error('[interactive_dashboard] Error:', error);
       const errEmbed = createErrorEmbed('Failed to load the interactive dashboard.');
-      if (interaction.deferred || interaction.replied) await interaction.editReply({ embeds: [errEmbed] });
-      else await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
+            if (interaction.deferred || interaction.replied) { return await interaction.editReply({ embeds: [errEmbed], components: [row] }); } else await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
     }
   }
 };

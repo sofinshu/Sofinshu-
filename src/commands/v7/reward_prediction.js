@@ -1,5 +1,6 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { createEnterpriseEmbed } = require('../../utils/embeds');
+const { validatePremiumLicense } = require('../../utils/premium_guard');
 const { User } = require('../../database/mongo');
 
 const REWARD_THRESHOLDS = [50, 150, 300, 500, 1000];
@@ -12,6 +13,11 @@ module.exports = {
 
   async execute(interaction, client) {
     await interaction.deferReply();
+
+            const license = await validatePremiumLicense(interaction, 'enterprise');
+            if (!license.allowed) {
+                return await interaction.editReply({ embeds: [license.embed], components: [license.components] });
+            }
     const target = interaction.options.getUser('user') || interaction.user;
     const user = await User.findOne({ userId: target.id }).lean();
     const points = user?.staff?.points || 0;

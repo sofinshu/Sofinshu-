@@ -26,7 +26,7 @@ module.exports = {
 
       const member = await interaction.guild.members.fetch(targetUser.id).catch(() => null);
       if (!member) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_promote').setLabel('🔄 Refresh').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_promote').setLabel('  Refresh').setStyle(ButtonStyle.Secondary));
         return await interaction.editReply({ embeds: [createErrorEmbed('User not found in this server.')], components: [row] });
       }
 
@@ -39,7 +39,7 @@ module.exports = {
       const oldRank = user.staff.rank || 'trial';
       
       if (oldRank === newRank) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_promote').setLabel('🔄 Refresh').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_promote').setLabel('  Refresh').setStyle(ButtonStyle.Secondary));
         return await interaction.editReply({ embeds: [createErrorEmbed(`User is already at **${newRank.toUpperCase()}** rank.`)], components: [row] });
       }
 
@@ -77,7 +77,7 @@ module.exports = {
         ]
       });
 
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_promote').setLabel('🔄 Refresh').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_promote').setLabel('  Refresh').setStyle(ButtonStyle.Secondary));
       await interaction.editReply({ embeds: [embed], components: [row] });
 
       try {
@@ -91,8 +91,8 @@ module.exports = {
     } catch (error) {
       console.error(error);
       const errEmbed = createErrorEmbed('An error occurred while promoting the user.');
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_promote').setLabel('🔄 Retry').setStyle(ButtonStyle.Secondary));
-      if (interaction.deferred || interaction.replied) {
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_promote').setLabel('  Retry').setStyle(ButtonStyle.Secondary));
+            if (interaction.deferred || interaction.replied) {
         await return await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {
         await interaction.editReply({ embeds: [errEmbed], ephemeral: true });

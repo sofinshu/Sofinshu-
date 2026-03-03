@@ -1,5 +1,6 @@
-const { SlashCommandBuilder, PermissionFlagsBits, AuditLogEvent, ComponentType, ButtonBuilder, ActionRowBuilder, ButtonStyle } = require('discord.js');
+﻿const { SlashCommandBuilder, PermissionFlagsBits, AuditLogEvent, ComponentType, ButtonBuilder, ActionRowBuilder, ButtonStyle } = require('discord.js');
 const { createCustomEmbed, createErrorEmbed, createPremiumEmbed, createSuccessEmbed } = require('../../utils/embeds');
+const { validatePremiumLicense } = require('../../utils/premium_guard');
 
 const ACTION_MAP = {
   all: null,
@@ -32,6 +33,11 @@ module.exports = {
   async execute(interaction) {
     try {
       await interaction.deferReply();
+
+            const license = await validatePremiumLicense(interaction, 'premium');
+            if (!license.allowed) {
+                return await interaction.editReply({ embeds: [license.embed], components: [license.components] });
+            }
 
       if (!interaction.member.permissions.has(PermissionFlagsBits.ViewAuditLog)) {
         return interaction.editReply({ embeds: [createErrorEmbed('You need the `View Audit Log` permission.')] });
@@ -107,8 +113,7 @@ module.exports = {
     } catch (error) {
       console.error('[audit_logs] Error:', error);
       const errEmbed = createErrorEmbed('Failed to fetch audit logs. Check my permissions (`View Audit Log`).');
-      if (interaction.deferred || interaction.replied) await interaction.editReply({ embeds: [errEmbed] });
-      else await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
+            if (interaction.deferred || interaction.replied) { return await interaction.editReply({ embeds: [errEmbed], components: [row] }); } else await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
     }
   }
 };

@@ -112,7 +112,7 @@ module.exports = {
     } catch (error) {
       console.error('Task Assign Error:', error);
       const errEmbed = createErrorEmbed('A database error occurred while modifying the assignment logs.');
-      if (interaction.deferred || interaction.replied) {
+            if (interaction.deferred || interaction.replied) {
         const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_task_assign').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
             await return await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {

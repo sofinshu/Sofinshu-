@@ -1,4 +1,4 @@
-const { SlashCommandBuilder , ActionRowBuilder , ButtonBuilder , ButtonStyle } = require('discord.js');
+﻿const { SlashCommandBuilder , ActionRowBuilder , ButtonBuilder , ButtonStyle } = require('discord.js');
 const { createCustomEmbed, createEnterpriseEmbed, createErrorEmbed, createProgressBar, createSuccessEmbed } = require('../../utils/embeds');
 const { validatePremiumLicense } = require('../../utils/premium_guard');
 const { User, Warning } = require('../../database/mongo');
@@ -21,9 +21,9 @@ module.exports = {
     try {
       await interaction.deferReply();
 
-      const license = await validatePremiumLicense(interaction);
+      const license = await validatePremiumLicense(interaction, 'enterprise');
       if (!license.allowed) {
-        return return await interaction.editReply({ embeds: [license.embed], components: license.components });
+        return await interaction.editReply({ embeds: [license.embed], components: license.components });
       }
 
       const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
@@ -78,8 +78,7 @@ module.exports = {
     } catch (error) {
       console.error('[auto_rewards] Error:', error);
       const errEmbed = createErrorEmbed('Failed to load reward tiers.');
-      if (interaction.deferred || interaction.replied) await interaction.editReply({ embeds: [errEmbed] });
-      else await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
+            if (interaction.deferred || interaction.replied) { return await interaction.editReply({ embeds: [errEmbed], components: [row] }); } else await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
     }
   }
 };

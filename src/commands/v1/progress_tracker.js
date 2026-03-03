@@ -18,7 +18,7 @@ module.exports = {
       const user = await User.findOne({ userId: target.id, 'guilds.guildId': interaction.guildId }).lean();
 
       if (!user || !user.staff) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_progress_tracker').setLabel('🔄 Refresh').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_progress_tracker').setLabel('  Refresh').setStyle(ButtonStyle.Secondary));
         return await interaction.editReply({ embeds: [createErrorEmbed(`No staff data found for **${target.username}**. They need to start a shift first!`)], components: [row] });
       }
 
@@ -40,7 +40,7 @@ module.exports = {
           ],
           color: 'premium'
         });
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_progress_tracker').setLabel('🔄 Refresh').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_progress_tracker').setLabel('  Refresh').setStyle(ButtonStyle.Secondary));
         return await interaction.editReply({ embeds: [embed], components: [row] });
       }
 
@@ -70,15 +70,15 @@ module.exports = {
       });
 
       const row = new ActionRowBuilder().addComponents(
-        new ButtonBuilder().setCustomId('auto_v1_progress_tracker').setLabel('🔄 Refresh').setStyle(ButtonStyle.Secondary),
+        new ButtonBuilder().setCustomId('auto_v1_progress_tracker').setLabel('  Refresh').setStyle(ButtonStyle.Secondary),
         new ButtonBuilder().setLabel('🎯 Start Shift').setStyle(ButtonStyle.Success).setCustomId('shift_start_btn')
       );
       await interaction.editReply({ embeds: [embed], components: [row] });
     } catch (error) {
       console.error(error);
       const errEmbed = createErrorEmbed('An error occurred while tracking progress.');
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_progress_tracker').setLabel('🔄 Retry').setStyle(ButtonStyle.Secondary));
-      if (interaction.deferred || interaction.replied) {
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_progress_tracker').setLabel('  Retry').setStyle(ButtonStyle.Secondary));
+            if (interaction.deferred || interaction.replied) {
         await return await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {
         await interaction.editReply({ embeds: [errEmbed], ephemeral: true });

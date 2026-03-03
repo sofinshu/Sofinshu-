@@ -37,7 +37,7 @@ module.exports = {
 
                 const details = [
                     `> ⭐ **Points**: \`${(req.points || 0).toLocaleString()}\``,
-                    `> 🔄 **Shifts**: \`${(req.shifts || 0).toLocaleString()}\``,
+                    `>   **Shifts**: \`${(req.shifts || 0).toLocaleString()}\``,
                     `> 📈 **Reliability**: \`${req.consistency || 0}%\``,
                     req.maxWarnings !== undefined ? `> ⚠️ **Risk Limit**: \`${req.maxWarnings}\`` : null,
                     req.shiftHours > 0 ? `> ⏱️ **Flight Time**: \`${req.shiftHours}h\`` : null

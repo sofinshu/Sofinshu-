@@ -14,7 +14,7 @@ module.exports = {
       const guildId = interaction.guildId;
 
       if (!staffSystem) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_shift_start').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_shift_start').setLabel('  Sync Live Data').setStyle(ButtonStyle.Secondary));
         return await interaction.editReply({ embeds: [createErrorEmbed('Staff system is currently offline.')], components: [row] });
       }
 
@@ -25,7 +25,7 @@ module.exports = {
       });
 
       if (existingShift) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_shift_start').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_shift_start').setLabel('  Sync Live Data').setStyle(ButtonStyle.Secondary));
         return await interaction.editReply({ embeds: [createErrorEmbed('You already have an active shift!')], components: [row] });
       }
 
@@ -60,8 +60,8 @@ module.exports = {
     } catch (error) {
       console.error(error);
       const errEmbed = createErrorEmbed('An error occurred while starting your shift.');
-      if (interaction.deferred || interaction.replied) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_shift_start').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
+            if (interaction.deferred || interaction.replied) {
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_shift_start').setLabel('  Sync Live Data').setStyle(ButtonStyle.Secondary));
         await return await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {
         await interaction.editReply({ embeds: [errEmbed], ephemeral: true });

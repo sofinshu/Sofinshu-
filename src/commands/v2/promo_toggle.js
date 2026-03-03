@@ -5,7 +5,7 @@ const { Guild } = require('../../database/mongo');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('promo_toggle')
-        .setDescription('🔄 Toggle the auto-promotion background engine on or off')
+        .setDescription('  Toggle the auto-promotion background engine on or off')
         .addBooleanOption(opt => opt.setName('enabled').setDescription('Whether auto-promotion should be active in this server').setRequired(true))
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild),
 

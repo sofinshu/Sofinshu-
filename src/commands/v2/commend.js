@@ -17,7 +17,7 @@ module.exports = {
             const guildId = interaction.guildId;
 
             if (targetUser.id === interaction.user.id) {
-                const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_commend').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
+                const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_commend').setLabel('  Sync Live Data').setStyle(ButtonStyle.Secondary));
                 return await interaction.editReply({ embeds: [createErrorEmbed('Self-commendation protocol is prohibited for data integrity.')], components: [row] });
             }
 
@@ -27,7 +27,7 @@ module.exports = {
             ]);
 
             if (!sender || !sender.staff || !receiver || !receiver.staff) {
-                const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_commend').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
+                const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_commend').setLabel('  Sync Live Data').setStyle(ButtonStyle.Secondary));
                 return await interaction.editReply({ embeds: [createErrorEmbed('Personnel not found in the staff registry.')], components: [row] });
             }
 
@@ -54,12 +54,12 @@ module.exports = {
                 color: 'premium'
             });
 
-            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_commend').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
+            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_commend').setLabel('  Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
         } catch (error) {
             console.error('Commend Error:', error);
-            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_commend').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
+            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_commend').setLabel('  Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('Cultural suite failure: Unable to record peer recognition.')], components: [row] });
         }
     }

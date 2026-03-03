@@ -51,7 +51,7 @@ module.exports = {
         .lean();
 
       if (!tickets.length) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_ticketLogs').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_ticketLogs').setLabel('  Sync Live Data').setStyle(ButtonStyle.Secondary));
         return await interaction.editReply({ embeds: [createErrorEmbed('No tickets found matching your query.')], components: [row] });
       }
 
@@ -113,8 +113,8 @@ module.exports = {
     } catch (error) {
       console.error(error);
         const errEmbed = createErrorEmbed('An error occurred while fetching ticket logs.');
-        if (interaction.deferred || interaction.replied) {
-          const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_ticketLogs').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
+            if (interaction.deferred || interaction.replied) {
+          const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_ticketLogs').setLabel('  Sync Live Data').setStyle(ButtonStyle.Secondary));
           await return await interaction.editReply({ embeds: [errEmbed], components: [row] });
         } else {
         await interaction.editReply({ embeds: [errEmbed], ephemeral: true });

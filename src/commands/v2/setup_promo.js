@@ -99,7 +99,7 @@ module.exports = {
                 description: `Operational requirements for the **${rank.toUpperCase()}** classification have been successfully updated.`,
                 fields: [
                     { name: '⭐ Points', value: `\`${pts.toLocaleString()}\``, inline: true },
-                    { name: '🔄 Shifts', value: `\`${shifts}\``, inline: true },
+                    { name: '  Shifts', value: `\`${shifts}\``, inline: true },
                     { name: '📈 Reliability', value: `\`${consistency}%\``, inline: true },
                     { name: '⚠️ Risk Limit', value: `\`${maxWarnings}\``, inline: true }
                 ],

@@ -115,7 +115,7 @@ module.exports = {
     } catch (error) {
       console.error('Promotion Status Error:', error);
       const errEmbed = createErrorEmbed('An error occurred while fetching the promotion status.');
-      if (interaction.deferred || interaction.replied) {
+            if (interaction.deferred || interaction.replied) {
         const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_promotion_status').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
             await return await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {

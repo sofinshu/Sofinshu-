@@ -16,7 +16,7 @@ module.exports = {
       const user = await User.findOne({ userId: targetUser.id, 'guilds.guildId': interaction.guildId }).lean();
 
       if (!user || !user.staff) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_reputation').setLabel('🔄 Refresh').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_reputation').setLabel('  Refresh').setStyle(ButtonStyle.Secondary));
         return await interaction.editReply({ embeds: [createErrorEmbed('No staff data found for this user.')], components: [row] });
       }
 
@@ -43,13 +43,13 @@ module.exports = {
         color: rep >= 100 ? 'premium' : 'primary'
       });
 
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_reputation').setLabel('🔄 Refresh').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_reputation').setLabel('  Refresh').setStyle(ButtonStyle.Secondary));
       await interaction.editReply({ embeds: [embed], components: [row] });
     } catch (error) {
       console.error('Reputation Error:', error);
       const errEmbed = createErrorEmbed('Failed to load reputation data.');
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_reputation').setLabel('🔄 Retry').setStyle(ButtonStyle.Secondary));
-      if (interaction.deferred || interaction.replied) {
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_reputation').setLabel('  Retry').setStyle(ButtonStyle.Secondary));
+            if (interaction.deferred || interaction.replied) {
         await return await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {
         await interaction.editReply({ embeds: [errEmbed], ephemeral: true });

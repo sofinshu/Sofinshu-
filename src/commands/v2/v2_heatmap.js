@@ -18,8 +18,7 @@ module.exports = {
         } catch (error) {
             console.error('[v2_heatmap] Critical Error:', error);
             const errEmbed = createErrorEmbed('Critical failure in heatmap visualization matrix.');
-            if (interaction.deferred || interaction.replied) await interaction.editReply({ embeds: [errEmbed] });
-            else await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
+            if (interaction.deferred || interaction.replied) { return await interaction.editReply({ embeds: [errEmbed], components: [row] }); } else await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
         }
     }
 };
@@ -121,7 +120,7 @@ async function renderHeatmap(interaction, replyMessage, daysBack) {
             .setDisabled(daysBack === 90),
         new ButtonBuilder()
             .setCustomId('heat_refresh')
-            .setLabel('🔄 Sync Live Data')
+            .setLabel('  Sync Live Data')
             .setStyle(ButtonStyle.Secondary)
     );
 

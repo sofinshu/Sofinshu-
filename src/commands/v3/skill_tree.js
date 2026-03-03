@@ -14,9 +14,9 @@ module.exports = {
             await interaction.deferReply();
 
             // Enterprise Hyper-Apex License Guard
-            const license = await validatePremiumLicense(interaction);
+            const license = await validatePremiumLicense(interaction, 'premium');
             if (!license.allowed) {
-                return return await interaction.editReply({ embeds: [license.embed], components: license.components });
+                return await interaction.editReply({ embeds: [license.embed], components: license.components });
             }
 
             const targetUser = interaction.options.getUser('user') || interaction.user;
@@ -62,7 +62,7 @@ module.exports = {
                     { name: '⚔️ Tactical Vector', value: `${generateRibbon(tactical)} **${tactical}%**`, inline: true },
                     { name: '📊 Core Proficiency', value: `\`${rank} RANK SPECIALIST\``, inline: true },
                     { name: '✨ Signal Yield', value: `\`${points.toLocaleString()} pts\``, inline: true },
-                    { name: '🔄 Sync Rating', value: '`OPTIMAL`', inline: true }
+                    { name: '  Sync Rating', value: '`OPTIMAL`', inline: true }
                 ],
                 footer: 'Skill Tree Visualization • V3 Workforce Hyper-Apex Suite',
                 color: 'premium'

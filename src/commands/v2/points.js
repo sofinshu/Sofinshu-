@@ -20,7 +20,7 @@ module.exports = {
       const staffSystem = client.systems.staff;
 
       if (!staffSystem) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_points').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_points').setLabel('  Sync Live Data').setStyle(ButtonStyle.Secondary));
         return await interaction.editReply({ embeds: [createErrorEmbed('Staff system is offline.')], components: [row] });
       }
 
@@ -52,14 +52,14 @@ module.exports = {
         color: userPoints > 500 ? 'premium' : 'primary'
       });
 
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_points').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_points').setLabel('  Sync Live Data').setStyle(ButtonStyle.Secondary));
       await interaction.editReply({ embeds: [embed], components: [row] });
 
     } catch (error) {
       console.error('Points Command Error:', error);
       const errEmbed = createErrorEmbed('An error occurred while fetching points balance.');
-      if (interaction.deferred || interaction.replied) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_points').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
+            if (interaction.deferred || interaction.replied) {
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_points').setLabel('  Sync Live Data').setStyle(ButtonStyle.Secondary));
         await return await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {
         await interaction.editReply({ embeds: [errEmbed], ephemeral: true });

@@ -13,7 +13,7 @@ module.exports = {
         try {
             await interaction.deferReply();
 
-            const license = await validatePremiumLicense(interaction);
+            const license = await validatePremiumLicense(interaction, 'enterprise');
             if (!license.allowed) {
                 return await return await interaction.editReply({ embeds: [license.embed], components: license.components });
             }
@@ -31,7 +31,7 @@ module.exports = {
                 const row = new ActionRowBuilder().addComponents(
                     new ButtonBuilder()
                         .setCustomId('auto_ent_passport')
-                        .setLabel('🔄 Sync Enterprise Data')
+                        .setLabel('  Sync Enterprise Data')
                         .setStyle(ButtonStyle.Secondary)
                 );
                 return await interaction.editReply({
@@ -98,7 +98,7 @@ module.exports = {
             const row = new ActionRowBuilder().addComponents(
                 new ButtonBuilder()
                     .setCustomId('auto_ent_passport')
-                    .setLabel('🔄 Sync Enterprise Data')
+                    .setLabel('  Sync Enterprise Data')
                     .setStyle(ButtonStyle.Secondary)
             );
             return await interaction.editReply({ embeds: [embed], components: [row] });
@@ -108,10 +108,9 @@ module.exports = {
             const row = new ActionRowBuilder().addComponents(
                 new ButtonBuilder()
                     .setCustomId('auto_ent_passport')
-                    .setLabel('🔄 Sync Enterprise Data')
+                    .setLabel('  Sync Enterprise Data')
                     .setStyle(ButtonStyle.Secondary)
             );
-
             if (interaction.deferred || interaction.replied) {
                 return await return await interaction.editReply({ embeds: [errEmbed], components: [row] });
             } else {
