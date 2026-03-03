@@ -15,8 +15,8 @@ module.exports = {
       const staffSystem = client.systems.staff;
 
       if (!staffSystem) {
-        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_staff_stats').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [createErrorEmbed('Operational systems are currently offline.')], components: [row] });
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_staff_stats').setLabel('ðŸ”„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        return await interaction.editReply({ embeds: [createErrorEmbed('Operational systems are currently offline.')], components: [row] });
       }
 
       const points = await staffSystem.getPoints(user.id, interaction.guildId);
@@ -32,13 +32,13 @@ module.exports = {
       // 1. Merit Velocity Gauge (ASCII)
       const segments = 12;
       const velocity = Math.min(100, Math.round(score || 0));
-      const filled = '¦'.repeat(Math.round((velocity / 100) * segments));
-      const empty = '¦'.repeat(segments - filled.length);
+      const filled = 'ï¿½'.repeat(Math.round((velocity / 100) * segments));
+      const empty = 'ï¿½'.repeat(segments - filled.length);
       const velocityRibbon = `\`[? ${filled}${empty}]\` **${velocity}% INTENSITY**`;
 
       // 2. Efficiency Ribbon
       const efficiency = shifts.length > 0 ? (points / shifts.length).toFixed(1) : 0;
-      const efficiencyRibbon = `\`[${'¦'.repeat(Math.min(10, Math.round(efficiency)))}${'¦'.repeat(Math.max(0, 10 - Math.round(efficiency)))}]\``;
+      const efficiencyRibbon = `\`[${'ï¿½'.repeat(Math.min(10, Math.round(efficiency)))}${'ï¿½'.repeat(Math.max(0, 10 - Math.round(efficiency)))}]\``;
 
       const embed = await createCustomEmbed(interaction, {
         title: `?? Zenith Hyper-Apex: Operational Analytics`,
@@ -54,16 +54,16 @@ module.exports = {
           { name: '?? Incidents', value: `\`${warnings?.total || 0}\``, inline: true },
           { name: '?? Sessions', value: `\`${shifts.length}\``, inline: true }
         ],
-        footer: 'Operational Analytics Engine • V1 Foundation Hyper-Apex Suite',
+        footer: 'Operational Analytics Engine ï¿½ V1 Foundation Hyper-Apex Suite',
         color: 'premium'
       });
 
-      await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_staff_stats').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [embed], components: [row] });
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_staff_stats').setLabel('ðŸ”„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+      await interaction.editReply({ embeds: [embed], components: [row] });
     } catch (error) {
       console.error('Zenith Staff Stats Error:', error);
-      await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_staff_stats').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [createErrorEmbed('Operational Analytics failure: Unable to decode personnel telemetry.')], components: [row] });
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_staff_stats').setLabel('ðŸ”„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+      await interaction.editReply({ embeds: [createErrorEmbed('Operational Analytics failure: Unable to decode personnel telemetry.')], components: [row] });
     }
   }
 };

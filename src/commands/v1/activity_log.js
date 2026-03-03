@@ -28,8 +28,8 @@ module.exports = {
         .limit(limit);
 
       if (!activities || activities.length === 0) {
-        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_activity_log').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [createErrorEmbed('No activity recorded yet for these filters.')], components: [row] });
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_activity_log').setLabel('ðŸ”„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        return await interaction.editReply({ embeds: [createErrorEmbed('No activity recorded yet for these filters.')], components: [row] });
       }
 
       // Process types for pie chart
@@ -53,7 +53,7 @@ module.exports = {
         else if (actionUpper.includes('MOD') || actionUpper.includes('WARN')) emoji = '???';
         else if (actionUpper.includes('COMMAND')) emoji = '??';
 
-        return `${emoji} **${action}** • ${userName} • <t:${Math.floor(new Date(a.createdAt).getTime() / 1000)}:R>`;
+        return `${emoji} **${action}** ï¿½ ${userName} ï¿½ <t:${Math.floor(new Date(a.createdAt).getTime() / 1000)}:R>`;
       }));
 
       // Generate Pie Chart
@@ -72,14 +72,14 @@ module.exports = {
         footer: `Displaying last ${activities.length} internal events`
       });
 
-      await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_activity_log').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [embed], components: [row] });
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_activity_log').setLabel('ðŸ”„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+      await interaction.editReply({ embeds: [embed], components: [row] });
     } catch (error) {
       console.error(error);
       const errEmbed = createErrorEmbed('An error occurred while fetching the activity log.');
       if (interaction.deferred || interaction.replied) {
-        await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_activity_log').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [errEmbed], components: [row] });
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_activity_log').setLabel('ðŸ”„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {
         await interaction.reply({ embeds: [errEmbed], ephemeral: true });
       }

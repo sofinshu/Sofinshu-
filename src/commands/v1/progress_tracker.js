@@ -18,8 +18,8 @@ module.exports = {
       const user = await User.findOne({ userId: target.id, 'guilds.guildId': interaction.guildId }).lean();
 
       if (!user) {
-        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_progress_tracker').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [createErrorEmbed(`No local data found for **${target.username}**. Database entry missing for this sector.`)], components: [row] });
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_progress_tracker').setLabel('ðŸ”„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        return await interaction.editReply({ embeds: [createErrorEmbed(`No local data found for **${target.username}**. Database entry missing for this sector.`)], components: [row] });
       }
 
       const points = user.staff?.points || 0;
@@ -30,7 +30,7 @@ module.exports = {
 
       if (!nextRank) {
         const embed = await createCustomEmbed(interaction, {
-          title: `?? Progression Limit Reached — ${target.username}`,
+          title: `?? Progression Limit Reached ï¿½ ${target.username}`,
           thumbnail: target.displayAvatarURL({ dynamic: true }),
           description: '?? **Apex Status Achieved.** You have reached the maximum rank within the current hierarchical structure.',
           fields: [
@@ -39,8 +39,8 @@ module.exports = {
           ],
           color: 'enterprise'
         });
-        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_progress_tracker').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [embed], components: [row] });
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_progress_tracker').setLabel('ðŸ”„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        return await interaction.editReply({ embeds: [embed], components: [row] });
       }
 
       const currentThreshold = RANK_THRESHOLDS[rank] || 0;
@@ -48,10 +48,10 @@ module.exports = {
       const progress = Math.min(100, Math.round(((points - currentThreshold) / (nextThreshold - currentThreshold)) * 100));
       const needed = Math.max(0, nextThreshold - points);
       const barFilled = Math.min(10, Math.round(progress / 10));
-      const bar = '¦'.repeat(barFilled) + '¦'.repeat(10 - barFilled);
+      const bar = 'ï¿½'.repeat(barFilled) + 'ï¿½'.repeat(10 - barFilled);
 
       const embed = await createCustomEmbed(interaction, {
-        title: `?? Progression Telemetry — ${target.username}`,
+        title: `?? Progression Telemetry ï¿½ ${target.username}`,
         thumbnail: target.displayAvatarURL({ dynamic: true }),
         fields: [
           { name: '??? Current Tier', value: `\`${rank.toUpperCase()}\``, inline: true },
@@ -63,14 +63,14 @@ module.exports = {
         ]
       });
 
-      await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_progress_tracker').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [embed], components: [row] });
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_progress_tracker').setLabel('ðŸ”„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+      await interaction.editReply({ embeds: [embed], components: [row] });
     } catch (error) {
       console.error(error);
       const errEmbed = createErrorEmbed('An error occurred while tracking progress.');
       if (interaction.deferred || interaction.replied) {
-        await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_progress_tracker').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [errEmbed], components: [row] });
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_progress_tracker').setLabel('ðŸ”„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {
         await interaction.reply({ embeds: [errEmbed], ephemeral: true });
       }
