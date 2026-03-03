@@ -22,23 +22,24 @@ let logger = null; // Will be set in register function
 
 // ── In-memory spam tracker: { guildId:userId → [timestamps] }
 const spamTracker = new Map();
-const SPAM_WINDOW = 5000; // 5 seconds
-const SPAM_CLEANUP_INTERVAL = 60000; // 1 minute
+const SPAM_WINDOW = 5000; // 5 seconds window for spam tracking
+const SPAM_CLEANUP_INTERVAL = 60000; // Cleanup old entries every minute
 
 // Cleanup old spam tracker entries to prevent memory leaks
 setInterval(() => {
     const now = Date.now();
     let cleaned = 0;
-    for (const [key, times] of spamTracker.entries()) {
-        const recent = times.filter(t => now - t < SPAM_WINDOW);
+    for (const [key, timestamps] of spamTracker.entries()) {
+        // Remove entries with no recent activity
+        const recent = timestamps.filter(t => now - t < SPAM_WINDOW);
         if (recent.length === 0) {
             spamTracker.delete(key);
             cleaned++;
-        } else {
+        } else if (recent.length !== timestamps.length) {
             spamTracker.set(key, recent);
         }
     }
-    if (cleaned > 0 && logger) logger.debug(`[DashboardSystems] Cleaned ${cleaned} stale spam tracker entries`);
+    if (cleaned > 0 && logger) logger.debug(`[DashboardSystems] Cleaned up ${cleaned} stale spam tracker entries`);
 }, SPAM_CLEANUP_INTERVAL);
 
 // ── Settings cache (5-minute TTL to avoid DB hammering)
@@ -106,11 +107,10 @@ function register(client, loggerInstance) {
         if (spam.enabled) {
             const key = `${guildId}:${message.author.id}`;
             const now = Date.now();
-            const window = 5000; // 5 seconds
             const limit = spam.maxMessagesPerWindow || 5;
 
             if (!spamTracker.has(key)) spamTracker.set(key, []);
-            const times = spamTracker.get(key).filter(t => now - t < window);
+            const times = spamTracker.get(key).filter(t => now - t < SPAM_WINDOW);
             times.push(now);
             spamTracker.set(key, times);
 

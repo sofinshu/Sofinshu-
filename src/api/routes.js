@@ -20,9 +20,15 @@ function sanitizeInput(input) {
 function isValidObjectId(id) {
     return /^[0-9a-fA-F]{24}$/.test(id);
 }
+
 const { invalidateCache } = require('../dashboardSystems');
+const { validateGuildId, validateUserId, validatePagination, validateNoSQLInjection, isValidHexColor } = require('../middleware/validation');
+const logger = require('../utils/logger');
 
 const MANAGE_GUILD = 0x20; // Discord permission bit
+
+// Apply NoSQL injection validation to all routes
+router.use(validateNoSQLInjection);
 
 /* ── Auth middleware: verify Discord Bearer token ── */
 async function auth(req, res, next) {
