@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, PermissionFlagsBits, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createZenithEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
+const { createEnterpriseEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { createCustomEmbed, createErrorEmbed, createSuccessEmbed } = require('../../utils/embeds');
 const { validatePremiumLicense } = require('../../utils/premium_guard');
 const { User } = require('../../database/mongo');
@@ -61,7 +61,7 @@ module.exports = {
           color: 'zenith',
           footer: 'uwu-chan • Elite Badges System'
         });
-        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_zen_elite_badges').setLabel('ðŸ„ Refresh Hyper-Apex Metrics').setStyle(ButtonStyle.Secondary));
+        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_elite_badges').setLabel('ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
       }
 
@@ -88,13 +88,13 @@ module.exports = {
           color: 'zenith',
           footer: 'uwu-chan • Elite Badges System'
         });
-        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_zen_elite_badges').setLabel('ðŸ„ Refresh Hyper-Apex Metrics').setStyle(ButtonStyle.Secondary));
+        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_elite_badges').setLabel('ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
       }
 
       if (sub === 'grant') {
         if (!interaction.member.permissions.has(PermissionFlagsBits.ManageGuild)) {
-          return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_zen_elite_badges').setLabel('ðŸ„ Refresh Hyper-Apex Metrics').setStyle(ButtonStyle.Secondary));
+          return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_elite_badges').setLabel('ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('You need the `Manage Server` permission to grant badges.')], components: [row] });
         }
 
@@ -102,7 +102,7 @@ module.exports = {
         const badgeId = interaction.options.getString('badge');
         const badge = ELITE_BADGES.find(b => b.id === badgeId);
 
-        if (!badge) return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_zen_elite_badges').setLabel('ðŸ„ Refresh Hyper-Apex Metrics').setStyle(ButtonStyle.Secondary));
+        if (!badge) return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_elite_badges').setLabel('ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('Invalid badge selection.')], components: [row] });
 
         // Update user in DB — add to achievements array (no duplicates)
@@ -135,16 +135,18 @@ module.exports = {
           await target.send({ embeds: [dmEmbed] });
         } catch { }
 
-        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_zen_elite_badges').setLabel('ðŸ„ Refresh Hyper-Apex Metrics').setStyle(ButtonStyle.Secondary));
+        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_elite_badges').setLabel('ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
       }
     } catch (error) {
       console.error('[elite_badges] Error:', error);
       const errEmbed = createErrorEmbed('Failed to process elite badge operation.');
-      if (interaction.deferred || interaction.replied) await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_zen_elite_badges').setLabel('ðŸ„ Refresh Hyper-Apex Metrics').setStyle(ButtonStyle.Secondary));
+      if (interaction.deferred || interaction.replied) await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_elite_badges').setLabel('ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [errEmbed], components: [row] });
       else await interaction.reply({ embeds: [errEmbed], ephemeral: true });
     }
   }
 };
+
+
 

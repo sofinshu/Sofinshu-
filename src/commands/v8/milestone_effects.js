@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createZenithEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
+const { createEnterpriseEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { createEnterpriseEmbed } = require('../../utils/embeds');
 
 module.exports = {
@@ -34,10 +34,12 @@ module.exports = {
       .setDescription(effects)
       
       ;
-    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_zen_milestone_effects').setLabel('ðŸ„ Refresh Hyper-Apex Metrics').setStyle(ButtonStyle.Secondary));
+    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_milestone_effects').setLabel('ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
+
 
 
 

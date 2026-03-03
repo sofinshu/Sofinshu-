@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createZenithEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
+const { createEnterpriseEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { createEnterpriseEmbed } = require('../../utils/embeds');
 
 module.exports = {
@@ -33,10 +33,12 @@ module.exports = {
     if (feedback) embed.setDescription(`?? **Your Feedback:** ${feedback}\n\nThank you! This helps us improve the bot.`);
     else embed.setDescription('Use `/visual_feedback message:Your feedback here` to submit feedback.');
 
-    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_zen_visual_feedback').setLabel('ðŸ„ Refresh Hyper-Apex Metrics').setStyle(ButtonStyle.Secondary));
+    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_visual_feedback').setLabel('ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
+
 
 
 

@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType } = require('discord.js');
-const { createZenithEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
+const { createEnterpriseEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { createCustomEmbed, createErrorEmbed, createProgressBar } = require('../../utils/embeds');
 const { validatePremiumLicense } = require('../../utils/premium_guard');
 const { User, Guild, Shift, Warning } = require('../../database/mongo');
@@ -142,4 +142,6 @@ module.exports = {
     }
   }
 };
+
+
 

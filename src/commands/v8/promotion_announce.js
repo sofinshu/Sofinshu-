@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, PermissionFlagsBits, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createZenithEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
+const { createEnterpriseEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { validatePremiumLicense } = require('../../utils/premium_guard');
 const { User, Guild, Activity } = require('../../database/mongo');
@@ -33,7 +33,7 @@ module.exports = {
       }
 
       if (!interaction.member.permissions.has(PermissionFlagsBits.ManageRoles)) {
-        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_zen_promotion_announce').setLabel('ðŸ„ Refresh Hyper-Apex Metrics').setStyle(ButtonStyle.Secondary));
+        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_promotion_announce').setLabel('ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('You need the `Manage Roles` permission to promote staff.')], components: [row] });
       }
 
@@ -128,15 +128,17 @@ module.exports = {
         }
       }
 
-      await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_zen_promotion_announce').setLabel('ðŸ„ Refresh Hyper-Apex Metrics').setStyle(ButtonStyle.Secondary));
+      await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_promotion_announce').setLabel('ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [announceEmbed], components: [row] });
     } catch (error) {
       console.error('[promotion_announce] Error:', error);
       const errEmbed = createErrorEmbed('Failed to process promotion. Check bot permissions.');
-      if (interaction.deferred || interaction.replied) await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_zen_promotion_announce').setLabel('ðŸ„ Refresh Hyper-Apex Metrics').setStyle(ButtonStyle.Secondary));
+      if (interaction.deferred || interaction.replied) await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_promotion_announce').setLabel('ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [errEmbed], components: [row] });
       else await interaction.reply({ embeds: [errEmbed], ephemeral: true });
     }
   }
 };
+
+
 

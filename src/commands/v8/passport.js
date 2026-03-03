@@ -1,13 +1,13 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createZenithEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
+const { createEnterpriseEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { createCustomEmbed, createErrorEmbed, createProgressBar } = require('../../utils/embeds');
 const { validatePremiumLicense } = require('../../utils/premium_guard');
 const { User, Shift } = require('../../database/mongo');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('zenith_passport')
-        .setDescription('💎 Zenith Divine Identity Passport — complete holographic staff profile with real shift history')
+        .setName('passport')
+        .setDescription('💎 Enterprise Divine Identity Passport — complete holographic staff profile with real shift history')
         .addUserOption(opt => opt.setName('user').setDescription('Staff member to view').setRequired(false)),
 
     async execute(interaction) {
@@ -29,7 +29,7 @@ module.exports = {
             ]);
 
             if (!user || !user.staff) {
-                return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_zen_zenith_passport').setLabel('� Refresh Hyper-Apex Metrics').setStyle(ButtonStyle.Secondary));
+                return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_zenith_passport').setLabel('� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed(`No staff record found for <@${target.id}>. They must use the bot first.`)], components: [row] });
             }
 
@@ -72,7 +72,7 @@ module.exports = {
             const sectorStatus = tiers.map((t, i) => pts > i * 125 ? `\`✅${t}\`` : `\`❌${t}\``).join(' ');
 
             const embed = await createCustomEmbed(interaction, {
-                title: `💎 Zenith Passport: ${target.username}`,
+                title: `💎 Enterprise Passport: ${target.username}`,
                 thumbnail: target.displayAvatarURL({ dynamic: true, size: 256 }),
                 description: `The definitive identity record for **${target.username}** in **${interaction.guild.name}**.\n\n${identityRibbon}\n\n**Sector Access:**\n${sectorStatus}`,
                 fields: [
@@ -85,18 +85,20 @@ module.exports = {
                     { name: '🏅 Achievements', value: achieveDisplay, inline: false }
                 ],
                 color: 'zenith',
-                footer: `uwu-chan • Zenith Passport • ID: ${target.id}`
+                footer: `uwu-chan • Enterprise Passport • ID: ${target.id}`
             });
 
-            await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_zen_zenith_passport').setLabel('� Refresh Hyper-Apex Metrics').setStyle(ButtonStyle.Secondary));
+            await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_zenith_passport').setLabel('� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
         } catch (error) {
             console.error('[zenith_passport] Error:', error);
-            const errEmbed = createErrorEmbed('Failed to load Zenith Passport.');
-            if (interaction.deferred || interaction.replied) await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_zen_zenith_passport').setLabel('� Refresh Hyper-Apex Metrics').setStyle(ButtonStyle.Secondary));
+            const errEmbed = createErrorEmbed('Failed to load Enterprise Passport.');
+            if (interaction.deferred || interaction.replied) await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_zenith_passport').setLabel('� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [errEmbed], components: [row] });
             else await interaction.reply({ embeds: [errEmbed], ephemeral: true });
         }
     }
 };
+
+
 

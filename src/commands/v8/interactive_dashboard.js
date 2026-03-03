@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType } = require('discord.js');
-const { createZenithEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
+const { createEnterpriseEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { createCustomEmbed, createErrorEmbed, createProgressBar } = require('../../utils/embeds');
 const { validatePremiumLicense } = require('../../utils/premium_guard');
 const { Guild, Activity, User } = require('../../database/mongo');
@@ -7,7 +7,7 @@ const { Guild, Activity, User } = require('../../database/mongo');
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('interactive_dashboard')
-    .setDescription('?? Zenith fully interactive server dashboard with real-time tab navigation'),
+    .setDescription('?? Enterprise fully interactive server dashboard with real-time tab navigation'),
 
   async execute(interaction) {
     try {
@@ -46,7 +46,7 @@ module.exports = {
               { name: '?? Total Tracked Staff', value: `\`${users.length}\``, inline: true }
             ],
             color: 'enterprise',
-            footer: 'uwu-chan • Zenith Staff Tab'
+            footer: 'uwu-chan • Enterprise Staff Tab'
           });
         }
 
@@ -75,7 +75,7 @@ module.exports = {
               }
             ],
             color: 'enterprise',
-            footer: 'uwu-chan • Zenith Moderation Tab'
+            footer: 'uwu-chan • Enterprise Moderation Tab'
           });
         }
 
@@ -96,7 +96,7 @@ module.exports = {
         return createCustomEmbed(interaction, {
           title: `?? Server Dashboard — ${interaction.guild.name}`,
           thumbnail: interaction.guild.iconURL({ dynamic: true }),
-          description: `Welcome to the Zenith Interactive Dashboard. Navigate tabs below.`,
+          description: `Welcome to the Enterprise Interactive Dashboard. Navigate tabs below.`,
           fields: [
             { name: '?? Members', value: `\`${memberCount.toLocaleString()}\``, inline: true },
             { name: '? Active (7d)', value: `\`${activeUsers}\``, inline: true },
@@ -107,7 +107,7 @@ module.exports = {
             { name: '?? Server Created', value: `<t:${Math.floor(interaction.guild.createdTimestamp / 1000)}:D>`, inline: true }
           ],
           color: 'zenith',
-          footer: 'uwu-chan • Zenith Interactive Dashboard'
+          footer: 'uwu-chan • Enterprise Interactive Dashboard'
         });
       };
 
@@ -145,4 +145,6 @@ module.exports = {
     }
   }
 };
+
+
 

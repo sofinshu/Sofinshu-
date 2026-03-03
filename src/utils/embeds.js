@@ -8,7 +8,7 @@ const EMBED_COLORS = {
     info: '#3498db',
     premium: '#ff73fa',
     enterprise: '#f1c40f',
-    zenith: '#00fff5',
+    
     dark: '#2f3136',
     free: '#5865F2'
 };
@@ -179,7 +179,7 @@ function createEnterpriseEmbed(options = {}) {
 /**
  * Creates a zenith-styled embed
  */
-function createZenithEmbed(options = {}) {
+) {
     return createTierEmbed('zenith', {
         ...options,
         title: options.title || 'Zenith Feature'
@@ -208,6 +208,7 @@ module.exports = {
     createSuccessEmbed,
     createPremiumEmbed,
     createEnterpriseEmbed,
-    createZenithEmbed,
+    
     createStatField
 };
+

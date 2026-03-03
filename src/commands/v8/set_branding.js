@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createZenithEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
+const { createEnterpriseEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { validatePremiumLicense } = require('../../utils/premium_guard');
 const { Guild } = require('../../database/mongo');
@@ -7,7 +7,7 @@ const { Guild } = require('../../database/mongo');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('set_branding')
-        .setDescription('Zenith Hyper-Apex: macroscopic Visual Entity Branding & Divine Frames')
+        .setDescription('Enterprise Hyper-Apex: macroscopic Visual Entity Branding & Divine Frames')
         .addStringOption(opt => opt.setName('title').setDescription('The visual entity title').setRequired(true))
         .addStringOption(opt => opt.setName('color').setDescription('The hex color code (e.g. #7289DA)').setRequired(false)),
 
@@ -15,7 +15,7 @@ module.exports = {
         try {
             await interaction.deferReply();
 
-            // Zenith Hyper-Apex License Guard
+            // Enterprise Hyper-Apex License Guard
             const license = await validatePremiumLicense(interaction);
             if (!license.allowed) {
                 return interaction.editReply({ embeds: [license.embed], components: license.components });
@@ -40,7 +40,7 @@ module.exports = {
             const previewFrame = generateFrame(title.toUpperCase());
 
             const embed = await createCustomEmbed(interaction, {
-                title: 'ðŸŽ¨ Zenith Hyper-Apex: Visual Calibration',
+                title: 'ðŸŽ¨ Enterprise Hyper-Apex: Visual Calibration',
                 thumbnail: interaction.guild.iconURL({ dynamic: true }),
                 description: `### âœ¨ Divine Visual Identity Updated\nStrategic sector branding has been recalibrated for **${interaction.guild.name}**.\n\n**ðŸ’Ž VISUAL ENTITY PREVIEW**\n${previewFrame}\n\n**ðŸ’Ž ZENITH HYPER-APEX EXCLUSIVE**`,
                 fields: [
@@ -54,14 +54,16 @@ module.exports = {
                 color: 'premium'
             });
 
-            await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_zen_set_branding').setLabel('ðŸ„ Refresh Hyper-Apex Metrics').setStyle(ButtonStyle.Secondary));
+            await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_set_branding').setLabel('ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
         } catch (error) {
-            console.error('Zenith Set Branding Error:', error);
-            await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_zen_set_branding').setLabel('ðŸ„ Refresh Hyper-Apex Metrics').setStyle(ButtonStyle.Secondary));
+            console.error('Enterprise Set Branding Error:', error);
+            await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_set_branding').setLabel('ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('Visual Calibration failure: Unable to synchronize sector branding.')], components: [row] });
         }
     }
 };
+
+
 
