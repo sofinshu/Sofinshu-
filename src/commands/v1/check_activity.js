@@ -542,3 +542,4 @@ function createProgressBar(percent, length = 15) {
     const empty = length - filled;
     return '▇'.repeat(filled) + '—'.repeat(empty);
 }
+
