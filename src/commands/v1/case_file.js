@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+﻿const { ActionRowBuilder, ButtonBuilder, ButtonStyle, SlashCommandBuilder } = require('discord.js');
 const { createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { User, Shift, Warning, Activity } = require('../../database/mongo');
 
@@ -16,7 +16,7 @@ module.exports = {
 
             const userRecord = await User.findOne({ userId: targetUser.id, 'guilds.guildId': guildId }).lean();
             if (!userRecord || !userRecord.staff) {
-                const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_case_file').setLabel('  Sync Live Data').setStyle(ButtonStyle.Secondary));
+                const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_case_file').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
                 return await interaction.editReply({ embeds: [createErrorEmbed(`No local database records exist for **${targetUser.username}** in this sector.`)], components: [row] });
             }
 
@@ -88,15 +88,15 @@ module.exports = {
                 { name: '🏅 Relational Analytics', value: `\`Lifetime Velocity:\` **${totalHrs}h**\n\`Merits Unlocked:\` **${trophies.length}**\n\`Login Streak:\` 🔥 **${userRecord.staff.streak || 0}**`, inline: false }
             );
 
-            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_case_file').setLabel('  Sync Live Data').setStyle(ButtonStyle.Secondary));
+            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_case_file').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
         } catch (error) {
             console.error('Case File Error:', error);
             const errEmbed = createErrorEmbed('An error occurred while generating the user case file.');
             if (interaction.deferred || interaction.replied) {
-                const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_case_file').setLabel('  Sync Live Data').setStyle(ButtonStyle.Secondary));
-                await return await interaction.editReply({ embeds: [errEmbed], components: [row] });
+                const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_case_file').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
+                return await interaction.editReply({ embeds: [errEmbed], components: [row] });
             } else {
                 await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
             }

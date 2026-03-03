@@ -1,9 +1,9 @@
-const { SlashCommandBuilder, ActionRowBuilder, StringSelectMenuBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+﻿const { ActionRowBuilder, ButtonBuilder, ButtonStyle, SlashCommandBuilder, StringSelectMenuBuilder } = require('discord.js');
 const { createCustomEmbed, createErrorEmbed, createTierEmbed } = require('../../utils/embeds');
 
 const CATEGORIES = {
   general: {
-    emoji: '??',
+    emoji: '⚙️',
     label: 'General Utilities',
     description: 'Core commands available to everyone',
     commands: [
@@ -15,7 +15,7 @@ const CATEGORIES = {
     ]
   },
   staff: {
-    emoji: '??',
+    emoji: '👔',
     label: 'Staff & Shifts',
     description: 'Staff management and shift tracking',
     commands: [
@@ -30,7 +30,7 @@ const CATEGORIES = {
     ]
   },
   analytics: {
-    emoji: '??',
+    emoji: '📊',
     label: 'Analytics',
     description: 'Server and staff performance data',
     commands: [
@@ -42,7 +42,7 @@ const CATEGORIES = {
     ]
   },
   moderation: {
-    emoji: '???',
+    emoji: '🛡️',
     label: 'Moderation',
     description: 'Server moderation tools',
     commands: [
@@ -53,7 +53,7 @@ const CATEGORIES = {
     ]
   },
   premium: {
-    emoji: '??',
+    emoji: '💎',
     label: 'Premium & Enterprise',
     description: 'Unlock advanced features',
     commands: [
@@ -67,7 +67,7 @@ const CATEGORIES = {
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('help')
-    .setDescription('?? Interactive command directory � browse all available features')
+    .setDescription('📖 Interactive command directory • browse all available features')
     .addStringOption(opt =>
       opt.setName('command')
         .setDescription('Get details for a specific command')
@@ -76,14 +76,14 @@ module.exports = {
 
   async execute(interaction) {
     try {
-            await interaction.deferReply({ fetchReply: true });
+      await interaction.deferReply({ fetchReply: true });
       const commandName = interaction.options.getString('command');
 
       if (commandName) {
         const embed = createTierEmbed('free', {
           title: `Help: /${commandName}`,
-          description: `Showing details for the \`${commandName}\` command.\nSome features require a higher license tier � use \`/buy\` to upgrade.`,
-          footer: 'uwu-chan � Type /help to see all categories'
+          description: `Showing details for the \`${commandName}\` command.\nSome features require a higher license tier • use \`/buy\` to upgrade.`,
+          footer: 'uwu-chan • Type /help to see all categories'
         });
         return interaction.editReply({ embeds: [embed], ephemeral: true });
       }
@@ -94,7 +94,7 @@ module.exports = {
       const selectRow = new ActionRowBuilder().addComponents(
         new StringSelectMenuBuilder()
           .setCustomId('help_category_select')
-          .setPlaceholder('?? Browse a command category...')
+          .setPlaceholder('📂 Browse a command category...')
           .addOptions(
             Object.entries(CATEGORIES).map(([key, cat]) => ({
               label: cat.label,
@@ -107,11 +107,11 @@ module.exports = {
 
       const buttonRow = new ActionRowBuilder().addComponents(
         new ButtonBuilder()
-          .setLabel('?? Upgrade')
+          .setLabel('⭐ Upgrade')
           .setStyle(ButtonStyle.Link)
           .setURL('https://discord.gg/uwuchan'),
         new ButtonBuilder()
-          .setLabel('?? GitHub')
+          .setLabel('🔗 GitHub')
           .setStyle(ButtonStyle.Link)
           .setURL('https://github.com/Reyrey-mibombo/uwu-chan-saas')
       );
@@ -121,7 +121,7 @@ module.exports = {
       const collector = msg.createMessageComponentCollector({ time: 120000 });
       collector.on('collect', async i => {
         if (i.user.id !== interaction.user.id) {
-          return i.reply({ content: '? This menu is not for you.', ephemeral: true });
+          return i.reply({ content: '❌ This menu is not for you.', ephemeral: true });
         }
         if (i.customId === 'help_category_select') {
           await i.deferUpdate();
@@ -138,7 +138,7 @@ module.exports = {
     } catch (error) {
       console.error('[help] Error:', error);
       const errEmbed = createErrorEmbed('An error occurred while loading the help menu.');
-            if (interaction.deferred || interaction.replied) {
+      if (interaction.deferred || interaction.replied) {
         await interaction.editReply({ embeds: [errEmbed] });
       } else {
         await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
@@ -151,7 +151,7 @@ async function buildCategoryEmbed(interaction, categoryKey) {
   const cat = CATEGORIES[categoryKey] || CATEGORIES.general;
 
   const commandList = cat.commands
-    .map(c => `**${c.name}** � ${c.desc}`)
+    .map(c => `**${c.name}** • ${c.desc}`)
     .join('\n');
 
   return createCustomEmbed(interaction, {
@@ -159,12 +159,10 @@ async function buildCategoryEmbed(interaction, categoryKey) {
     description: `${cat.description}\n\n${commandList}`,
     thumbnail: interaction.client.user?.displayAvatarURL(),
     fields: [
-      { name: '?? Commands Available', value: `\`${cat.commands.length}\` in this category`, inline: true },
-      { name: '?? Total Categories', value: `\`${Object.keys(CATEGORIES).length}\` categories`, inline: true }
+      { name: '📜 Commands Available', value: `\`${cat.commands.length}\` in this category`, inline: true },
+      { name: '📁 Total Categories', value: `\`${Object.keys(CATEGORIES).length}\` categories`, inline: true }
     ],
-    footer: `uwu-chan Help � Use /buy to unlock Premium & Enterprise`,
+    footer: `uwu-chan Help • Use /buy to unlock Premium & Enterprise`,
     color: 'primary'
   });
 }
-
-

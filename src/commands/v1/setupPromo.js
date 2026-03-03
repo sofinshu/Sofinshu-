@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, PermissionFlagsBits, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+﻿const { ActionRowBuilder, ButtonBuilder, ButtonStyle, PermissionFlagsBits, SlashCommandBuilder } = require('discord.js');
 const { createCustomEmbed, createErrorEmbed, createSuccessEmbed } = require('../../utils/embeds');
 const { Guild } = require('../../database/mongo');
 
@@ -57,30 +57,30 @@ module.exports = {
 
       const rolesList = [
         `? Staff: <@&${staffRole.id}>`,
-        seniorRole ? `?? Senior: <@&${seniorRole.id}>` : null,
-        managerRole ? `?? Manager: <@&${managerRole.id}>` : null,
-        adminRole ? `?? Admin: <@&${adminRole.id}>` : null
+        seniorRole ? `🎖️ Senior: <@&${seniorRole.id}>` : null,
+        managerRole ? `👔 Manager: <@&${managerRole.id}>` : null,
+        adminRole ? `👑 Admin: <@&${adminRole.id}>` : null
       ].filter(Boolean).join('\n');
 
       const embed = await createCustomEmbed(interaction, {
         title: '? Promotion Architecture Deployed',
         description: 'Your server\'s promotion system and rank hierarchy have been successfully initialized.',
         fields: [
-          { name: '?? Notification Vector', value: `<#${channel.id}>`, inline: true },
-          { name: '?? Rank Assignment Matrix', value: rolesList, inline: false },
-          { name: '?? Threshold Configuration', value: '```Staff: 100pts\nSenior: 300pts\nManager: 600pts\nAdmin: 1000pts```', inline: false }
+          { name: '📡 Notification Vector', value: `<#${channel.id}>`, inline: true },
+          { name: '📊 Rank Assignment Matrix', value: rolesList, inline: false },
+          { name: '📈 Threshold Configuration', value: '```Staff: 100pts\nSenior: 300pts\nManager: 600pts\nAdmin: 1000pts```', inline: false }
         ],
         color: 'success'
       });
 
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_setupPromo').setLabel('  Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_setupPromo').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
       await interaction.editReply({ embeds: [embed], components: [row] });
     } catch (error) {
       console.error(error);
       const errEmbed = createErrorEmbed('An error occurred during promotion setup.');
-            if (interaction.deferred || interaction.replied) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_setupPromo').setLabel('  Sync Live Data').setStyle(ButtonStyle.Secondary));
-        await return await interaction.editReply({ embeds: [errEmbed], components: [row] });
+      if (interaction.deferred || interaction.replied) {
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_setupPromo').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
+        return await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {
         await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
       }

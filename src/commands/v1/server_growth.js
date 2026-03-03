@@ -1,11 +1,11 @@
-const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+﻿const { ActionRowBuilder, ButtonBuilder, ButtonStyle, SlashCommandBuilder } = require('discord.js');
 const { createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { DailyActivity } = require('../../database/mongo');
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('server_growth')
-        .setDescription('Enterprise Hyper-Apex: Macroscopic Growth Velocity & Sparkline Modeling'),
+        .setDescription('V1 Foundation: Macroscopic Growth Velocity & Sparkline Modeling'),
 
     async execute(interaction) {
         try {
@@ -75,9 +75,9 @@ module.exports = {
             const chartUrl = `https://quickchart.io/chart?c=${encodeURIComponent(JSON.stringify(chartConfig))}&bkg=transparent&w=600&h=300`;
 
             const embed = await createCustomEmbed(interaction, {
-                title: '📈 Enterprise Hyper-Apex: Growth Velocity',
+                title: '📈 V1 Foundation: Growth Velocity',
                 thumbnail: interaction.guild.iconURL({ dynamic: true }),
-                description: `### 🚀 Macroscopic Activity Modeling\nTracking signal density and growth trajectories for sector **${interaction.guild.name}**.\n\n**💎 Enterprise HYPER-APEX EXCLUSIVE**`,
+                description: `### 🚀 Macroscopic Activity Modeling\nTracking signal density and growth trajectories for sector **${interaction.guild.name}**.\n\n**💎 V1 Foundation EXCLUSIVE**`,
                 fields: [
                     { name: '📊 Growth Velocity Sparkline', value: velocityRibbon, inline: false },
                     { name: '📉 7D Volume', value: `\`${sumMessages.toLocaleString()}\` signals`, inline: true },
@@ -88,15 +88,15 @@ module.exports = {
                 ],
                 image: chartUrl,
                 footer: 'Growth Velocity Analytics • V1 Foundation Hyper-Apex Suite',
-                color: 'premium'
+                color: 'primary'
             });
 
-            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_server_growth').setLabel('  Sync Live Data').setStyle(ButtonStyle.Secondary));
+            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_server_growth').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
         } catch (error) {
             console.error('Enterprise Server Growth Error:', error);
-            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_server_growth').setLabel('  Sync Live Data').setStyle(ButtonStyle.Secondary));
+            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_server_growth').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('Growth Analytics failure: Unable to compute macroscopic velocity models.')], components: [row] });
         }
     }

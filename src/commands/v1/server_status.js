@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+﻿const { ActionRowBuilder, ButtonBuilder, ButtonStyle, SlashCommandBuilder } = require('discord.js');
 const { createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
 
 module.exports = {
@@ -46,9 +46,9 @@ module.exports = {
             const globalPoints = globalPointsData[0]?.total || 0;
 
             const embed = await createCustomEmbed(interaction, {
-                title: `📊 Macroscopic Status: ${guild.name}`,
+                title: `📊 Server Status: ${guild.name}`,
                 thumbnail: guild.iconURL({ dynamic: true }),
-                description: `**ID:** \`${guild.id}\`\n**Owner:** <@${guild.ownerId}>\n**Clearance:** \`V2 APEX\``,
+                description: `**ID:** \`${guild.id}\`\n**Owner:** <@${guild.ownerId}>\n**Clearance:** \`V1 Foundation\``,
                 footer: 'Real-time telemetry aggregated from local cache and global spectral logs.'
             });
 
@@ -61,18 +61,18 @@ module.exports = {
                 { name: '🛠️ Metadata', value: `Roles: **${rolesCount}**\nEmojis: **${emojisCount}**`, inline: true }
             );
 
-            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_server_status').setLabel('  Sync Live Data').setStyle(ButtonStyle.Secondary));
+            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_server_status').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
         } catch (error) {
             console.error('Server Status Error:', error);
             const errEmbed = createErrorEmbed('An error occurred while analyzing the server cache.');
             if (interaction.deferred || interaction.replied) {
-            const row = new ActionRowBuilder().addComponents(
-                new ButtonBuilder().setCustomId('auto_v1_server_status').setLabel('  Refresh').setStyle(ButtonStyle.Secondary),
-                new ButtonBuilder().setLabel('📈 Analytics').setStyle(ButtonStyle.Primary).setCustomId('analytics_btn')
-            );
-                await return await interaction.editReply({ embeds: [errEmbed], components: [row] });
+                const row = new ActionRowBuilder().addComponents(
+                    new ButtonBuilder().setCustomId('auto_v1_server_status').setLabel('🔄 Refresh').setStyle(ButtonStyle.Secondary),
+                    new ButtonBuilder().setLabel('📈 Analytics').setStyle(ButtonStyle.Primary).setCustomId('analytics_btn')
+                );
+                return await interaction.editReply({ embeds: [errEmbed], components: [row] });
             } else {
                 await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
             }

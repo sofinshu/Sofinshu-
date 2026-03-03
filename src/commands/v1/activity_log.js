@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+﻿const { ActionRowBuilder, ButtonBuilder, ButtonStyle, SlashCommandBuilder } = require('discord.js');
 const { createCoolEmbed, createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { createPieChart } = require('../../utils/charts');
 
@@ -28,7 +28,7 @@ module.exports = {
         .limit(limit);
 
       if (!activities || activities.length === 0) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_activity_log').setLabel('  Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_activity_log').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
         return await interaction.editReply({ embeds: [createErrorEmbed('No activity recorded yet for these filters.')], components: [row] });
       }
 
@@ -46,12 +46,12 @@ module.exports = {
 
         // Select emoji based on type
         const actionUpper = action.toUpperCase();
-        let emoji = '??';
-        if (actionUpper.includes('MESSAGE')) emoji = '??';
-        else if (actionUpper.includes('JOIN')) emoji = '??';
-        else if (actionUpper.includes('SHIFT')) emoji = '??';
-        else if (actionUpper.includes('MOD') || actionUpper.includes('WARN')) emoji = '???';
-        else if (actionUpper.includes('COMMAND')) emoji = '??';
+        let emoji = '📜';
+        if (actionUpper.includes('MESSAGE')) emoji = '💬';
+        else if (actionUpper.includes('JOIN')) emoji = '📥';
+        else if (actionUpper.includes('SHIFT')) emoji = '⏱️';
+        else if (actionUpper.includes('MOD') || actionUpper.includes('WARN')) emoji = '🛡️';
+        else if (actionUpper.includes('COMMAND')) emoji = '⚙️';
 
         return `${emoji} **${action}** � ${userName} � <t:${Math.floor(new Date(a.createdAt).getTime() / 1000)}:R>`;
       }));
@@ -62,7 +62,7 @@ module.exports = {
       const chartUrl = createPieChart(labels, data, 'Activity Partitioning');
 
       const embed = await createCustomEmbed(interaction, {
-        title: targetUser ? `?? User Dossier: ${targetUser.username}` : '?? Operational Activity Log',
+        title: targetUser ? `📖 User Dossier: ${targetUser.username}` : '📋 Operational Activity Log',
         description: activityList.join('\n'),
         image: chartUrl,
         author: {
@@ -72,14 +72,14 @@ module.exports = {
         footer: `Displaying last ${activities.length} internal events`
       });
 
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_activity_log').setLabel('  Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_activity_log').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
       await interaction.editReply({ embeds: [embed], components: [row] });
     } catch (error) {
       console.error(error);
       const errEmbed = createErrorEmbed('An error occurred while fetching the activity log.');
-            if (interaction.deferred || interaction.replied) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_activity_log').setLabel('  Sync Live Data').setStyle(ButtonStyle.Secondary));
-        await return await interaction.editReply({ embeds: [errEmbed], components: [row] });
+      if (interaction.deferred || interaction.replied) {
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_activity_log').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
+        return await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {
         await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
       }

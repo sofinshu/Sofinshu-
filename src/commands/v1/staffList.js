@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType } = require('discord.js');
+﻿const { ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, SlashCommandBuilder } = require('discord.js');
 const { createCoolEmbed, createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { User } = require('../../database/mongo');
 
@@ -46,7 +46,7 @@ module.exports = {
         }).join('\n');
 
         return await createCustomEmbed(interaction, {
-          title: `?? Server Staff Index (${users.length} Records)`,
+          title: `👔 Server Staff Index (${users.length} Records)`,
           description: list || 'No staff identified within this sector.',
           footer: `Page ${page} / ${totalPages} � Real-time database dump`
         });
@@ -104,7 +104,7 @@ module.exports = {
     } catch (error) {
       console.error(error);
       const errEmbed = createErrorEmbed('An error occurred while fetching the staff list.');
-            if (interaction.deferred || interaction.replied) {
+      if (interaction.deferred || interaction.replied) {
         await interaction.editReply({ embeds: [errEmbed] });
       } else {
         await interaction.editReply({ embeds: [errEmbed], ephemeral: true });

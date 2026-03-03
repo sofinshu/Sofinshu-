@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+﻿const { ActionRowBuilder, ButtonBuilder, ButtonStyle, SlashCommandBuilder } = require('discord.js');
 const { createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { Shift } = require('../../database/mongo');
 
@@ -18,7 +18,7 @@ module.exports = {
             }).sort({ startTime: 1 }).lean();
 
             if (!activeShifts || activeShifts.length === 0) {
-                const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_active_shifts').setLabel('  Sync Live Data').setStyle(ButtonStyle.Secondary));
+                const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_active_shifts').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
                 return await interaction.editReply({ embeds: [createErrorEmbed('There are currently no staff members on duty.')], components: [row] });
             }
 
@@ -43,15 +43,15 @@ module.exports = {
                 footer: `Status: ${activeShifts.length} node(s) currently transmitting`
             });
 
-            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_active_shifts').setLabel('  Sync Live Data').setStyle(ButtonStyle.Secondary));
+            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_active_shifts').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
         } catch (error) {
             console.error('Active Shifts Error:', error);
             const errEmbed = createErrorEmbed('An error occurred while fetching the active shifts dashboard.');
             if (interaction.deferred || interaction.replied) {
-                const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_active_shifts').setLabel('  Sync Live Data').setStyle(ButtonStyle.Secondary));
-                await return await interaction.editReply({ embeds: [errEmbed], components: [row] });
+                const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_active_shifts').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
+                return await interaction.editReply({ embeds: [errEmbed], components: [row] });
             } else {
                 await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
             }

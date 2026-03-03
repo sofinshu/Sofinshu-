@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, PermissionFlagsBits, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+﻿const { ActionRowBuilder, ButtonBuilder, ButtonStyle, PermissionFlagsBits, SlashCommandBuilder } = require('discord.js');
 const { createCustomEmbed, createErrorEmbed, createSuccessEmbed } = require('../../utils/embeds');
 const { Guild } = require('../../database/mongo');
 
@@ -66,31 +66,31 @@ module.exports = {
       await guildData.save();
 
       const embed = await createCustomEmbed(interaction, {
-        title: `?? Protocol Update: ${rank.toUpperCase()}`,
+        title: `📜 Protocol Update: ${rank.toUpperCase()}`,
         description: `Threshold parameters for the **${rank}** tier have been recalibrated.`,
         fields: [
-          { name: '? Min Points', value: `\`${points}\``, inline: true },
-          { name: '?? Min Shifts', value: `\`${shifts}\``, inline: true },
-          { name: '?? Consistency', value: `\`${consistency}%\``, inline: true }
+          { name: '💎 Min Points', value: `\`${points}\``, inline: true },
+          { name: '⏱️ Min Shifts', value: `\`${shifts}\``, inline: true },
+          { name: '📊 Consistency', value: `\`${consistency}%\``, inline: true }
         ],
         color: 'success'
       });
 
-      if (maxWarnings !== null) embed.addFields({ name: '?? Max Warnings', value: `\`${maxWarnings}\``, inline: true });
-      if (shiftHours !== null) embed.addFields({ name: '? Min Hours', value: `\`${shiftHours}\``, inline: true });
-      if (achievements !== null) embed.addFields({ name: '?? achievements', value: `\`${achievements}\``, inline: true });
-      if (reputation !== null) embed.addFields({ name: '?? Reputation', value: `\`${reputation}\``, inline: true });
-      if (daysInServer !== null) embed.addFields({ name: '?? Tenure (Days)', value: `\`${daysInServer}\``, inline: true });
-      if (cleanRecordDays !== null) embed.addFields({ name: '? Record (Days)', value: `\`${cleanRecordDays}\``, inline: true });
+      if (maxWarnings !== null) embed.addFields({ name: '⚠️ Max Warnings', value: `\`${maxWarnings}\``, inline: true });
+      if (shiftHours !== null) embed.addFields({ name: '⏱️ Min Hours', value: `\`${shiftHours}\``, inline: true });
+      if (achievements !== null) embed.addFields({ name: '🏆 Achievements', value: `\`${achievements}\``, inline: true });
+      if (reputation !== null) embed.addFields({ name: '⭐ Reputation', value: `\`${reputation}\``, inline: true });
+      if (daysInServer !== null) embed.addFields({ name: '⏳ Tenure (Days)', value: `\`${daysInServer}\``, inline: true });
+      if (cleanRecordDays !== null) embed.addFields({ name: '🛡️ Record (Days)', value: `\`${cleanRecordDays}\``, inline: true });
 
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_set_requirements').setLabel('  Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_set_requirements').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
       await interaction.editReply({ embeds: [embed], components: [row] });
     } catch (error) {
       console.error(error);
       const errEmbed = createErrorEmbed('An error occurred while saving the requirements.');
-            if (interaction.deferred || interaction.replied) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_set_requirements').setLabel('  Sync Live Data').setStyle(ButtonStyle.Secondary));
-        await return await interaction.editReply({ embeds: [errEmbed], components: [row] });
+      if (interaction.deferred || interaction.replied) {
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_set_requirements').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
+        return await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {
         await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
       }

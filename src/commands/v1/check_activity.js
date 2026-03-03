@@ -1,9 +1,5 @@
-const { 
-    SlashCommandBuilder, 
-    
-    ActionRowBuilder, 
-    ButtonBuilder, 
-    ButtonStyle,
+﻿const {
+    SlashCommandBuilder,
     StringSelectMenuBuilder,
     StringSelectMenuOptionBuilder,
     ComponentType,
@@ -13,7 +9,7 @@ const {
     TextInputBuilder,
     TextInputStyle,
     EmbedBuilder
-, ActionRowBuilder , ButtonBuilder , ButtonStyle } = require('discord.js');
+} = require('discord.js');
 const { createCustomEmbed, createErrorEmbed, createSuccessEmbed } = require('../../utils/embeds');
 
 // In-memory storage
@@ -40,7 +36,7 @@ module.exports = {
 
         const targetUser = interaction.options.getUser('target') || interaction.user;
         const live = interaction.options.getBoolean('live') ?? false;
-        
+
         let member;
         try {
             member = await interaction.guild.members.fetch({ user: targetUser.id, force: true });
@@ -51,7 +47,7 @@ module.exports = {
         // Initial Presence Check
         const presence = member.presence;
         if (!presence || presence.status === 'offline') {
-                        const offlineEmbed = new EmbedBuilder()
+            const offlineEmbed = new EmbedBuilder()
                 .setTitle(`🔭 Target Lost: ${targetUser.username}`)
                 .setDescription('🔒 This user is **Offline**, **Invisible**, or has privacy settings enabled.')
                 .setThumbnail(targetUser.displayAvatarURL({ dynamic: true, size: 512 }))
@@ -110,7 +106,7 @@ module.exports = {
         );
 
         const row2 = new ActionRowBuilder().addComponents(
-            new ButtonBuilder().setCustomId('refresh').setLabel('  Refresh').setStyle(ButtonStyle.Primary),
+            new ButtonBuilder().setCustomId('refresh').setLabel('🔄 Refresh').setStyle(ButtonStyle.Primary),
             new ButtonBuilder().setLabel('👤 Profile').setStyle(ButtonStyle.Link).setURL(`https://discord.com/users/${targetUser.id}`),
             new ButtonBuilder().setCustomId('join_position').setLabel('🚪 Join Pos').setStyle(ButtonStyle.Secondary),
             new ButtonBuilder().setCustomId('mutual_servers').setLabel('🤝 Mutuals').setStyle(ButtonStyle.Secondary),
@@ -126,7 +122,7 @@ module.exports = {
 
         const components = [row1, row2, row3];
         const message = await interaction.editReply({ embeds: [embed], components });
-        
+
         viewModes.delete(tempId);
         viewModes.set(message.id, 'full');
 
@@ -148,7 +144,7 @@ module.exports = {
                     const freshPresence = freshMember.presence;
 
                     if (!freshPresence || freshPresence.status === 'offline') {
-            const offlineEmbed = new EmbedBuilder()
+                        const offlineEmbed = new EmbedBuilder()
                             .setDescription('🔴 **Target went offline.**')
                             .setColor('Red');
                         await message.edit({ embeds: [offlineEmbed], components: [] });
@@ -158,13 +154,13 @@ module.exports = {
                     }
 
                     updateHistory(targetUser.id, freshPresence);
-                    
+
                     const updatedEmbed = await buildSmartEmbed(
-                        interaction, targetUser, freshMember, freshPresence, 
-                        freshPresence.activities || [], 
+                        interaction, targetUser, freshMember, freshPresence,
+                        freshPresence.activities || [],
                         bannerURL, accentColor, viewModes.get(message.id) || 'full', currentFilter, updates
                     );
-                    
+
                     await message.edit({ embeds: [updatedEmbed] });
 
                 } catch (error) {
@@ -181,7 +177,7 @@ module.exports = {
             if (action === 'refresh') {
                 await i.deferUpdate();
                 await handleRefresh(i, targetUser, interaction, message, viewModes, currentFilter);
-            } 
+            }
             else if (action === 'activity_select') {
                 await i.deferUpdate();
                 currentFilter = i.values[0];
@@ -206,7 +202,7 @@ module.exports = {
                 const count = mutuals.size;
                 let list = mutuals.map(g => `• ${g.name}`).slice(0, 10).join('\n');
                 if (count > 10) list += `\n...and ${count - 10} more.`;
-                
+
                 const mutualEmbed = new EmbedBuilder()
                     .setTitle(`🤝 Mutual Servers`)
                     .setDescription(`I share **${count}** servers with ${targetUser.username}.\n\n${list || 'None'}`)
@@ -250,7 +246,7 @@ module.exports = {
 
         collector.on('end', () => {
             if (interval) clearInterval(interval);
-            message.edit({ components: [] }).catch(() => {});
+            message.edit({ components: [] }).catch(() => { });
         });
     }
 };
@@ -276,7 +272,7 @@ function updateHistory(userId, presence) {
 function buildTimelineText(history) {
     if (!history.length) return 'No history recorded.';
     return history.map(e => {
-        const time = `<t:${Math.floor(e.timestamp/1000)}:R>`;
+        const time = `<t:${Math.floor(e.timestamp / 1000)}:R>`;
         const emoji = e.status === 'online' ? '🟢' : e.status === 'idle' ? '🌙' : '⛔';
         const act = e.activities[0]?.name || 'Nothing';
         return `${emoji} ${time}: **${act}**`;
@@ -288,7 +284,7 @@ function getJoinPosition(guild, member) {
     // Sort existing cache by join date
     const sorted = [...guild.members.cache.values()]
         .sort((a, b) => a.joinedTimestamp - b.joinedTimestamp);
-    
+
     const position = sorted.findIndex(m => m.id === member.id);
     return position + 1;
 }
@@ -337,7 +333,7 @@ function buildTrustEmbed(user, member) {
 async function handleRefresh(i, targetUser, interaction, message, viewModes, currentFilter) {
     const freshMember = await interaction.guild.members.fetch({ user: targetUser.id, force: true });
     const freshPresence = freshMember.presence;
-    
+
     if (!freshPresence || freshPresence.status === 'offline') {
         return i.editReply({ content: '🔴 User went offline.', embeds: [], components: [] });
     }
@@ -348,11 +344,11 @@ async function handleRefresh(i, targetUser, interaction, message, viewModes, cur
         const u = await interaction.client.users.fetch(targetUser.id, { force: true });
         banner = u.bannerURL({ size: 1024 });
         accent = u.accentColor;
-    } catch {}
+    } catch { }
 
     const currentView = viewModes.get(message.id) || 'full';
     const refreshedEmbed = await buildSmartEmbed(
-        interaction, targetUser, freshMember, freshPresence, freshPresence.activities || [], 
+        interaction, targetUser, freshMember, freshPresence, freshPresence.activities || [],
         banner, accent, currentView, currentFilter, 0
     );
     await i.editReply({ embeds: [refreshedEmbed] });
@@ -363,13 +359,13 @@ async function handleMoreOptions(i, interaction, member, activities) {
         new ButtonBuilder().setCustomId('match_activity').setLabel('🤝 Find Similar').setStyle(ButtonStyle.Primary),
         new ButtonBuilder().setCustomId('note').setLabel('📝 Note').setStyle(ButtonStyle.Secondary)
     );
-    
+
     await i.reply({ content: '**Advanced Tools**', components: [row], ephemeral: true });
 
-    const collector = i.channel.createMessageComponentCollector({ 
-        filter: btn => btn.user.id === i.user.id, 
-        time: 60000, 
-        componentType: ComponentType.Button 
+    const collector = i.channel.createMessageComponentCollector({
+        filter: btn => btn.user.id === i.user.id,
+        time: 60000,
+        componentType: ComponentType.Button
     });
 
     collector.on('collect', async btn => {
@@ -377,11 +373,11 @@ async function handleMoreOptions(i, interaction, member, activities) {
         if (btn.customId === 'match_activity') {
             const actName = activities[0]?.name;
             if (!actName) return btn.editReply({ content: '❌ No activity to match.', components: [] });
-            
+
             const members = await interaction.guild.members.fetch();
             const matches = members.filter(m => m.presence?.activities?.some(a => a.name === actName));
             const list = matches.map(m => `• ${m.user.username}`).slice(0, 10).join('\n') || 'None found';
-            
+
             await btn.editReply({ content: `🤝 **Users also doing ${actName}:**\n${list}`, components: [] });
         }
         else if (btn.customId === 'note') {
@@ -401,7 +397,7 @@ async function handleMoreOptions(i, interaction, member, activities) {
 function buildPermissionsEmbed(interaction, member) {
     const perms = member.permissions.toArray();
     const dangerous = ['Administrator', 'BanMembers', 'KickMembers', 'ManageChannels', 'ManageGuild', 'ManageRoles'];
-    
+
     const dangerousPerms = perms.filter(p => dangerous.includes(p));
     const otherPerms = perms.filter(p => !dangerous.includes(p));
 
@@ -427,12 +423,12 @@ function buildPermissionsEmbed(interaction, member) {
 async function buildSmartEmbed(interaction, targetUser, member, presence, activities, bannerURL, accentColor, viewMode, filter, updateCount) {
     // Fix: Ensure color is always valid
     let color = member.displayHexColor !== '#000000' ? member.displayHexColor : (accentColor || 0x5865F2);
-    
+
     const spotify = activities.find(a => a.name === 'Spotify');
     if (spotify) color = 0x1DB954; // Spotify Green
 
     const statusEmoji = presence.status === 'online' ? '🟢' : presence.status === 'idle' ? '🌙' : presence.status === 'dnd' ? '⛔' : '⚫';
-    const clientStatus = presence.clientStatus ? 
+    const clientStatus = presence.clientStatus ?
         Object.keys(presence.clientStatus).map(k => k === 'desktop' ? '🖥️' : k === 'mobile' ? '📱' : '🌐').join(' ') : '❓';
 
     let thumbnail = targetUser.displayAvatarURL({ dynamic: true, size: 512 });
@@ -441,7 +437,7 @@ async function buildSmartEmbed(interaction, targetUser, member, presence, activi
     if (filter === 'deep') {
         const permCount = member.permissions.toArray().length;
         const ageDays = Math.floor((Date.now() - targetUser.createdTimestamp) / (1000 * 60 * 60 * 24));
-        
+
         return new EmbedBuilder()
             .setTitle(`🔬 Deep Scan: ${targetUser.username}`)
             .setColor(color)
@@ -473,7 +469,7 @@ async function buildSmartEmbed(interaction, targetUser, member, presence, activi
         if (v.streaming) vInfo += '📺 Streaming • ';
         if (v.selfVideo) vInfo += '📹 Video • ';
         if (v.selfMute || v.serverMute) vInfo += '🔇 Muted';
-        
+
         fields.push({ name: 'Voice State', value: vInfo, inline: true });
     } else {
         fields.push({ name: 'Voice State', value: 'Not connected', inline: true });
@@ -485,7 +481,7 @@ async function buildSmartEmbed(interaction, targetUser, member, presence, activi
         const artist = spotify.state || 'Unknown';
         const album = spotify.assets?.largeText || 'Unknown';
         const url = `https://open.spotify.com/track/${spotify.syncId || ''}`;
-        
+
         let progress = '';
         if (spotify.timestamps?.start && spotify.timestamps?.end) {
             const dur = spotify.timestamps.end - spotify.timestamps.start;
@@ -514,7 +510,7 @@ async function buildSmartEmbed(interaction, targetUser, member, presence, activi
                 let val = `**${act.name}**`;
                 if (act.details) val += `\n📝 ${act.details}`;
                 if (act.state) val += `\n📍 ${act.state}`;
-                
+
                 fields.push({ name: `🎮 ${typeStr}`, value: val, inline: false });
             }
         });

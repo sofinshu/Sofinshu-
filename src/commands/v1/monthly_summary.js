@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+﻿const { ActionRowBuilder, ButtonBuilder, ButtonStyle, SlashCommandBuilder } = require('discord.js');
 const { createCoolEmbed, createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { Guild, Activity, Shift, Warning } = require('../../database/mongo');
 
@@ -24,26 +24,26 @@ module.exports = {
       const totalShiftHours = shifts.reduce((acc, s) => acc + (s.duration || 0), 0) / 3600;
 
       const embed = await createCustomEmbed(interaction, {
-        title: `?? Operational Summary: ${guild.name}`,
+        title: `📊 Operational Summary: ${guild.name}`,
         description: 'Comprehensive 30-day longitudinal analytics report for server staff operations.',
         thumbnail: guild.iconURL({ dynamic: true }),
         fields: [
-          { name: '?? Active Personnel', value: `\`${activeStaff}\` members`, inline: true },
-          { name: '?? Total Active Hours', value: `\`${Math.round(totalShiftHours)}h\``, inline: true },
-          { name: '?? Total Incidents', value: `\`${warnings.length}\``, inline: true },
-          { name: '?? Event Logs', value: `\`${activities.length}\``, inline: true },
-          { name: '?? Member Count', value: `\`${guild.memberCount.toLocaleString()}\``, inline: true }
+          { name: '👥 Active Personnel', value: `\`${activeStaff}\` members`, inline: true },
+          { name: '⏱️ Total Active Hours', value: `\`${Math.round(totalShiftHours)}h\``, inline: true },
+          { name: '⚠️ Total Incidents', value: `\`${warnings.length}\``, inline: true },
+          { name: '📜 Event Logs', value: `\`${activities.length}\``, inline: true },
+          { name: '📈 Member Count', value: `\`${guild.memberCount.toLocaleString()}\``, inline: true }
         ]
       });
 
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_monthly_summary').setLabel('  Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_monthly_summary').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
       await interaction.editReply({ embeds: [embed], components: [row] });
     } catch (error) {
       console.error(error);
       const errEmbed = createErrorEmbed('An error occurred while fetching the monthly summary.');
-            if (interaction.deferred || interaction.replied) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_monthly_summary').setLabel('  Sync Live Data').setStyle(ButtonStyle.Secondary));
-        await return await interaction.editReply({ embeds: [errEmbed], components: [row] });
+      if (interaction.deferred || interaction.replied) {
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_monthly_summary').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
+        return await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {
         await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
       }

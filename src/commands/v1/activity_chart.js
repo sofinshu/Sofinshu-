@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+﻿const { ActionRowBuilder, ButtonBuilder, ButtonStyle, SlashCommandBuilder } = require('discord.js');
 const { createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
 const QuickChart = require('quickchart-js');
 const { Activity } = require('../../database/mongo');
@@ -6,7 +6,7 @@ const { Activity } = require('../../database/mongo');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('activity_chart')
-        .setDescription('Enterprise Hyper-Apex: Macroscopic Peak Intensity Ribbons & 7D Analytics'),
+        .setDescription('V1 Foundation: Standard Intensity Ribbons & 7D Analytics'),
 
     async execute(interaction) {
         try {
@@ -76,9 +76,9 @@ module.exports = {
             const chartUrl = await chart.getShortUrl();
 
             const embed = await createCustomEmbed(interaction, {
-                title: '📈 Enterprise Hyper-Apex: Engagement Analytics',
+                title: '📈 V1 Foundation: Engagement Analytics',
                 thumbnail: interaction.guild.iconURL({ dynamic: true }),
-                description: `### 🚀 Macroscopic Signal Intensity\nHigh-fidelity telemetry showing sector activity thresholds over the trailing 7-day cycle.\n\n**💎 Enterprise HYPER-APEX EXCLUSIVE**`,
+                description: `### 🚀 Signal Intensity\nHigh-fidelity telemetry showing sector activity thresholds over the trailing 7-day cycle.\n\n**💎 V1 Foundation EXCLUSIVE**`,
                 fields: [
                     { name: '🔥 Peak Intensity Ribbon', value: peakIntensityRibbon, inline: false },
                     { name: '📊 Total Velocity', value: `\`${totalActivity.toLocaleString()}\` events`, inline: true },
@@ -89,14 +89,14 @@ module.exports = {
                 ],
                 image: chartUrl,
                 footer: 'Engagement Analytics Engine • V1 Foundation Hyper-Apex Suite',
-                color: 'premium'
+                color: 'primary'
             });
 
-            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_activity_chart').setLabel('  Sync Live Data').setStyle(ButtonStyle.Secondary));
+            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_activity_chart').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
         } catch (error) {
-            console.error('Enterprise Activity Chart Error:', error);
-            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_activity_chart').setLabel('  Sync Live Data').setStyle(ButtonStyle.Secondary));
+            console.error('V1 Activity Chart Error:', error);
+            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_activity_chart').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('Engagement Analytics failure: Unable to synchronize signal intensity.')], components: [row] });
         }
     }

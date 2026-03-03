@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+﻿const { ActionRowBuilder, ButtonBuilder, ButtonStyle, SlashCommandBuilder } = require('discord.js');
 const { createCoolEmbed, createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { Ticket } = require('../../database/mongo');
 
@@ -51,7 +51,7 @@ module.exports = {
         .lean();
 
       if (!tickets.length) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_ticketLogs').setLabel('  Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_ticketLogs').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
         return await interaction.editReply({ embeds: [createErrorEmbed('No tickets found matching your query.')], components: [row] });
       }
 
@@ -112,11 +112,11 @@ module.exports = {
       await interaction.editReply({ embeds: [summaryEmbed, ...embeds].slice(0, 10) });
     } catch (error) {
       console.error(error);
-        const errEmbed = createErrorEmbed('An error occurred while fetching ticket logs.');
-            if (interaction.deferred || interaction.replied) {
-          const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_ticketLogs').setLabel('  Sync Live Data').setStyle(ButtonStyle.Secondary));
-          await return await interaction.editReply({ embeds: [errEmbed], components: [row] });
-        } else {
+      const errEmbed = createErrorEmbed('An error occurred while fetching ticket logs.');
+      if (interaction.deferred || interaction.replied) {
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_ticketLogs').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
+        return await interaction.editReply({ embeds: [errEmbed], components: [row] });
+      } else {
         await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
       }
     }

@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+﻿const { ActionRowBuilder, ButtonBuilder, ButtonStyle, SlashCommandBuilder } = require('discord.js');
 const { createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { User, Shift } = require('../../database/mongo');
 
@@ -15,7 +15,7 @@ module.exports = {
       const staffSystem = client.systems.staff;
 
       if (!staffSystem) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_staff_stats').setLabel('  Refresh').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_staff_stats').setLabel('🔄 Refresh').setStyle(ButtonStyle.Secondary));
         return await interaction.editReply({ embeds: [createErrorEmbed('Staff system is currently offline.')], components: [row] });
       }
 
@@ -31,9 +31,9 @@ module.exports = {
       const completedShifts = shifts.filter(s => s.endTime).length;
 
       const guildUsers = await User.countDocuments({ 'guilds.guildId': interaction.guildId, 'staff.points': { $gt: 0 } });
-      const rankPosition = await User.countDocuments({ 
-        'guilds.guildId': interaction.guildId, 
-        'staff.points': { $gt: points } 
+      const rankPosition = await User.countDocuments({
+        'guilds.guildId': interaction.guildId,
+        'staff.points': { $gt: points }
       }) + 1;
 
       const velocity = Math.min(100, Math.round(score || 0));
@@ -68,7 +68,7 @@ module.exports = {
       });
 
       const row = new ActionRowBuilder().addComponents(
-        new ButtonBuilder().setCustomId('auto_v1_staff_stats').setLabel('  Refresh').setStyle(ButtonStyle.Secondary),
+        new ButtonBuilder().setCustomId('auto_v1_staff_stats').setLabel('🔄 Refresh').setStyle(ButtonStyle.Secondary),
         new ButtonBuilder().setLabel('🏆 Leaderboard').setStyle(ButtonStyle.Link).setURL(`https://discord.com/channels/${interaction.guildId}`)
       );
       await interaction.editReply({ embeds: [embed], components: [row] });

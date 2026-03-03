@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, PermissionFlagsBits, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+﻿const { ActionRowBuilder, ButtonBuilder, ButtonStyle, PermissionFlagsBits, SlashCommandBuilder } = require('discord.js');
 const { createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { User, Guild } = require('../../database/mongo');
 
@@ -25,20 +25,20 @@ module.exports = {
 
       const member = await interaction.guild.members.fetch(targetUser.id).catch(() => null);
       if (!member) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_demote').setLabel('  Refresh').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_demote').setLabel('🔄 Refresh').setStyle(ButtonStyle.Secondary));
         return await interaction.editReply({ embeds: [createErrorEmbed('User not found in this server.')], components: [row] });
       }
 
       let user = await User.findOne({ userId: targetUser.id, 'guilds.guildId': guildId });
       if (!user || !user.staff) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_demote').setLabel('  Refresh').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_demote').setLabel('🔄 Refresh').setStyle(ButtonStyle.Secondary));
         return await interaction.editReply({ embeds: [createErrorEmbed('This user is not registered as staff in this server.')], components: [row] });
       }
 
       const oldRank = user.staff.rank || 'trial';
-      
+
       if (oldRank === newRank) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_demote').setLabel('  Refresh').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_demote').setLabel('🔄 Refresh').setStyle(ButtonStyle.Secondary));
         return await interaction.editReply({ embeds: [createErrorEmbed(`User is already at **${newRank.toUpperCase()}** rank.`)], components: [row] });
       }
 
@@ -73,18 +73,18 @@ module.exports = {
           { name: '⬅️ New Rank', value: `${rankEmojis[newRank] || '🌱'} \`${newRank.toUpperCase()}\``, inline: true },
           { name: '🎭 Role Sync', value: roleStatus, inline: false },
           { name: '👮 Demoted By', value: `${interaction.user}`, inline: true },
-          { name: '📅 Date', value: `<t:${Math.floor(Date.now()/1000)}:D>`, inline: true }
+          { name: '📅 Date', value: `<t:${Math.floor(Date.now() / 1000)}:D>`, inline: true }
         ]
       });
 
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_demote').setLabel('  Refresh').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_demote').setLabel('🔄 Refresh').setStyle(ButtonStyle.Secondary));
       await interaction.editReply({ embeds: [embed], components: [row] });
     } catch (error) {
       console.error(error);
       const errEmbed = createErrorEmbed('An error occurred while demoting the user.');
       const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_demote').setLabel('  Retry').setStyle(ButtonStyle.Secondary));
-            if (interaction.deferred || interaction.replied) {
-        await return await interaction.editReply({ embeds: [errEmbed], components: [row] });
+      if (interaction.deferred || interaction.replied) {
+        return await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {
         await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
       }

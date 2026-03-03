@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+﻿const { ActionRowBuilder, ButtonBuilder, ButtonStyle, SlashCommandBuilder } = require('discord.js');
 const { createCoolEmbed, createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
 
 module.exports = {
@@ -32,14 +32,14 @@ module.exports = {
 
       const xpPercent = Math.min(100, Math.floor((xp / 1000) * 100));
       const barLength = 15;
-      const filled = '�'.repeat(Math.round((xpPercent / 100) * barLength));
-      const empty = '�'.repeat(barLength - filled.length);
+      const filled = '█'.repeat(Math.round((xpPercent / 100) * barLength));
+      const empty = '░'.repeat(barLength - filled.length);
       const resonanceRibbon = `\`[${filled}${empty}]\` **LVL ${level}**`;
 
       const meritDensity = (points / Math.max(1, level)).toFixed(1);
 
       const trophies = dbUser.staff?.trophies || [];
-      const trophyDisplay = trophies.length > 0 ? trophies.map(t => `?? ${t}`).join('\n') : 'No Trophies Yet';
+      const trophyDisplay = trophies.length > 0 ? trophies.map(t => `🏆 ${t}`).join('\n') : 'No Trophies Yet';
 
       const warningPenalty = Math.max(0, 100 - ((warnings?.total || 0) * 20));
       const activityScore = Math.min(100, points > 0 ? (points / 50) * 100 : 0);
@@ -52,27 +52,27 @@ module.exports = {
       );
 
       const embed = await createCustomEmbed(interaction, {
-        title: `?? Enterprise Hyper-Apex: Staff Dossier`,
+        title: `📜 V1 Foundation: Staff Dossier`,
         thumbnail: user.displayAvatarURL({ dynamic: true }),
         image: chartUrl,
-        description: `### ??? Macroscopic Personnel Registry\nAuthenticated signal dossier for **${user.username}**. Resonance synchronization active.\n\n**?? Enterprise HYPER-APEX EXCLUSIVE**`,
+        description: `### 📂 Personnel Registry\nAuthenticated signal dossier for **${user.username}**. Resonance synchronization active.\n\n**⭐ V1 Foundation EXCLUSIVE**`,
         fields: [
-          { name: '?? Identity', value: `**Tag:** ${user.tag}\n**Nick:** ${member?.nickname || 'None'}`, inline: true },
-          { name: '? Resonance Ribbon', value: resonanceRibbon, inline: false },
-          { name: '?? Authority', value: `Rank: \`${rank.toUpperCase()}\` (${points} pts)`, inline: true },
-          { name: '?? Merit Density', value: `\`${meritDensity}\` yield/lvl`, inline: true },
-          { name: '?? Risk Rating', value: `\`${warnings?.total || 0}\` alerts`, inline: true },
-          { name: '??? Achievements', value: trophyDisplay || 'None', inline: false },
-          { name: '?? Omni-Bridge', value: '`SYNCHRONIZED`', inline: true }
+          { name: '🆔 Identity', value: `**Tag:** ${user.tag}\n**Nick:** ${member?.nickname || 'None'}`, inline: true },
+          { name: '📊 Resonance Ribbon', value: resonanceRibbon, inline: false },
+          { name: '🎖️ Authority', value: `Rank: \`${rank.toUpperCase()}\` (${points} pts)`, inline: true },
+          { name: '📈 Merit Density', value: `\`${meritDensity}\` yield/lvl`, inline: true },
+          { name: '⚠️ Risk Rating', value: `\`${warnings?.total || 0}\` alerts`, inline: true },
+          { name: '🏆 Achievements', value: trophyDisplay || 'None', inline: false },
+          { name: '📡 Omni-Bridge', value: '`SYNCHRONIZED`', inline: true }
         ],
-        footer: 'Blockchain-verified Operational Identity � V1 Foundation Hyper-Apex',
-        color: 'premium'
+        footer: 'Blockchain-verified Operational Identity • V1 Foundation Hyper-Apex',
+        color: 'primary'
       });
 
       const row = new ActionRowBuilder().addComponents(
         new ButtonBuilder()
           .setCustomId(`export_stats_${user.id}`)
-          .setLabel('?? Export System Record')
+          .setLabel('📥 Export System Record')
           .setStyle(ButtonStyle.Secondary)
       );
 
@@ -80,7 +80,7 @@ module.exports = {
     } catch (error) {
       console.error(error);
       const errEmbed = createErrorEmbed('An error occurred while fetching the staff profile.');
-            if (interaction.deferred || interaction.replied) {
+      if (interaction.deferred || interaction.replied) {
         await interaction.editReply({ embeds: [errEmbed] });
       } else {
         await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
@@ -94,7 +94,7 @@ module.exports = {
       const requestedUserId = interaction.customId.replace('export_stats_', '');
 
       if (interaction.user.id !== requestedUserId && !interaction.member.permissions.has('ModerateMembers') && !interaction.member.permissions.has('ManageGuild')) {
-        return interaction.editReply({ content: '? You don\'t have permission to export this user\'s stats.' });
+        return interaction.editReply({ content: '❌ You don\'t have permission to export this user\'s stats.' });
       }
 
       const staffSystem = client.systems.staff;
@@ -111,15 +111,13 @@ module.exports = {
       });
 
       const buffer = Buffer.from(csvContent, 'utf-8');
-      const { AttachmentBuilder , ActionRowBuilder , ButtonBuilder , ButtonStyle } = require('discord.js');
+      const { AttachmentBuilder } = require('discord.js');
       const attachment = new AttachmentBuilder(buffer, { name: `staff_export_${requestedUserId}.csv` });
 
-      await interaction.editReply({ content: '?? System Record Dump:', files: [attachment] });
+      await interaction.editReply({ content: '📂 System Record Dump:', files: [attachment] });
     } catch (error) {
       console.error('Error handling export:', error);
-      await interaction.editReply({ content: '? An error occurred exporting the CSV.' });
+      await interaction.editReply({ content: '❌ An error occurred exporting the CSV.' });
     }
   }
 };
-
-

@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+﻿const { ActionRowBuilder, ButtonBuilder, ButtonStyle, SlashCommandBuilder } = require('discord.js');
 const { createCoolEmbed, createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { User } = require('../../database/mongo');
 
@@ -35,7 +35,7 @@ module.exports = {
         .sort((a, b) => b.points - a.points);
 
       if (!eligible.length) {
-        return interaction.editReply({ content: '?? No staff currently qualify for an automatic rank-up. Keep earning points!', ephemeral: true });
+        return interaction.editReply({ content: '❌ No staff currently qualify for an automatic rank-up. Keep earning points!', ephemeral: true });
       }
 
       const listText = eligible.map((e, i) =>
@@ -43,11 +43,11 @@ module.exports = {
       ).join('\n');
 
       const embed = await createCustomEmbed(interaction, {
-        title: '?? Automatic Rank-Up Eligibility',
+        title: '📈 Automatic Rank-Up Eligibility',
         description: `The following staff members have exceeded their point thresholds and are eligible for instant promotion.\n\n${listText}`,
         fields: [
           { name: '? Total Eligible', value: `**${eligible.length}** Staff members`, inline: true },
-          { name: '?? Management', value: 'Approve all via button below', inline: true }
+          { name: '⚙️ Management', value: 'Approve all via button below', inline: true }
         ],
         color: 'success'
       });
@@ -57,14 +57,14 @@ module.exports = {
           .setCustomId('approve_all_promotions')
           .setLabel(`Mass Approve ${eligible.length} Promotions`)
           .setStyle(ButtonStyle.Success)
-          .setEmoji('??')
+          .setEmoji('✅')
       );
 
       await interaction.editReply({ embeds: [embed], components: [row] });
     } catch (error) {
       console.error(error);
       const errEmbed = createErrorEmbed('An error occurred while evaluating rank eligibility.');
-            if (interaction.deferred || interaction.replied) {
+      if (interaction.deferred || interaction.replied) {
         await interaction.editReply({ embeds: [errEmbed] });
       } else {
         await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
