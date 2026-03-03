@@ -1,4 +1,4 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { createPremiumEmbed } = require('../../utils/embeds');
 const { Activity, User } = require('../../database/mongo');
 
@@ -30,7 +30,7 @@ module.exports = {
     };
 
     const embed = createPremiumEmbed()
-      .setTitle('📈 Server Trends')
+      .setTitle('?? Server Trends')
       
       .addFields(
         { name: 'Messages', value: `${currentMessages} (${calcTrend(currentMessages, previousMessages)})`, inline: true },
@@ -38,13 +38,15 @@ module.exports = {
         { name: 'Period', value: `${days} days`, inline: true }
       )
       .setDescription(
-        currentMessages >= previousMessages ? '📈 Trending Up' : '📉 Trending Down'
+        currentMessages >= previousMessages ? '?? Trending Up' : '?? Trending Down'
       )
       ;
 
-    await interaction.reply({ embeds: [embed] });
+    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_server_trends').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
 
 
 

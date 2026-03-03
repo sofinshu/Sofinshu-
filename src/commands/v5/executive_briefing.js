@@ -1,4 +1,5 @@
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { createPremiumEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { validatePremiumLicense } = require('../../utils/premium_guard');
 const { Activity, User } = require('../../database/mongo');
@@ -62,11 +63,14 @@ module.exports = {
                 color: 'premium'
             });
 
-            await interaction.editReply({ embeds: [embed] });
+            await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_executive_briefing').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
 
         } catch (error) {
             console.error('Zenith Executive Briefing Error:', error);
-            await interaction.editReply({ embeds: [createErrorEmbed('Intelligence failure: Unable to compile executive macroscopic briefing.')] });
+            await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_executive_briefing').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [createErrorEmbed('Intelligence failure: Unable to compile executive macroscopic briefing.')], components: [row] });
         }
     }
 };
+

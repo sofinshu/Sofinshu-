@@ -1,4 +1,4 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { createPremiumEmbed } = require('../../utils/embeds');
 const { Activity } = require('../../database/mongo');
 
@@ -40,7 +40,7 @@ module.exports = {
       : 0;
 
     const embed = createPremiumEmbed()
-      .setTitle('📈 Trend Report')
+      .setTitle('?? Trend Report')
       
       .addFields(
         { name: 'This Week', value: `${currentWeek.length} activities`, inline: true },
@@ -52,9 +52,11 @@ module.exports = {
       )
       ;
 
-    await interaction.reply({ embeds: [embed] });
+    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_trend_report').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
 
 
 

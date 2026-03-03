@@ -1,4 +1,4 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { createPremiumEmbed } = require('../../utils/embeds');
 const { User, Activity } = require('../../database/mongo');
 
@@ -25,14 +25,16 @@ module.exports = {
       .join('\n');
 
     const embed = createPremiumEmbed()
-      .setTitle('📈 Activity Report')
+      .setTitle('?? Activity Report')
       .setDescription(list || 'No activity data')
       
       ;
 
-    await interaction.editReply({ embeds: [embed] });
+    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_activityReport').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
 
 
 

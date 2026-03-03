@@ -1,4 +1,4 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { createPremiumEmbed } = require('../../utils/embeds');
 const { Activity } = require('../../database/mongo');
 
@@ -30,7 +30,7 @@ module.exports = {
       .slice(0, 5);
 
     const embed = createPremiumEmbed()
-      .setTitle('📋 Report Summary')
+      .setTitle('?? Report Summary')
       
       .addFields(
         { name: 'Total Activities', value: activities.length.toString(), inline: true },
@@ -43,9 +43,11 @@ module.exports = {
       .setDescription(`Top 5 Active Users:\n${topUsers.map(([uid, count], i) => `${i + 1}. <@${uid}>: ${count}`).join('\n')}`)
       ;
 
-    await interaction.reply({ embeds: [embed] });
+    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_report_summary').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
 
 
 

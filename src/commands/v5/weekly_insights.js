@@ -1,4 +1,5 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { createPremiumEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { Activity } = require('../../database/mongo');
 
@@ -29,33 +30,36 @@ module.exports = {
       const prev = processWeek(lastWeek);
 
       const getTrajectory = (c, p) => {
-        if (p === 0) return c > 0 ? '📈 GROWTH (NEW)' : '➖ STABLE';
+        if (p === 0) return c > 0 ? '?? GROWTH (NEW)' : '? STABLE';
         const pct = ((c - p) / p * 100).toFixed(1);
-        if (pct > 5) return `📈 +${pct}% GROWTH`;
-        if (pct < -5) return `📉 ${pct}% DECAY`;
-        return '➖ STABLE';
+        if (pct > 5) return `?? +${pct}% GROWTH`;
+        if (pct < -5) return `?? ${pct}% DECAY`;
+        return '? STABLE';
       };
 
       const embed = await createCustomEmbed(interaction, {
-        title: '💡 Sector Periodic Intelligence',
+        title: '?? Sector Periodic Intelligence',
         thumbnail: interaction.guild.iconURL({ dynamic: true }),
-        description: `### 🛡️ Macroscopic Performance Delta\nStrategic comparison of the current 7-day vector against the previous 14-day baseline for sector **${interaction.guild.name}**.`,
+        description: `### ??? Macroscopic Performance Delta\nStrategic comparison of the current 7-day vector against the previous 14-day baseline for sector **${interaction.guild.name}**.`,
         fields: [
-          { name: '📡 Signal Throughput', value: `\`${curr.message}\` | **${getTrajectory(curr.message, prev.message)}**`, inline: false },
-          { name: '✅ Command Execution', value: `\`${curr.command}\` | **${getTrajectory(curr.command, prev.command)}**`, inline: false },
-          { name: '🔄 Operational Shifts', value: `\`${curr.shift}\` | **${getTrajectory(curr.shift, prev.shift)}**`, inline: false },
-          { name: '⚠️ Security Incidents', value: `\`${curr.warning}\` | **${getTrajectory(curr.warning, prev.warning)}**`, inline: false },
-          { name: '👥 Active Operatives', value: `\`${curr.activeUsers}\` | **${getTrajectory(curr.activeUsers, prev.activeUsers)}**`, inline: false }
+          { name: '?? Signal Throughput', value: `\`${curr.message}\` | **${getTrajectory(curr.message, prev.message)}**`, inline: false },
+          { name: '? Command Execution', value: `\`${curr.command}\` | **${getTrajectory(curr.command, prev.command)}**`, inline: false },
+          { name: '?? Operational Shifts', value: `\`${curr.shift}\` | **${getTrajectory(curr.shift, prev.shift)}**`, inline: false },
+          { name: '?? Security Incidents', value: `\`${curr.warning}\` | **${getTrajectory(curr.warning, prev.warning)}**`, inline: false },
+          { name: '?? Active Operatives', value: `\`${curr.activeUsers}\` | **${getTrajectory(curr.activeUsers, prev.activeUsers)}**`, inline: false }
         ],
-        footer: 'Periodic Intelligence Comparison • V5 Executive Suite',
+        footer: 'Periodic Intelligence Comparison � V5 Executive Suite',
         color: 'enterprise'
       });
 
-      await interaction.editReply({ embeds: [embed] });
+      await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_weekly_insights').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
 
     } catch (error) {
       console.error('Weekly Insights Error:', error);
-      await interaction.editReply({ embeds: [createErrorEmbed('Periodic Intelligence failure: Unable to synchronize comparison matrices.')] });
+      await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_weekly_insights').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [createErrorEmbed('Periodic Intelligence failure: Unable to synchronize comparison matrices.')], components: [row] });
     }
   }
 };
+

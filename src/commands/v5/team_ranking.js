@@ -1,4 +1,4 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { createPremiumEmbed } = require('../../utils/embeds');
 const { User } = require('../../database/mongo');
 
@@ -35,7 +35,7 @@ module.exports = {
       .lean();
 
     const embed = createPremiumEmbed()
-      .setTitle(`🏆 Team Ranking (by ${sortBy})`)
+      .setTitle(`?? Team Ranking (by ${sortBy})`)
       
       .setDescription(
         users.map((u, i) => {
@@ -49,9 +49,11 @@ module.exports = {
       )
       ;
 
-    await interaction.reply({ embeds: [embed] });
+    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_team_ranking').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
 
 
 

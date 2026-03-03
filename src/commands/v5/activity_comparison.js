@@ -1,4 +1,4 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { createPremiumEmbed } = require('../../utils/embeds');
 const { Activity } = require('../../database/mongo');
 
@@ -39,7 +39,7 @@ module.exports = {
     const calcChange = (curr, prev) => prev > 0 ? ((curr - prev) / prev * 100).toFixed(1) : (curr > 0 ? 100 : 0);
 
     const embed = createPremiumEmbed()
-      .setTitle('📊 Activity Comparison')
+      .setTitle('?? Activity Comparison')
       
       .addFields(
         { name: 'Metric', value: 'Period 1', inline: true },
@@ -51,9 +51,11 @@ module.exports = {
       )
       ;
 
-    await interaction.reply({ embeds: [embed] });
+    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_activity_comparison').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
 
 
 

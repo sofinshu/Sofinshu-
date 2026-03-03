@@ -1,4 +1,4 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { createPremiumEmbed } = require('../../utils/embeds');
 const { User } = require('../../database/mongo');
 
@@ -21,12 +21,12 @@ module.exports = {
       .lean();
 
     if (users.length === 0) {
-      await interaction.reply({ content: 'No staff data found.' });
+      await interaction.editReply({ content: 'No staff data found.' });
       return;
     }
 
     const embed = createPremiumEmbed()
-      .setTitle('📉 Low Performance Staff')
+      .setTitle('?? Low Performance Staff')
       
       .setDescription(
         users.map((u, i) => {
@@ -37,9 +37,11 @@ module.exports = {
       )
       ;
 
-    await interaction.reply({ embeds: [embed] });
+    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_low_performance').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
 
 
 

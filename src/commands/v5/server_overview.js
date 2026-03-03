@@ -1,4 +1,4 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { createPremiumEmbed } = require('../../utils/embeds');
 const { Guild, User, Activity } = require('../../database/mongo');
 
@@ -18,7 +18,7 @@ module.exports = {
     const recentActivity = await Activity.countDocuments({ guildId, createdAt: { $gte: weekAgo } });
 
     const embed = createPremiumEmbed()
-      .setTitle(`📊 Server Overview: ${guild.name}`)
+      .setTitle(`?? Server Overview: ${guild.name}`)
       
       .setThumbnail(guild.iconURL())
       .addFields(
@@ -27,7 +27,7 @@ module.exports = {
         { name: 'Roles', value: guild.roles.cache.size.toString(), inline: true },
         { name: 'Channels', value: guild.channels.cache.size.toString(), inline: true },
         { name: 'Active (7d)', value: recentActivity.toString(), inline: true },
-        { name: 'Premium', value: guildDoc?.premium?.isActive ? '✅ Active' : '❌ Inactive', inline: true }
+        { name: 'Premium', value: guildDoc?.premium?.isActive ? '? Active' : '? Inactive', inline: true }
       )
       .addFields(
         { name: 'Created', value: guild.createdAt.toLocaleDateString(), inline: true },
@@ -35,9 +35,11 @@ module.exports = {
       )
       ;
 
-    await interaction.reply({ embeds: [embed] });
+    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_server_overview').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
 
 
 

@@ -1,4 +1,4 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { createPremiumEmbed } = require('../../utils/embeds');
 const { User } = require('../../database/mongo');
 
@@ -21,12 +21,12 @@ module.exports = {
       .lean();
 
     if (users.length === 0) {
-      await interaction.reply({ content: 'No performer data found.' });
+      await interaction.editReply({ content: 'No performer data found.' });
       return;
     }
 
     const embed = createPremiumEmbed()
-      .setTitle('⭐ Top Performers')
+      .setTitle('? Top Performers')
       
       .setDescription(
         users.map((u, i) => {
@@ -34,15 +34,17 @@ module.exports = {
           const name = guildData?.nickname || u.username || `User ${u.userId}`;
           const pts = u.staff?.points || 0;
           const consistency = u.staff?.consistency || 100;
-          const badge = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}.`;
+          const badge = i === 0 ? '??' : i === 1 ? '??' : i === 2 ? '??' : `${i + 1}.`;
           return `${badge} ${name} - ${pts} pts (${consistency}%)`;
         }).join('\n')
       )
       ;
 
-    await interaction.reply({ embeds: [embed] });
+    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_top_performers').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
 
 
 

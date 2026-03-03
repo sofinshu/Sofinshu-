@@ -1,4 +1,4 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { createPremiumEmbed } = require('../../utils/embeds');
 const { Activity } = require('../../database/mongo');
 
@@ -30,7 +30,7 @@ module.exports = {
     const sortedMonths = Object.entries(monthlyData).sort((a, b) => b[0].localeCompare(a[0]));
 
     const embed = createPremiumEmbed()
-      .setTitle('📅 Monthly Report')
+      .setTitle('?? Monthly Report')
       
       .addFields(
         { name: 'Messages', value: messages.toLocaleString(), inline: true },
@@ -43,9 +43,11 @@ module.exports = {
       .setDescription(sortedMonths.map(([month, count]) => `${month}: ${count} activities`).join('\n'))
       ;
 
-    await interaction.reply({ embeds: [embed] });
+    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_monthly_report').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
 
 
 

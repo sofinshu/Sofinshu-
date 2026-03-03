@@ -1,18 +1,19 @@
-﻿const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType } = require('discord.js');
+const { createPremiumEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { createCustomEmbed, createErrorEmbed, createProgressBar } = require('../../utils/embeds');
 const { Activity, Shift, Warning, User } = require('../../database/mongo');
 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('analytics_dashboard')
-    .setDescription('📊 Full real-time analytics dashboard with Today/Week/Month views')
+    .setDescription('?? Full real-time analytics dashboard with Today/Week/Month views')
     .addStringOption(opt =>
       opt.setName('period')
         .setDescription('Time period to analyze')
         .addChoices(
-          { name: '📅 Today', value: 'today' },
-          { name: '📆 This Week', value: 'week' },
-          { name: '🗓️ This Month', value: 'month' }
+          { name: '?? Today', value: 'today' },
+          { name: '?? This Week', value: 'week' },
+          { name: '??? This Month', value: 'month' }
         )
         .setRequired(false)
     ),
@@ -26,9 +27,9 @@ module.exports = {
       const embed = await generateDashboard(interaction, guildId, period);
 
       const row = new ActionRowBuilder().addComponents(
-        new ButtonBuilder().setCustomId('dash_today').setLabel('📅 Today').setStyle(period === 'today' ? ButtonStyle.Primary : ButtonStyle.Secondary),
-        new ButtonBuilder().setCustomId('dash_week').setLabel('📆 Week').setStyle(period === 'week' ? ButtonStyle.Primary : ButtonStyle.Secondary),
-        new ButtonBuilder().setCustomId('dash_month').setLabel('🗓️ Month').setStyle(period === 'month' ? ButtonStyle.Primary : ButtonStyle.Secondary)
+        new ButtonBuilder().setCustomId('dash_today').setLabel('?? Today').setStyle(period === 'today' ? ButtonStyle.Primary : ButtonStyle.Secondary),
+        new ButtonBuilder().setCustomId('dash_week').setLabel('?? Week').setStyle(period === 'week' ? ButtonStyle.Primary : ButtonStyle.Secondary),
+        new ButtonBuilder().setCustomId('dash_month').setLabel('??? Month').setStyle(period === 'month' ? ButtonStyle.Primary : ButtonStyle.Secondary)
       );
 
       const msg = await interaction.editReply({ embeds: [embed], components: [row] });
@@ -44,9 +45,9 @@ module.exports = {
         const p = i.customId.replace('dash_', '');
         const newEmbed = await generateDashboard(interaction, guildId, p);
         const newRow = new ActionRowBuilder().addComponents(
-          new ButtonBuilder().setCustomId('dash_today').setLabel('📅 Today').setStyle(p === 'today' ? ButtonStyle.Primary : ButtonStyle.Secondary),
-          new ButtonBuilder().setCustomId('dash_week').setLabel('📆 Week').setStyle(p === 'week' ? ButtonStyle.Primary : ButtonStyle.Secondary),
-          new ButtonBuilder().setCustomId('dash_month').setLabel('🗓️ Month').setStyle(p === 'month' ? ButtonStyle.Primary : ButtonStyle.Secondary)
+          new ButtonBuilder().setCustomId('dash_today').setLabel('?? Today').setStyle(p === 'today' ? ButtonStyle.Primary : ButtonStyle.Secondary),
+          new ButtonBuilder().setCustomId('dash_week').setLabel('?? Week').setStyle(p === 'week' ? ButtonStyle.Primary : ButtonStyle.Secondary),
+          new ButtonBuilder().setCustomId('dash_month').setLabel('??? Month').setStyle(p === 'month' ? ButtonStyle.Primary : ButtonStyle.Secondary)
         );
         await i.editReply({ embeds: [newEmbed], components: [newRow] });
       });
@@ -101,22 +102,23 @@ async function generateDashboard(interaction, guildId, period) {
   });
   const topUserId = Object.entries(cmdByUser).sort((a, b) => b[1] - a[1])[0]?.[0];
   const topUserObj = topUserId ? await interaction.client.users.fetch(topUserId).catch(() => null) : null;
-  const topUserStr = topUserObj ? `**${topUserObj.username}** — \`${cmdByUser[topUserId]} cmds\`` : '`No data yet`';
+  const topUserStr = topUserObj ? `**${topUserObj.username}** � \`${cmdByUser[topUserId]} cmds\`` : '`No data yet`';
 
   return createCustomEmbed(interaction, {
-    title: `📊 Analytics Dashboard — ${periodLabel}`,
+    title: `?? Analytics Dashboard � ${periodLabel}`,
     thumbnail: interaction.guild.iconURL({ dynamic: true }),
     description: `Real-time analytics for **${interaction.guild.name}**.`,
     fields: [
-      { name: '⚡ Commands Run', value: `\`${commands.toLocaleString()}\``, inline: true },
-      { name: '👥 Active Users', value: `\`${activeUsers}\``, inline: true },
-      { name: '🔄 Shifts Done', value: `\`${shifts.length}\` (\`${shiftHours}h\`)`, inline: true },
-      { name: '⚠️ Warnings', value: `\`${warnings.length}\``, inline: true },
-      { name: '📈 Promotions', value: `\`${promotions}\``, inline: true },
-      { name: '📊 Engagement Rate', value: `\`${engageBar}\` **${engagePct}%**`, inline: false },
-      { name: '🏆 Top User', value: topUserStr, inline: false }
+      { name: '? Commands Run', value: `\`${commands.toLocaleString()}\``, inline: true },
+      { name: '?? Active Users', value: `\`${activeUsers}\``, inline: true },
+      { name: '?? Shifts Done', value: `\`${shifts.length}\` (\`${shiftHours}h\`)`, inline: true },
+      { name: '?? Warnings', value: `\`${warnings.length}\``, inline: true },
+      { name: '?? Promotions', value: `\`${promotions}\``, inline: true },
+      { name: '?? Engagement Rate', value: `\`${engageBar}\` **${engagePct}%**`, inline: false },
+      { name: '?? Top User', value: topUserStr, inline: false }
     ],
     color: 'premium',
-    footer: `uwu-chan • Premium Analytics • ${periodLabel}`
+    footer: `uwu-chan � Premium Analytics � ${periodLabel}`
   });
 }
+

@@ -1,4 +1,4 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { createPremiumEmbed } = require('../../utils/embeds');
 const { User, Activity } = require('../../database/mongo');
 
@@ -17,19 +17,21 @@ module.exports = {
     const activeUsers = users.filter(u => u.staff?.points > 0).length;
 
     const embed = createPremiumEmbed()
-      .setTitle(`📊 ${guild.name} - Member Stats`)
+      .setTitle(`?? ${guild.name} - Member Stats`)
       
       .addFields(
-        { name: '👥 Total Members', value: memberCount.toString(), inline: true },
-        { name: '👨‍💼 Staff Members', value: staffCount.toString(), inline: true },
-        { name: '⭐ Active Users', value: activeUsers.toString(), inline: true }
+        { name: '?? Total Members', value: memberCount.toString(), inline: true },
+        { name: '????? Staff Members', value: staffCount.toString(), inline: true },
+        { name: '? Active Users', value: activeUsers.toString(), inline: true }
       )
       .setThumbnail(guild.iconURL())
       ;
 
-    await interaction.reply({ embeds: [embed] });
+    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_memberStats').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
 
 
 

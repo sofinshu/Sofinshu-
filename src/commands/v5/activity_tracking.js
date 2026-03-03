@@ -1,4 +1,4 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { createPremiumEmbed } = require('../../utils/embeds');
 const { Activity, User } = require('../../database/mongo');
 
@@ -24,7 +24,7 @@ module.exports = {
     const staffData = user?.staff || { points: 0, warnings: 0, shiftTime: 0 };
 
     const embed = createPremiumEmbed()
-      .setTitle(`📈 Activity Tracking: ${targetUser.username}`)
+      .setTitle(`?? Activity Tracking: ${targetUser.username}`)
       
       .addFields(
         { name: 'Messages (30d)', value: messages.toString(), inline: true },
@@ -36,9 +36,11 @@ module.exports = {
       )
       ;
 
-    await interaction.reply({ embeds: [embed] });
+    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_activity_tracking').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
 
 
 

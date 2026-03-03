@@ -1,4 +1,4 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { createPremiumEmbed } = require('../../utils/embeds');
 const { Activity } = require('../../database/mongo');
 
@@ -32,7 +32,7 @@ module.exports = {
     const sortedMonths = Object.entries(eventTypes).sort((a, b) => b[0].localeCompare(a[0]));
 
     const embed = createPremiumEmbed()
-      .setTitle('🎉 Event Summary')
+      .setTitle('?? Event Summary')
       
       .addFields(
         { name: 'Shifts', value: shifts.toString(), inline: true },
@@ -43,9 +43,11 @@ module.exports = {
       .setDescription(sortedMonths.slice(0, 6).map(([month, count]) => `${month}: ${count} events`).join('\n'))
       ;
 
-    await interaction.reply({ embeds: [embed] });
+    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_event_summary').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
 
 
 

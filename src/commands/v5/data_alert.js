@@ -1,4 +1,4 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { createPremiumEmbed } = require('../../utils/embeds');
 const { Guild } = require('../../database/mongo');
 
@@ -46,24 +46,26 @@ module.exports = {
       }
       await guild.save();
 
-      await interaction.reply({ content: `Alert **${alertType}** has been ${enabled ? 'enabled' : 'disabled'}.` });
+      await interaction.editReply({ content: `Alert **${alertType}** has been ${enabled ? 'enabled' : 'disabled'}.` });
     } else {
       const alerts = guild.settings.alerts;
       const embed = createPremiumEmbed()
-        .setTitle('🔔 Data Alerts Configuration')
+        .setTitle('?? Data Alerts Configuration')
         
         .addFields(
-          { name: 'Low Activity', value: alerts.lowActivity?.enabled ? '✅ Enabled' : '❌ Disabled', inline: true },
-          { name: 'High Warnings', value: alerts.highWarnings?.enabled ? '✅ Enabled' : '❌ Disabled', inline: true },
-          { name: 'New Members', value: alerts.newMembers?.enabled ? '✅ Enabled' : '❌ Disabled', inline: true }
+          { name: 'Low Activity', value: alerts.lowActivity?.enabled ? '? Enabled' : '? Disabled', inline: true },
+          { name: 'High Warnings', value: alerts.highWarnings?.enabled ? '? Enabled' : '? Disabled', inline: true },
+          { name: 'New Members', value: alerts.newMembers?.enabled ? '? Enabled' : '? Disabled', inline: true }
         )
         .setDescription('Use `/data_alert alert_type:... enabled:...` to configure alerts.')
         ;
 
-      await interaction.reply({ embeds: [embed] });
+      await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_data_alert').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
     }
   }
 };
+
 
 
 

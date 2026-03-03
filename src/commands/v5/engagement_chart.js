@@ -1,4 +1,5 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { createPremiumEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { Activity } = require('../../database/mongo');
 
@@ -39,7 +40,7 @@ module.exports = {
       const maxVal = Math.max(...chartData.map(([, d]) => d.total), 1);
       const chart = chartData.map(([date, d]) => {
         const barLen = Math.min(10, Math.floor((d.total / maxVal) * 10));
-        const bar = '█'.repeat(barLen) + '░'.repeat(10 - barLen);
+        const bar = '�'.repeat(barLen) + '�'.repeat(10 - barLen);
         const dayLabel = new Date(date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
         return `\`${dayLabel}\` ${bar} **${d.total}**`;
       }).join('\n');
@@ -48,24 +49,27 @@ module.exports = {
       const totalCommands = activities.filter(a => a.type === 'command').length;
 
       const embed = await createCustomEmbed(interaction, {
-        title: '📈 Macroscopic Engagement Dashboard',
+        title: '?? Macroscopic Engagement Dashboard',
         thumbnail: interaction.guild.iconURL({ dynamic: true }),
-        description: `### 🛡️ Sector Metabolic Visualization\nTracing metabolic engagement density and operational throughput for the **${interaction.guild.name}** sector. Current capture: **${days} Days**.`,
+        description: `### ??? Sector Metabolic Visualization\nTracing metabolic engagement density and operational throughput for the **${interaction.guild.name}** sector. Current capture: **${days} Days**.`,
         fields: [
-          { name: '📊 14-Day Trailing Engagement', value: chart || '*No metabolic signals detected.*', inline: false },
-          { name: '📡 Total Throughput', value: `\`${totalMessages.toLocaleString()}\` Msgs`, inline: true },
-          { name: '✅ Total Pings', value: `\`${totalCommands.toLocaleString()}\` Cmds`, inline: true },
-          { name: '⚖️ Capture Vector', value: `\`${days} Days\``, inline: true }
+          { name: '?? 14-Day Trailing Engagement', value: chart || '*No metabolic signals detected.*', inline: false },
+          { name: '?? Total Throughput', value: `\`${totalMessages.toLocaleString()}\` Msgs`, inline: true },
+          { name: '? Total Pings', value: `\`${totalCommands.toLocaleString()}\` Cmds`, inline: true },
+          { name: '?? Capture Vector', value: `\`${days} Days\``, inline: true }
         ],
-        footer: 'Strategic Engagement Modeling • V5 Executive Suite',
+        footer: 'Strategic Engagement Modeling � V5 Executive Suite',
         color: 'enterprise'
       });
 
-      await interaction.editReply({ embeds: [embed] });
+      await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_engagement_chart').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
 
     } catch (error) {
       console.error('Engagement Chart Error:', error);
-      await interaction.editReply({ embeds: [createErrorEmbed('Engagement Intelligence failure: Unable to decode metabolic throughput charts.')] });
+      await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_engagement_chart').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [createErrorEmbed('Engagement Intelligence failure: Unable to decode metabolic throughput charts.')], components: [row] });
     }
   }
 };
+
