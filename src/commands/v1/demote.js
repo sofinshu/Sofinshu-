@@ -25,8 +25,8 @@ module.exports = {
 
       let user = await User.findOne({ userId: targetUser.id, 'guilds.guildId': guildId });
       if (!user) {
-        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_demote').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [createErrorEmbed('This user is not registered in the staff database for this server.')], components: [row] });
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_demote').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
+        return await interaction.editReply({ embeds: [createErrorEmbed('This user is not registered in the staff database for this server.')], components: [row] });
       }
 
       if (!user.staff) user.staff = {};
@@ -52,25 +52,25 @@ module.exports = {
       }
 
       const embed = await createCustomEmbed(interaction, {
-        title: '?? Staff Demotion Executed',
+        title: '✅ Staff Demotion Executed',
         description: `Successfully adjusted the rank for ${targetUser} within the server hierarchy.`,
         color: 'warning',
         fields: [
-          { name: '?? Target', value: `${targetUser.tag}`, inline: true },
-          { name: '??? New Rank', value: `\`${newRank.toUpperCase()}\``, inline: true },
-          { name: '?? Progression', value: `\`${oldRank.toUpperCase()}\` ? \`${newRank.toUpperCase()}\``, inline: false },
-          { name: '?? Discord Sync', value: roleStatus, inline: false }
+          { name: '🎯 Target', value: `${targetUser.tag}`, inline: true },
+          { name: '🚀 New Rank', value: `\`${newRank.toUpperCase()}\``, inline: true },
+          { name: '📈 Progression', value: `\`${oldRank.toUpperCase()}\` ➡ \`${newRank.toUpperCase()}\``, inline: false },
+          { name: '🔗 Discord Sync', value: roleStatus, inline: false }
         ]
       });
 
-      await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_demote').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [embed], components: [row] });
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_demote').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
+      await interaction.editReply({ embeds: [embed], components: [row] });
     } catch (error) {
       console.error(error);
       const errEmbed = createErrorEmbed('An error occurred while demoting the user.');
       if (interaction.deferred || interaction.replied) {
-        await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_demote').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [errEmbed], components: [row] });
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_demote').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
+        await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {
         await interaction.reply({ embeds: [errEmbed], ephemeral: true });
       }

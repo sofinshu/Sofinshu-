@@ -51,8 +51,8 @@ module.exports = {
         .lean();
 
       if (!tickets.length) {
-        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_ticketLogs').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [createErrorEmbed('No tickets found matching your query.')], components: [row] });
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_ticketLogs').setLabel('ðŸ”„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        return await interaction.editReply({ embeds: [createErrorEmbed('No tickets found matching your query.')], components: [row] });
       }
 
       const pendingTickets = tickets.filter(t => t.status === 'open');
@@ -112,11 +112,11 @@ module.exports = {
       await interaction.editReply({ embeds: [summaryEmbed, ...embeds].slice(0, 10) });
     } catch (error) {
       console.error(error);
-      const errEmbed = createErrorEmbed('An error occurred while fetching ticket logs.');
-      if (interaction.deferred || interaction.replied) {
-        await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_ticketLogs').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [errEmbed], components: [row] });
-      } else {
+        const errEmbed = createErrorEmbed('An error occurred while fetching ticket logs.');
+        if (interaction.deferred || interaction.replied) {
+          const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_ticketLogs').setLabel('ðŸ”„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+          await interaction.editReply({ embeds: [errEmbed], components: [row] });
+        } else {
         await interaction.reply({ embeds: [errEmbed], ephemeral: true });
       }
     }

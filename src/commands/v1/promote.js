@@ -52,25 +52,25 @@ module.exports = {
       }
 
       const embed = await createCustomEmbed(interaction, {
-        title: '?? Staff Promotion Executed',
+        title: '✅ Staff Promotion Executed',
         description: `Successfully promoted ${targetUser} within the hierarchical structure.`,
         color: 'success',
         fields: [
-          { name: '?? Target', value: `${targetUser.tag}`, inline: true },
-          { name: '??? New Rank', value: `\`${newRank.toUpperCase()}\``, inline: true },
-          { name: '?? Progression', value: `\`${oldRank.toUpperCase()}\` ? \`${newRank.toUpperCase()}\``, inline: false },
-          { name: '?? Discord Sync', value: roleStatus, inline: false }
+          { name: '🎯 Target', value: `${targetUser.tag}`, inline: true },
+          { name: '🚀 New Rank', value: `\`${newRank.toUpperCase()}\``, inline: true },
+          { name: '📈 Progression', value: `\`${oldRank.toUpperCase()}\` ➡ \`${newRank.toUpperCase()}\``, inline: false },
+          { name: '🔗 Discord Sync', value: roleStatus, inline: false }
         ]
       });
 
-      await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_promote').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [embed], components: [row] });
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_promote').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
+      await interaction.editReply({ embeds: [embed], components: [row] });
     } catch (error) {
       console.error(error);
       const errEmbed = createErrorEmbed('An error occurred while promoting the user.');
       if (interaction.deferred || interaction.replied) {
-        await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_promote').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [errEmbed], components: [row] });
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_promote').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
+        await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {
         await interaction.reply({ embeds: [errEmbed], ephemeral: true });
       }

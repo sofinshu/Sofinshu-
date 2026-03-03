@@ -61,15 +61,15 @@ module.exports = {
                 { name: '🛠️ Metadata', value: `Roles: **${rolesCount}**\nEmojis: **${emojisCount}**`, inline: true }
             );
 
-            await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_server_status').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_server_status').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
         } catch (error) {
             console.error('Server Status Error:', error);
             const errEmbed = createErrorEmbed('An error occurred while analyzing the server cache.');
             if (interaction.deferred || interaction.replied) {
-                await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_server_status').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [errEmbed], components: [row] });
+                const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_server_status').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
+                await interaction.editReply({ embeds: [errEmbed], components: [row] });
             } else {
                 await interaction.reply({ embeds: [errEmbed], ephemeral: true });
             }

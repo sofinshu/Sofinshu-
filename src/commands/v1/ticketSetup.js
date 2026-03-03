@@ -374,7 +374,7 @@ module.exports.handleClaimTicket = async (interaction, client) => {
 module.exports.handleTicketDM = async (interaction, client) => {
   try {
             await interaction.deferReply({ fetchReply: true });
-    if (!client.isOwner(interaction.user)) {
+    if (!client.isOwner || !client.isOwner(interaction.user)) {
       return interaction.editReply({ embeds: [createErrorEmbed('Access denied. Executive clearance required.')], ephemeral: true });
     }
 

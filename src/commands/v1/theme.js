@@ -55,15 +55,15 @@ module.exports = {
                 branding: { color: hexColor }
             });
 
-            await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_theme').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_theme').setLabel('ðŸ”„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [previewEmbed], components: [row] });
 
         } catch (error) {
             console.error('Theme Command Error:', error);
             const errEmbed = createErrorEmbed('An error occurred while updating the server theme.');
             if (interaction.deferred || interaction.replied) {
-                await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_theme').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [errEmbed], components: [row] });
+                const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_theme').setLabel('ðŸ”„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+                await interaction.editReply({ embeds: [errEmbed], components: [row] });
             } else {
                 await interaction.reply({ embeds: [errEmbed], ephemeral: true });
             }
