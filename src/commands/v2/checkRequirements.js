@@ -24,12 +24,12 @@ module.exports = {
       const guild = await Guild.findOne({ guildId: guildId }).lean();
 
       if (!userData || !userData.staff) {
-        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_checkRequirements').setLabel('ğŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [createErrorEmbed(`The user <@${targetUser.id}> is not enrolled as staff in this server.`)], components: [row] });
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_checkRequirements').setLabel('ğŸ”„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        return await interaction.editReply({ embeds: [createErrorEmbed(`The user <@${targetUser.id}> is not enrolled as staff in this server.`)], components: [row] });
       }
       if (!guild || !guild.promotionRequirements) {
-        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_checkRequirements').setLabel('ğŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [createErrorEmbed('No promotion requirements have been established in this server.')], components: [row] });
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_checkRequirements').setLabel('ğŸ”„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        return await interaction.editReply({ embeds: [createErrorEmbed('No promotion requirements have been established in this server.')], components: [row] });
       }
 
       const currentRank = userData.staff.rank || 'member';
@@ -48,12 +48,12 @@ module.exports = {
 
       if (!nextRankName || !guild.promotionRequirements[nextRankName]) {
         const maxEmbed = await createCustomEmbed(interaction, {
-          title: `?? Maximum Rank: ${targetUser.username}`,
-          description: `?? <@${targetUser.id}> is already at the maximum achievable rank in this server!`,
+          title: `ğŸ† Maximum Rank: ${targetUser.username}`,
+          description: `â­ <@${targetUser.id}> is already at the maximum achievable rank in this server!`,
           thumbnail: targetUser.displayAvatarURL()
         });
-        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_checkRequirements').setLabel('ğŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [maxEmbed], components: [row] });
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_checkRequirements').setLabel('ğŸ”„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        return await interaction.editReply({ embeds: [maxEmbed], components: [row] });
       }
 
       const req = guild.promotionRequirements[nextRankName];
@@ -72,7 +72,7 @@ module.exports = {
       const getBar = (current, target) => {
         const percent = Math.min(100, Math.floor((current / target) * 100));
         const filled = Math.floor(percent / 10);
-        return `\`${'¦'.repeat(filled)}${'?'.repeat(10 - filled)}\` **${percent}%**`;
+        return `\`${'ï¿½'.repeat(filled)}${'?'.repeat(10 - filled)}\` **${percent}%**`;
       };
 
       const embed = await createCustomEmbed(interaction, {
@@ -91,15 +91,15 @@ module.exports = {
         color: canPromote ? 'success' : 'primary'
       });
 
-      await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_checkRequirements').setLabel('ğŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [embed], components: [row] });
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_checkRequirements').setLabel('ğŸ”„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+      await interaction.editReply({ embeds: [embed], components: [row] });
 
     } catch (error) {
       console.error('Check Requirements Error:', error);
       const errEmbed = createErrorEmbed('A database error occurred while calculating milestone eligibility.');
       if (interaction.deferred || interaction.replied) {
-        await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_checkRequirements').setLabel('ğŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [errEmbed], components: [row] });
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_checkRequirements').setLabel('ğŸ”„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {
         await interaction.reply({ embeds: [errEmbed], ephemeral: true });
       }

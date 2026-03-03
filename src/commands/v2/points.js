@@ -20,8 +20,8 @@ module.exports = {
       const staffSystem = client.systems.staff;
 
       if (!staffSystem) {
-        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_points').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [createErrorEmbed('Staff system is offline.')], components: [row] });
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_points').setLabel('ðŸ”„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        return await interaction.editReply({ embeds: [createErrorEmbed('Staff system is offline.')], components: [row] });
       }
 
       const userPoints = await staffSystem.getPoints(user.id, interaction.guildId);
@@ -52,15 +52,15 @@ module.exports = {
         color: userPoints > 500 ? 'premium' : 'primary'
       });
 
-      await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_points').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [embed], components: [row] });
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_points').setLabel('ðŸ”„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+      await interaction.editReply({ embeds: [embed], components: [row] });
 
     } catch (error) {
       console.error('Points Command Error:', error);
       const errEmbed = createErrorEmbed('An error occurred while fetching points balance.');
       if (interaction.deferred || interaction.replied) {
-        await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_points').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [errEmbed], components: [row] });
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_points').setLabel('ðŸ”„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {
         await interaction.reply({ embeds: [errEmbed], ephemeral: true });
       }

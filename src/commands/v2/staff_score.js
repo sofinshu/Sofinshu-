@@ -14,8 +14,8 @@ module.exports = {
       const staffSystem = client.systems.staff;
 
       if (!staffSystem) {
-        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_staff_score').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [createErrorEmbed('Staff system is currently offline.')], components: [row] });
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_staff_score').setLabel('ðŸ”„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        return await interaction.editReply({ embeds: [createErrorEmbed('Staff system is currently offline.')], components: [row] });
       }
 
       // StaffSystem utility safely enforces guildId scoping out-of-the-box
@@ -28,7 +28,7 @@ module.exports = {
       const qualityScore = Math.max(0, 100 - (warnings.total * 5));
 
       const filledScore = Math.min(10, Math.floor(score / 10));
-      const progressBar = `\`${'¦'.repeat(filledScore)}${'¦'.repeat(10 - filledScore)}\``;
+      const progressBar = `\`${'ï¿½'.repeat(filledScore)}${'ï¿½'.repeat(10 - filledScore)}\``;
 
       const embed = await createCustomEmbed(interaction, {
         title: `?? Staff Quality Algorithm: ${targetUser.username}`,
@@ -43,15 +43,15 @@ module.exports = {
         footer: `Disciplinary Warnings Impact Quality: [${warnings.total} Strikes recorded]`
       });
 
-      await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_staff_score').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [embed], components: [row] });
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_staff_score').setLabel('ðŸ”„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+      await interaction.editReply({ embeds: [embed], components: [row] });
 
     } catch (error) {
       console.error('Staff Score Error:', error);
       const errEmbed = createErrorEmbed('An error occurred while running the grading algorithm.');
       if (interaction.deferred || interaction.replied) {
-        await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_staff_score').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [errEmbed], components: [row] });
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_staff_score').setLabel('ðŸ”„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {
         await interaction.reply({ embeds: [errEmbed], ephemeral: true });
       }

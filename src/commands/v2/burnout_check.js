@@ -65,8 +65,8 @@ module.exports = {
                     footer: 'uwu-chan • Burnout Analysis • Last 7 Days'
                 });
 
-                return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_burnout_check').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [embed], components: [row] });
+                const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_burnout_check').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
+                return await interaction.editReply({ embeds: [embed], components: [row] });
             }
 
             // Server-wide burnout overview
@@ -107,14 +107,17 @@ module.exports = {
                 footer: 'uwu-chan • Server Burnout Analysis • Last 7 Days'
             });
 
-            await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_burnout_check').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_burnout_check').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
         } catch (error) {
             console.error('[burnout_check] Error:', error);
             const errEmbed = createErrorEmbed('Failed to run burnout analysis. Please try again.');
-            if (interaction.deferred || interaction.replied) await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_burnout_check').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [errEmbed], components: [row] });
-            else await interaction.reply({ embeds: [errEmbed], ephemeral: true });
+            if (interaction.deferred || interaction.replied) {
+                const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_burnout_check').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
+                await interaction.editReply({ embeds: [errEmbed], components: [row] });
+            } else {
+                await interaction.reply({ embeds: [errEmbed], ephemeral: true });
+            }
         }
     }
 };

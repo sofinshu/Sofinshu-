@@ -21,8 +21,8 @@ module.exports = {
                     description: `<@${targetUser.id}> currently holds no official badges in this sector.`,
                     footer: 'Achievements can be awarded by server administrators.'
                 });
-                return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_badges').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [embed], components: [row] });
+                const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_badges').setLabel('ðŸ”„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+                return await interaction.editReply({ embeds: [embed], components: [row] });
             }
 
             const badges = userData.staff.achievements.map(a => {
@@ -42,12 +42,12 @@ module.exports = {
                 color: 'premium'
             });
 
-            await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_badges').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_badges').setLabel('ðŸ”„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
         } catch (error) {
             console.error('Badges Command Error:', error);
-            await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_badges').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_badges').setLabel('ðŸ”„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('Failed to query the badge registry.')], components: [row] });
         }
     }
