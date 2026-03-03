@@ -148,7 +148,12 @@ router.get('/guild/:guildId/promotion-requirements', auth, guildAuth, async (req
             manager: { points: 600, shifts: 20, consistency: 80, maxWarnings: 1 },
             admin: { points: 1000, shifts: 30, consistency: 85, maxWarnings: 0 }
         };
-        res.json({ ...defaults, ...(guildDb?.promotionRequirements || {}) });
+        const activeRequires = { ...defaults, ...(guildDb?.promotionRequirements || {}) };
+        res.json({
+            requirements: activeRequires,
+            rankRoles: guildDb?.rankRoles || {},
+            promotionChannel: guildDb?.settings?.promotionChannel || null
+        });
     } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
@@ -158,9 +163,21 @@ router.patch('/guild/:guildId/promotion-requirements', auth, guildAuth, async (r
         const { guildId } = req.params;
         const validRanks = ['trial', 'staff', 'senior', 'manager', 'admin'];
         const update = {};
-        for (const rank of validRanks) {
-            if (req.body[rank]) update[`promotionRequirements.${rank}`] = req.body[rank];
+
+        if (req.body.requirements) {
+            for (const rank of validRanks) {
+                if (req.body.requirements[rank]) update[`promotionRequirements.${rank}`] = req.body.requirements[rank];
+            }
         }
+        if (req.body.rankRoles) {
+            for (const rank of validRanks) {
+                if (req.body.rankRoles[rank] !== undefined) update[`rankRoles.${rank}`] = req.body.rankRoles[rank];
+            }
+        }
+        if (req.body.promotionChannel !== undefined) {
+            update['settings.promotionChannel'] = req.body.promotionChannel || null;
+        }
+
         await Guild.findOneAndUpdate({ guildId }, { $set: update }, { upsert: true });
         res.json({ success: true });
     } catch (e) { res.status(500).json({ error: e.message }); }
