@@ -1,4 +1,5 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { createPremiumEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { validatePremiumLicense } = require('../../utils/premium_guard');
 const { Shift, User } = require('../../database/mongo');
@@ -29,7 +30,8 @@ module.exports = {
       ]);
 
       if (shifts.length === 0) {
-        return interaction.editReply({ embeds: [createErrorEmbed(`Insufficient metabolic data recorded in the last \`${period}\` days to generate a Zenith predictive model.`)] });
+        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_shift_optimizer').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [createErrorEmbed(`Insufficient metabolic data recorded in the last \`${period}\` days to generate a Zenith predictive model.`)], components: [row] });
       }
 
       // 1. Predictive Peak Modeling (Hour-by-Hour density)
@@ -52,18 +54,18 @@ module.exports = {
       const completionRate = Math.round((stats.completed / stats.total) * 100);
 
       const embed = await createCustomEmbed(interaction, {
-        title: '📊 Zenith Strategic Workforce Matrix',
+        title: '?? Zenith Strategic Workforce Matrix',
         thumbnail: interaction.guild.iconURL({ dynamic: true }),
-        description: `### 🚀 Predictive Shift Intelligence\nMacroscopic signal processing for sector **${interaction.guild.name}**. Analyzing metabolic shift density to predict optimal deployment vectors.\n\n**💎 ZENITH BUYER EXCLUSIVE**`,
+        description: `### ?? Predictive Shift Intelligence\nMacroscopic signal processing for sector **${interaction.guild.name}**. Analyzing metabolic shift density to predict optimal deployment vectors.\n\n**?? ZENITH BUYER EXCLUSIVE**`,
         fields: [
-          { name: '📈 Peak Signal Density', value: `\`${peakHour}:00 UTC\``, inline: true },
-          { name: '📉 Low Signal Vector', value: `\`${quietHour}:00 UTC\``, inline: true },
-          { name: '⏱️ Man-Hours Periodic', value: `\`${stats.hours.toFixed(1)}h\``, inline: true },
-          { name: '✅ Retention Velocity', value: `\`${completionRate}%\``, inline: true },
-          { name: '🌐 Predictive Confidence', value: `\`98.4%\``, inline: true },
-          { name: '🛡️ License Tier', value: '`💎 ZENITH (TITAN)`', inline: true }
+          { name: '?? Peak Signal Density', value: `\`${peakHour}:00 UTC\``, inline: true },
+          { name: '?? Low Signal Vector', value: `\`${quietHour}:00 UTC\``, inline: true },
+          { name: '?? Man-Hours Periodic', value: `\`${stats.hours.toFixed(1)}h\``, inline: true },
+          { name: '? Retention Velocity', value: `\`${completionRate}%\``, inline: true },
+          { name: '?? Predictive Confidence', value: `\`98.4%\``, inline: true },
+          { name: '??? License Tier', value: '`?? ZENITH (TITAN)`', inline: true }
         ],
-        footer: 'Zenith Predictive Engine • V3 Executive Strategic Suite',
+        footer: 'Zenith Predictive Engine � V3 Executive Strategic Suite',
         color: 'premium'
       });
 
@@ -73,13 +75,16 @@ module.exports = {
         recommendation += `\n> **Risk:** Retention decay detected. Recommend mandatory debriefs for non-terminating shifts.`;
       }
 
-      embed.addFields({ name: '🧠 Zenith Strategic Recommendation', value: recommendation, inline: false });
+      embed.addFields({ name: '?? Zenith Strategic Recommendation', value: recommendation, inline: false });
 
-      await interaction.editReply({ embeds: [embed] });
+      await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_shift_optimizer').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
 
     } catch (error) {
       console.error('Zenith Shift Optimizer Error:', error);
-      await interaction.editReply({ embeds: [createErrorEmbed('Zenith Strategic failure: Unable to synchronize predictive matrices.')] });
+      await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_shift_optimizer').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [createErrorEmbed('Zenith Strategic failure: Unable to synchronize predictive matrices.')], components: [row] });
     }
   }
 };
+

@@ -1,4 +1,5 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { createPremiumEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { User, Activity, Shift, Guild } = require('../../database/mongo');
 
@@ -20,12 +21,14 @@ module.exports = {
       // Strip legacy execution constraints reading dynamically from object properties defined strictly by users
       const guild = await Guild.findOne({ guildId }).lean();
       if (!guild || !guild.promotionRequirements) {
-        return interaction.editReply({ embeds: [createErrorEmbed(`Missing mapping bounds. Admin has not initialized \`/promo_setup\` inside this server yet.`)] });
+        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_promotion_predictor').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [createErrorEmbed(`Missing mapping bounds. Admin has not initialized \`/promo_setup\` inside this server yet.`)], components: [row] });
       }
 
       let user = await User.findOne({ userId: targetUser.id, guildId }).lean();
       if (!user || !user.staff) {
-        return interaction.editReply({ embeds: [createErrorEmbed(`Unregistered execution. <@${targetUser.id}> isn't tracked globally inside this server footprint.`)] });
+        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_promotion_predictor').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [createErrorEmbed(`Unregistered execution. <@${targetUser.id}> isn't tracked globally inside this server footprint.`)], components: [row] });
       }
 
       const thirtyDaysAgo = new Date();
@@ -53,15 +56,16 @@ module.exports = {
 
       if (!nextRank || !guild.promotionRequirements[nextRank]) {
         const embedMax = await createCustomEmbed(interaction, {
-          title: `🔮 Algorithm Predictor: ${targetUser.username}`,
+          title: `?? Algorithm Predictor: ${targetUser.username}`,
           thumbnail: targetUser.displayAvatarURL(),
           description: `Operator <@${targetUser.id}> has already achieved the highest execution parameters flagged mapped inside **${interaction.guild.name}**.`,
           fields: [
-            { name: '⭐ Rank Parameters Bound', value: `\`${currentRank.toUpperCase()}\``, inline: true },
-            { name: '🎖️ Algorithmic Vector', value: '`MAXIMUM THRESHOLD`', inline: true }
+            { name: '? Rank Parameters Bound', value: `\`${currentRank.toUpperCase()}\``, inline: true },
+            { name: '??? Algorithmic Vector', value: '`MAXIMUM THRESHOLD`', inline: true }
           ]
         });
-        return interaction.editReply({ embeds: [embedMax] });
+        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_promotion_predictor').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embedMax], components: [row] });
       }
 
       const requirements = guild.promotionRequirements[nextRank];
@@ -80,46 +84,49 @@ module.exports = {
       const overallPredictiveScore = categories > 0 ? Math.round(ratioScore / categories) : 100;
       const isEligible = overallPredictiveScore >= 100;
 
-      const predictionLabel = isEligible ? 'Eligible for promotion! 🎉' : `Trailing Target Limits`;
+      const predictionLabel = isEligible ? 'Eligible for promotion! ??' : `Trailing Target Limits`;
       const embedColor = isEligible ? '#00FF00' : '#FFA500';
 
       const reqStringList = [];
-      if (reqPoints > 0) reqStringList.push(`🎯 \`${reqPoints}\` Priority Points`);
-      if (reqConsistency > 0) reqStringList.push(`🎯 \`${reqConsistency}%\` Local Consistency`);
-      if (reqShifts > 0) reqStringList.push(`🎯 \`${reqShifts}\` Processed Patrols`);
-      if (requirements.reputation && requirements.reputation > 0) reqStringList.push(`🎯 \`${requirements.reputation}\` Lifetime Rep`);
+      if (reqPoints > 0) reqStringList.push(`?? \`${reqPoints}\` Priority Points`);
+      if (reqConsistency > 0) reqStringList.push(`?? \`${reqConsistency}%\` Local Consistency`);
+      if (reqShifts > 0) reqStringList.push(`?? \`${reqShifts}\` Processed Patrols`);
+      if (requirements.reputation && requirements.reputation > 0) reqStringList.push(`?? \`${requirements.reputation}\` Lifetime Rep`);
 
       const embed = await createCustomEmbed(interaction, {
-        title: `🔮 Algorithm Predictor: ${targetUser.username}`,
+        title: `?? Algorithm Predictor: ${targetUser.username}`,
         thumbnail: targetUser.displayAvatarURL(),
         description: `Trailing performance bounds aggregating against thresholds configured by **${interaction.guild.name}** backend metrics.`,
         color: embedColor,
         fields: [
-          { name: '⭐ Valid Executed Status', value: `\`${currentRank.toUpperCase()}\``, inline: true },
-          { name: '📈 Global Predictive Vectors', value: `\`${overallPredictiveScore}/100\``, inline: true },
-          { name: '🔮 Algorithm Prediction', value: `\`${predictionLabel}\``, inline: false },
+          { name: '? Valid Executed Status', value: `\`${currentRank.toUpperCase()}\``, inline: true },
+          { name: '?? Global Predictive Vectors', value: `\`${overallPredictiveScore}/100\``, inline: true },
+          { name: '?? Algorithm Prediction', value: `\`${predictionLabel}\``, inline: false },
 
-          { name: '⭐ Point Trajectory', value: `\`${points}\``, inline: true },
-          { name: '🛡️ Local Consistency', value: `\`${consistency}%\``, inline: true },
-          { name: '💫 Reputation Lifetime', value: `\`${reputation}\``, inline: true },
-          { name: '✅ Lifetime Deployments', value: `\`${commands}\` Cmds`, inline: true },
-          { name: '⏱️ Executed Bounds', value: `\`${completedShifts}\` Pings`, inline: true },
+          { name: '? Point Trajectory', value: `\`${points}\``, inline: true },
+          { name: '??? Local Consistency', value: `\`${consistency}%\``, inline: true },
+          { name: '?? Reputation Lifetime', value: `\`${reputation}\``, inline: true },
+          { name: '? Lifetime Deployments', value: `\`${commands}\` Cmds`, inline: true },
+          { name: '?? Executed Bounds', value: `\`${completedShifts}\` Pings`, inline: true },
 
-          { name: `🎯 Execution Requirements for limit: [${nextRank.toUpperCase()}]`, value: reqStringList.join('\n') || '*Unconfigured Algorithm Limits*', inline: false }
+          { name: `?? Execution Requirements for limit: [${nextRank.toUpperCase()}]`, value: reqStringList.join('\n') || '*Unconfigured Algorithm Limits*', inline: false }
         ],
         footer: 'Dynamic matrices recalculate based securely entirely on local server execution traits.'
       });
 
-      await interaction.editReply({ embeds: [embed] });
+      await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_promotion_predictor').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
 
     } catch (error) {
       console.error('Promotion Predictor Error:', error);
       const errEmbed = createErrorEmbed('A database execution error occurred indexing algorithmic promotional bounds.');
       if (interaction.deferred || interaction.replied) {
-        await interaction.editReply({ embeds: [errEmbed] });
+        await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_promotion_predictor').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {
         await interaction.reply({ embeds: [errEmbed], ephemeral: true });
       }
     }
   }
 };
+

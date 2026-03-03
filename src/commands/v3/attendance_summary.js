@@ -1,4 +1,5 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { createPremiumEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { validatePremiumLicense } = require('../../utils/premium_guard');
 const { Shift } = require('../../database/mongo');
@@ -42,7 +43,7 @@ module.exports = {
 
       const maxDensity = Math.max(...heatmap, 1);
       const heatmapViz = heatmap.map((count, i) => {
-        const intensity = '░▒▓█'[Math.min(3, Math.floor((count / maxDensity) * 3))];
+        const intensity = '����'[Math.min(3, Math.floor((count / maxDensity) * 3))];
         return `\`${dayLabels[i]}\` ${intensity.repeat(5)} \`[${count}]\``;
       }).join('\n');
 
@@ -51,25 +52,28 @@ module.exports = {
       const attendanceRate = totalShifts > 0 ? Math.round((completedShifts / totalShifts) * 100) : 0;
 
       const embed = await createCustomEmbed(interaction, {
-        title: targetUser ? `📅 Zenith Attendance Matrix: ${targetUser.username}` : '📅 Sector Workforce Density',
+        title: targetUser ? `?? Zenith Attendance Matrix: ${targetUser.username}` : '?? Sector Workforce Density',
         thumbnail: targetUser ? targetUser.displayAvatarURL({ dynamic: true }) : interaction.guild.iconURL({ dynamic: true }),
-        description: `### 🛡️ Macroscopic Presence Mapping\nAutomated 7-day density analysis aggregated from operational personnel footprints. Visualizing sector metabolism.\n\n**💎 ZENITH APEX EXCLUSIVE**`,
+        description: `### ??? Macroscopic Presence Mapping\nAutomated 7-day density analysis aggregated from operational personnel footprints. Visualizing sector metabolism.\n\n**?? ZENITH APEX EXCLUSIVE**`,
         fields: [
-          { name: '📊 7-Day Activity Heatmap', value: heatmapViz, inline: false },
-          { name: '🔄 Operational Yield', value: `\`${totalShifts}\` Pings`, inline: true },
-          { name: '✅ Retention Success', value: `\`${completedShifts}\` Retained`, inline: true },
-          { name: '📈 Trajectory', value: `\`${attendanceRate}%\``, inline: true },
-          { name: '⚖️ Sector Health', value: attendanceRate >= 80 ? '`STABLE`' : '`DEGRADED`', inline: true }
+          { name: '?? 7-Day Activity Heatmap', value: heatmapViz, inline: false },
+          { name: '?? Operational Yield', value: `\`${totalShifts}\` Pings`, inline: true },
+          { name: '? Retention Success', value: `\`${completedShifts}\` Retained`, inline: true },
+          { name: '?? Trajectory', value: `\`${attendanceRate}%\``, inline: true },
+          { name: '?? Sector Health', value: attendanceRate >= 80 ? '`STABLE`' : '`DEGRADED`', inline: true }
         ],
-        footer: 'Presence Density Visualization • V3 Strategic Apex Suite',
+        footer: 'Presence Density Visualization � V3 Strategic Apex Suite',
         color: attendanceRate >= 80 ? 'success' : 'premium'
       });
 
-      await interaction.editReply({ embeds: [embed] });
+      await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_attendance_summary').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
 
     } catch (error) {
       console.error('Zenith Attendance Error:', error);
-      await interaction.editReply({ embeds: [createErrorEmbed('Presence Analytics failure: Unable to decode metabolic heatmaps.')] });
+      await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_attendance_summary').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [createErrorEmbed('Presence Analytics failure: Unable to decode metabolic heatmaps.')], components: [row] });
     }
   }
 };
+

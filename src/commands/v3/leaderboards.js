@@ -1,4 +1,5 @@
-ï»¿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { createPremiumEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { User } = require('../../database/mongo');
 
@@ -36,7 +37,8 @@ module.exports = {
       }).lean();
 
       if (!users.length) {
-        return interaction.editReply({ embeds: [createErrorEmbed('No valid staff targets have been registered in this server to generate a leaderboard against.')] });
+        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_leaderboards').setLabel('ğŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [createErrorEmbed('No valid staff targets have been registered in this server to generate a leaderboard against.')], components: [row] });
       }
 
       let sortedUsers = users
@@ -50,11 +52,12 @@ module.exports = {
         .slice(0, limit);
 
       if (sortedUsers.length === 0) {
-        return interaction.editReply({ embeds: [createErrorEmbed(`No staff targets mapped against the \`${type}\` tracking metric.`)] });
+        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_leaderboards').setLabel('ğŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [createErrorEmbed(`No staff targets mapped against the \`${type}\` tracking metric.`)], components: [row] });
       }
 
       const leaderboardEntries = [];
-      const medals = ['ğŸ¥‡', 'ğŸ¥ˆ', 'ğŸ¥‰'];
+      const medals = ['??', '??', '??'];
 
       for (let i = 0; i < sortedUsers.length; i++) {
         const user = sortedUsers[i];
@@ -65,28 +68,31 @@ module.exports = {
         else if (type === 'reputation') value = `**${user.staff?.reputation || 0}** Nodes`;
 
         const medal = i < 3 ? medals[i] : `**${i + 1}.**`;
-        leaderboardEntries.push(`${medal} <@${user.userId}> â” ${value}`);
+        leaderboardEntries.push(`${medal} <@${user.userId}> ? ${value}`);
       }
 
       const embed = await createCustomEmbed(interaction, {
-        title: `ğŸ† Server Index: ${type.charAt(0).toUpperCase() + type.slice(1)}`,
+        title: `?? Server Index: ${type.charAt(0).toUpperCase() + type.slice(1)}`,
         description: `Computing the top ${sortedUsers.length} ranking hierarchies currently deployed.`,
         thumbnail: interaction.guild.iconURL({ dynamic: true }),
         fields: [
-          { name: 'ğŸ“Š Operational Outputs', value: leaderboardEntries.join('\n'), inline: false }
+          { name: '?? Operational Outputs', value: leaderboardEntries.join('\n'), inline: false }
         ]
       });
 
-      await interaction.editReply({ embeds: [embed] });
+      await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_leaderboards').setLabel('ğŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
 
     } catch (error) {
       console.error('Leaderboards Error:', error);
       const errEmbed = createErrorEmbed('A database error occurred parsing the global indexed hierarchy lists.');
       if (interaction.deferred || interaction.replied) {
-        await interaction.editReply({ embeds: [errEmbed] });
+        await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_leaderboards').setLabel('ğŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {
         await interaction.reply({ embeds: [errEmbed], ephemeral: true });
       }
     }
   }
 };
+

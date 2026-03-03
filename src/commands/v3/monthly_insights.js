@@ -1,4 +1,5 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { createPremiumEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { createCustomEmbed, createErrorEmbed, createProgressBar } = require('../../utils/embeds');
 const { validatePremiumLicense } = require('../../utils/premium_guard');
 const { Activity, Shift, Warning, User } = require('../../database/mongo');
@@ -6,7 +7,7 @@ const { Activity, Shift, Warning, User } = require('../../database/mongo');
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('monthly_insights')
-    .setDescription('📆 Comprehensive 30-day performance insights with real analytics'),
+    .setDescription('?? Comprehensive 30-day performance insights with real analytics'),
 
   async execute(interaction) {
     try {
@@ -34,8 +35,8 @@ module.exports = {
 
       const cmdCount = thisMonthActs.filter(a => a.type === 'command').length;
       const lastCmdCount = lastMonthActs.filter(a => a.type === 'command').length;
-      const growth = lastCmdCount > 0 ? ((cmdCount - lastCmdCount) / lastCmdCount * 100).toFixed(1) : '∞';
-      const growthEmoji = parseFloat(growth) >= 0 ? '📈' : '📉';
+      const growth = lastCmdCount > 0 ? ((cmdCount - lastCmdCount) / lastCmdCount * 100).toFixed(1) : '8';
+      const growthEmoji = parseFloat(growth) >= 0 ? '??' : '??';
 
       const activeUsers = new Set(thisMonthActs.map(a => a.userId)).size;
       const totalShiftSecs = shifts.reduce((s, sh) => s + (sh.duration || 0), 0);
@@ -50,8 +51,8 @@ module.exports = {
       // Top performers
       const topList = topUsers.length > 0
         ? topUsers.slice(0, 5).map((u, i) => {
-          const medals = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣'];
-          return `${medals[i]} ${u.username || `<@${u.userId}>`} — \`${(u.staff?.points || 0).toLocaleString()} pts\``;
+          const medals = ['??', '??', '??', '4??', '5??'];
+          return `${medals[i]} ${u.username || `<@${u.userId}>`} � \`${(u.staff?.points || 0).toLocaleString()} pts\``;
         }).join('\n')
         : '`No data yet`';
 
@@ -62,34 +63,37 @@ module.exports = {
       const peakDay = dayNames[dayCounts.indexOf(Math.max(...dayCounts))];
       const dayBarline = dayCounts.map((c, i) => {
         const pct = Math.round((c / Math.max(...dayCounts, 1)) * 5);
-        return `${dayNames[i]}: ${'█'.repeat(pct)}${'░'.repeat(5 - pct)} ${c}`;
+        return `${dayNames[i]}: ${'�'.repeat(pct)}${'�'.repeat(5 - pct)} ${c}`;
       }).join('\n');
 
       const embed = await createCustomEmbed(interaction, {
-        title: `📆 Monthly Insights — ${interaction.guild.name}`,
+        title: `?? Monthly Insights � ${interaction.guild.name}`,
         thumbnail: interaction.guild.iconURL({ dynamic: true }),
         description: `Full 30-day performance breakdown for **${interaction.guild.name}**.\n\n**Engagement Rate:** \`${createProgressBar(engagePct)}\` **${engagePct}%**`,
         fields: [
-          { name: '⚡ Commands This Month', value: `\`${cmdCount.toLocaleString()}\` ${growthEmoji} \`${growth}%\` vs last month`, inline: true },
-          { name: '📅 Daily Average', value: `\`${dailyAvg}\` cmds/day`, inline: true },
-          { name: '👥 Unique Active Users', value: `\`${activeUsers}\``, inline: true },
-          { name: '🔄 Shifts Completed', value: `\`${shifts.length}\` shifts — \`${shiftHours}h\` total`, inline: true },
-          { name: '⚠️ Warnings Issued', value: `\`${warnings.length}\``, inline: true },
-          { name: '🏆 Promotions', value: `\`${promotions.length}\``, inline: true },
-          { name: '📊 Activity by Day', value: `\`\`\`\n${dayBarline}\`\`\``, inline: false },
-          { name: '🏅 Peak Day', value: `\`${peakDay}\``, inline: true },
-          { name: '🎖️ Top 5 Staff', value: topList, inline: false }
+          { name: '? Commands This Month', value: `\`${cmdCount.toLocaleString()}\` ${growthEmoji} \`${growth}%\` vs last month`, inline: true },
+          { name: '?? Daily Average', value: `\`${dailyAvg}\` cmds/day`, inline: true },
+          { name: '?? Unique Active Users', value: `\`${activeUsers}\``, inline: true },
+          { name: '?? Shifts Completed', value: `\`${shifts.length}\` shifts � \`${shiftHours}h\` total`, inline: true },
+          { name: '?? Warnings Issued', value: `\`${warnings.length}\``, inline: true },
+          { name: '?? Promotions', value: `\`${promotions.length}\``, inline: true },
+          { name: '?? Activity by Day', value: `\`\`\`\n${dayBarline}\`\`\``, inline: false },
+          { name: '?? Peak Day', value: `\`${peakDay}\``, inline: true },
+          { name: '??? Top 5 Staff', value: topList, inline: false }
         ],
         color: 'premium',
-        footer: 'uwu-chan • Premium Monthly Insights • Last 30 Days'
+        footer: 'uwu-chan � Premium Monthly Insights � Last 30 Days'
       });
 
-      await interaction.editReply({ embeds: [embed] });
+      await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_monthly_insights').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
     } catch (error) {
       console.error('[monthly_insights] Error:', error);
       const errEmbed = createErrorEmbed('Failed to generate monthly insights.');
-      if (interaction.deferred || interaction.replied) await interaction.editReply({ embeds: [errEmbed] });
+      if (interaction.deferred || interaction.replied) await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_monthly_insights').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [errEmbed], components: [row] });
       else await interaction.reply({ embeds: [errEmbed], ephemeral: true });
     }
   }
 };
+

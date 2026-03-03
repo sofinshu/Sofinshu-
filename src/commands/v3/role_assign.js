@@ -1,4 +1,5 @@
-Ôªøconst { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
+const { SlashCommandBuilder, PermissionFlagsBits, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { createPremiumEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { User, Activity } = require('../../database/mongo');
 
@@ -26,22 +27,26 @@ module.exports = {
 
       const member = await interaction.guild.members.fetch(targetUser.id).catch(() => null);
       if (!member) {
-        return interaction.editReply({ embeds: [createErrorEmbed(`Target <@${targetUser.id}> cannot be resolved within this server partition.`)] });
+        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_role_assign').setLabel('üÑ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [createErrorEmbed(`Target <@${targetUser.id}> cannot be resolved within this server partition.`)], components: [row] });
       }
 
       // Privilege escalation protections
       if (role.position >= interaction.member.roles.highest.position && interaction.user.id !== interaction.guild.ownerId) {
-        return interaction.editReply({ embeds: [createErrorEmbed('You do not possess sufficient hierarchical clearance to assign this role parameter.')] });
+        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_role_assign').setLabel('üÑ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [createErrorEmbed('You do not possess sufficient hierarchical clearance to assign this role parameter.')], components: [row] });
       }
 
       if (role.position >= interaction.guild.members.me.roles.highest.position) {
-        return interaction.editReply({ embeds: [createErrorEmbed('My overarching bot role must strictly sit above the target role before I can assign it.')] });
+        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_role_assign').setLabel('üÑ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [createErrorEmbed('My overarching bot role must strictly sit above the target role before I can assign it.')], components: [row] });
       }
 
       try {
         await member.roles.add(role);
       } catch (error) {
-        return interaction.editReply({ embeds: [createErrorEmbed(`Discord API Execution Error:\n\`${error.message}\``)] });
+        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_role_assign').setLabel('üÑ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [createErrorEmbed(`Discord API Execution Error:\n\`${error.message}\``)], components: [row] });
       }
 
       // Execute local Guild Scoped Map Update ensuring users are bound securely
@@ -71,26 +76,29 @@ module.exports = {
       await logTrace.save();
 
       const embed = await createCustomEmbed(interaction, {
-        title: '‚úÖ Role Propagation Executed',
+        title: '? Role Propagation Executed',
         description: `Security parameters securely bounded **${role.name}** into user limits.`,
         thumbnail: targetUser.displayAvatarURL(),
         fields: [
-          { name: 'üë§ Registered Operator', value: `<@${targetUser.id}>`, inline: true },
-          { name: 'üõ°Ô∏è Payload Injected', value: `<@&${role.id}>`, inline: true },
-          { name: '‚öôÔ∏è Commanding Author', value: `<@${interaction.user.id}>`, inline: true }
+          { name: '?? Registered Operator', value: `<@${targetUser.id}>`, inline: true },
+          { name: '??? Payload Injected', value: `<@&${role.id}>`, inline: true },
+          { name: '?? Commanding Author', value: `<@${interaction.user.id}>`, inline: true }
         ]
       });
 
-      await interaction.editReply({ embeds: [embed] });
+      await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_role_assign').setLabel('üÑ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
 
     } catch (error) {
       console.error('Role Assign Error:', error);
       const errEmbed = createErrorEmbed('A database tracking error occurred generating propagation permissions.');
       if (interaction.deferred || interaction.replied) {
-        await interaction.editReply({ embeds: [errEmbed] });
+        await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_role_assign').setLabel('üÑ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {
         await interaction.reply({ embeds: [errEmbed], ephemeral: true });
       }
     }
   }
 };
+

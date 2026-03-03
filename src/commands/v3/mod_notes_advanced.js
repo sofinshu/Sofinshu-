@@ -1,4 +1,5 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { createPremiumEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { Activity } = require('../../database/mongo');
 
@@ -34,47 +35,52 @@ module.exports = {
 
       if (notes.length === 0) {
         if (targetUser) {
-          return interaction.editReply({ embeds: [createErrorEmbed(`No moderation trace logs discovered for <@${targetUser.id}>.`)] });
+          return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_mod_notes_advanced').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [createErrorEmbed(`No moderation trace logs discovered for <@${targetUser.id}>.`)], components: [row] });
         }
-        return interaction.editReply({ embeds: [createErrorEmbed('No moderation logs have been recorded in this server yet.')] });
+        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_mod_notes_advanced').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [createErrorEmbed('No moderation logs have been recorded in this server yet.')], components: [row] });
       }
 
       const noteEntries = notes.map(note => {
-        const type = note.type === 'warning' ? '⚠️ Notice' : '🔧 Execution';
+        const type = note.type === 'warning' ? '?? Notice' : '?? Execution';
         const unixTime = Math.floor(new Date(note.createdAt).getTime() / 1000);
 
         let dataStr = note.data?.reason || note.data?.command || 'Empty Hash';
         if (dataStr.length > 60) dataStr = `${dataStr.substring(0, 60)}...`;
 
-        return `> **${type}** ➔ \`${dataStr}\` (<t:${unixTime}:R>)`;
+        return `> **${type}** ? \`${dataStr}\` (<t:${unixTime}:R>)`;
       });
 
       const totalWarnings = await Activity.countDocuments({ guildId, type: 'warning' });
       const totalCommands = await Activity.countDocuments({ guildId, type: 'command' });
 
       const embed = await createCustomEmbed(interaction, {
-        title: `📝 Advanced Logging Index`,
+        title: `?? Advanced Logging Index`,
         description: targetUser
           ? `Filtering footprint records mapped to <@${targetUser.id}> in **${interaction.guild.name}**.`
           : `Reviewing the top ${notes.length} log vectors recorded within **${interaction.guild.name}**.`,
         thumbnail: targetUser ? targetUser.displayAvatarURL() : interaction.guild.iconURL({ dynamic: true }),
         fields: [
-          { name: '🔍 Security Trace Index', value: noteEntries.join('\n') || '*Cache Error*', inline: false },
-          { name: '✅ Total Authorized Invocations', value: `\`${totalCommands}\` Global Operations`, inline: true },
-          { name: '⚠️ Server Disciplinary Traces', value: `\`${totalWarnings}\` Global Warnings`, inline: true }
+          { name: '?? Security Trace Index', value: noteEntries.join('\n') || '*Cache Error*', inline: false },
+          { name: '? Total Authorized Invocations', value: `\`${totalCommands}\` Global Operations`, inline: true },
+          { name: '?? Server Disciplinary Traces', value: `\`${totalWarnings}\` Global Warnings`, inline: true }
         ]
       });
 
-      await interaction.editReply({ embeds: [embed] });
+      await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_mod_notes_advanced').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
 
     } catch (error) {
       console.error('Mod Notes Advanced Error:', error);
       const errEmbed = createErrorEmbed('A database tracking error occurred iterating mod footprint history.');
       if (interaction.deferred || interaction.replied) {
-        await interaction.editReply({ embeds: [errEmbed] });
+        await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_mod_notes_advanced').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {
         await interaction.reply({ embeds: [errEmbed], ephemeral: true });
       }
     }
   }
 };
+

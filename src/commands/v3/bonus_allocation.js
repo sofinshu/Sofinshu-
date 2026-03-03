@@ -1,4 +1,5 @@
-﻿const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
+const { SlashCommandBuilder, PermissionFlagsBits, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { createPremiumEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { User, Activity } = require('../../database/mongo');
 
@@ -59,29 +60,32 @@ module.exports = {
       await Promise.all([user.save(), logTrace.save()]);
 
       const embed = await createCustomEmbed(interaction, {
-        title: '💰 Allocation Payload Executed',
+        title: '?? Allocation Payload Executed',
         description: `A dynamic point insertion command resolved explicitly against **${targetUser.username}**.`,
         thumbnail: targetUser.displayAvatarURL(),
         fields: [
-          { name: '👤 Targeted Operator', value: `<@${targetUser.id}>`, inline: true },
-          { name: '📈 Allocation Value', value: `\`+${points}\` Pts`, inline: true },
-          { name: '⭐ Lifetime Nodes', value: `\`${user.staff.points}\` Total`, inline: true },
-          { name: '⚙️ Commanding Author', value: `<@${moderatorId}>`, inline: true },
-          { name: '📝 Context Execution', value: `\`${reason}\``, inline: false }
+          { name: '?? Targeted Operator', value: `<@${targetUser.id}>`, inline: true },
+          { name: '?? Allocation Value', value: `\`+${points}\` Pts`, inline: true },
+          { name: '? Lifetime Nodes', value: `\`${user.staff.points}\` Total`, inline: true },
+          { name: '?? Commanding Author', value: `<@${moderatorId}>`, inline: true },
+          { name: '?? Context Execution', value: `\`${reason}\``, inline: false }
         ],
         footer: 'This execution metric was securely logged inside the database timeline.'
       });
 
-      await interaction.editReply({ embeds: [embed] });
+      await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_bonus_allocation').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
 
     } catch (error) {
       console.error('Bonus Allocation Error:', error);
       const errEmbed = createErrorEmbed('A database tracking error abruptly halted executing the allocation logic.');
       if (interaction.deferred || interaction.replied) {
-        await interaction.editReply({ embeds: [errEmbed] });
+        await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_bonus_allocation').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {
         await interaction.reply({ embeds: [errEmbed], ephemeral: true });
       }
     }
   }
 };
+

@@ -1,4 +1,5 @@
-ï»¿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { createPremiumEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { User, Guild } = require('../../database/mongo');
 
@@ -19,12 +20,14 @@ module.exports = {
 
       const user = await User.findOne({ userId: targetUser.id, guildId }).lean();
       if (!user || !user.staff) {
-        return interaction.editReply({ embeds: [createErrorEmbed(`Missing target footprint. <@${targetUser.id}> is unregistered globally inside this server.`)] });
+        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_staff_rank_advanced').setLabel('ğŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [createErrorEmbed(`Missing target footprint. <@${targetUser.id}> is unregistered globally inside this server.`)], components: [row] });
       }
 
       const guild = await Guild.findOne({ guildId }).lean();
       if (!guild || !guild.promotionRequirements) {
-        return interaction.editReply({ embeds: [createErrorEmbed(`Missing mapping. The active administrator has not setup backend /promo_setup values required to project ranking boundaries.`)] });
+        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_staff_rank_advanced').setLabel('ğŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [createErrorEmbed(`Missing mapping. The active administrator has not setup backend /promo_setup values required to project ranking boundaries.`)], components: [row] });
       }
 
       // Global Guild Ranked Sandbox Filtering to compute comparative positioning
@@ -71,39 +74,42 @@ module.exports = {
         const progressRatio = Math.min(1, Math.max(0, currentProgress / deltaLimit));
         const pipCount = Math.round(progressRatio * 15); // Width
 
-        progressStr = `\`${'â–ˆ'.repeat(pipCount)}${'â–‘'.repeat(15 - pipCount)}\` ${points}/${pointsForNextRank}`;
+        progressStr = `\`${'¦'.repeat(pipCount)}${'¦'.repeat(15 - pipCount)}\` ${points}/${pointsForNextRank}`;
       } else {
-        progressStr = '`â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ` **MAXIMUM**';
+        progressStr = '`¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦` **MAXIMUM**';
       }
 
       const embed = await createCustomEmbed(interaction, {
-        title: `ğŸ“ˆ Advanced Progression Vector: ${targetUser.username}`,
+        title: `?? Advanced Progression Vector: ${targetUser.username}`,
         thumbnail: targetUser.displayAvatarURL(),
         description: `Aggregating hierarchy thresholds directly against mapping logic created by **${interaction.guild.name}**.`,
         fields: [
-          { name: 'ğŸ† Valid Rank Status', value: `\`${currentRank.toUpperCase()}\``, inline: true },
-          { name: 'ğŸ¥‡ Server Position', value: `\`#${rank} / ${users.length}\``, inline: true },
-          { name: 'â¬†ï¸ Projection Queue', value: nextRank ? `\`${nextRank.toUpperCase()}\`` : '`---`', inline: true },
-          { name: 'ğŸ’¯ Projection Yield', value: nextRank ? `**${pointsToNext}** points required` : '*Zero requirements flagged.*', inline: false },
-          { name: 'ğŸ“Š Mathematical Bounds', value: progressStr, inline: false },
-          { name: 'â­ Total Points Yield', value: `\`${points}\``, inline: true },
-          { name: 'ğŸ“ˆ Rolling Consistency', value: `\`${consistency}%\``, inline: true },
-          { name: 'ğŸ’« Reputation Nodes', value: `\`${reputation}\``, inline: true },
-          { name: 'âš ï¸ Disciplinary Action', value: `\`${warnings}\``, inline: true }
+          { name: '?? Valid Rank Status', value: `\`${currentRank.toUpperCase()}\``, inline: true },
+          { name: '?? Server Position', value: `\`#${rank} / ${users.length}\``, inline: true },
+          { name: '?? Projection Queue', value: nextRank ? `\`${nextRank.toUpperCase()}\`` : '`---`', inline: true },
+          { name: '?? Projection Yield', value: nextRank ? `**${pointsToNext}** points required` : '*Zero requirements flagged.*', inline: false },
+          { name: '?? Mathematical Bounds', value: progressStr, inline: false },
+          { name: '? Total Points Yield', value: `\`${points}\``, inline: true },
+          { name: '?? Rolling Consistency', value: `\`${consistency}%\``, inline: true },
+          { name: '?? Reputation Nodes', value: `\`${reputation}\``, inline: true },
+          { name: '?? Disciplinary Action', value: `\`${warnings}\``, inline: true }
         ],
         footer: 'Algorithms execute locally. They respect arbitrary parameters dynamically selected.'
       });
 
-      await interaction.editReply({ embeds: [embed] });
+      await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_staff_rank_advanced').setLabel('ğŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
 
     } catch (error) {
       console.error('Rank Advanced Error:', error);
       const errEmbed = createErrorEmbed('A database error occurred generating overlapping requirement boundaries.');
       if (interaction.deferred || interaction.replied) {
-        await interaction.editReply({ embeds: [errEmbed] });
+        await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_staff_rank_advanced').setLabel('ğŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {
         await interaction.reply({ embeds: [errEmbed], ephemeral: true });
       }
     }
   }
 };
+
