@@ -24,7 +24,7 @@ module.exports = {
       if (targetUser) {
         const user = await User.findOne({ userId: targetUser.id, guildId }).lean();
         if (!user || !user.staff) {
-          return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_staff_efficiency').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+          const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_staff_efficiency').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed(`No performance logs retrieved. <@${targetUser.id}> isn't mapped inside this server.`)], components: [row] });
         }
 
@@ -73,7 +73,7 @@ module.exports = {
           color: efficiency >= 80 ? 'success' : 'premium'
         });
 
-        await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_staff_efficiency').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_staff_efficiency').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
       } else {
@@ -84,7 +84,7 @@ module.exports = {
         }).lean();
 
         if (!users.length) {
-          return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_staff_efficiency').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+          const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_staff_efficiency').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('No staff database queries detected mapped securely to this operational bounds.')], components: [row] });
         }
 
@@ -139,13 +139,13 @@ module.exports = {
           color: 'enterprise'
         });
 
-        await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_staff_efficiency').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_staff_efficiency').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
       }
 
     } catch (error) {
       console.error('Staff Efficiency Error:', error);
-      await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_staff_efficiency').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_staff_efficiency').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('Efficiency Matrix failure: Unable to decode server-wide performance comparisons.')], components: [row] });
     }
   }
@@ -164,4 +164,5 @@ function calculateEfficiency(commands, warnings, completedShifts, consistency) {
   const score = positiveScore - penalty + consistencyBonus;
   return Math.min(100, Math.max(0, Math.round(score / 2)));
 }
+
 

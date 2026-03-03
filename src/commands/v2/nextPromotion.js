@@ -14,7 +14,7 @@ module.exports = {
       const guild = await Guild.findOne({ guildId }).lean();
 
       if (!guild || !guild.promotionRequirements) {
-        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_nextPromotion').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_nextPromotion').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('This server has not configured any promotion requirements.')], components: [row] });
       }
 
@@ -79,7 +79,7 @@ module.exports = {
       eligible.sort((a, b) => b.progress - a.progress);
 
       if (!eligible.length) {
-        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_nextPromotion').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_nextPromotion').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('No staff members are currently eligible for promotion.')], components: [row] });
       }
 
@@ -97,14 +97,14 @@ module.exports = {
         footer: 'Automated Advancement Algorithms'
       });
 
-      await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_nextPromotion').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_nextPromotion').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
     } catch (error) {
       console.error('Next Promotion Error:', error);
       const errEmbed = createErrorEmbed('An error occurred while calculating the promotion queue.');
       if (interaction.deferred || interaction.replied) {
-        await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_nextPromotion').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_nextPromotion').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {
         await interaction.reply({ embeds: [errEmbed], ephemeral: true });
@@ -112,4 +112,5 @@ module.exports = {
     }
   }
 };
+
 

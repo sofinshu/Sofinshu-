@@ -27,7 +27,7 @@ module.exports = {
         .sort({ createdAt: 1 }).lean();
 
       if (activities.length === 0) {
-        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_growth_tracking').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_growth_tracking').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('Not enough activity data for growth tracking. Start using commands!')], components: [row] });
       }
 
@@ -82,15 +82,16 @@ module.exports = {
         footer: 'uwu-chan • Premium Growth Tracking • 30-Day View'
       });
 
-      await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_growth_tracking').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_growth_tracking').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
     } catch (error) {
       console.error('[growth_tracking] Error:', error);
       const errEmbed = createErrorEmbed('Failed to load growth tracking data.');
-      if (interaction.deferred || interaction.replied) await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_growth_tracking').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+      if (interaction.deferred || interaction.replied) const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_growth_tracking').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [errEmbed], components: [row] });
       else await interaction.reply({ embeds: [errEmbed], ephemeral: true });
     }
   }
 };
+
 

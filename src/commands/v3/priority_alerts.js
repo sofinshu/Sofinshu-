@@ -64,14 +64,14 @@ module.exports = {
         embed.addFields({ name: `?? Target Filter: ${filter.toUpperCase()}`, value: '*No traces match indexing algorithms.*', inline: false });
       }
 
-      await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_priority_alerts').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_priority_alerts').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
     } catch (error) {
       console.error('Priority Alerts Error:', error);
       const errEmbed = createErrorEmbed('A database tracking error occurred resolving backend threat aggregators.');
       if (interaction.deferred || interaction.replied) {
-        await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_priority_alerts').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_priority_alerts').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {
         await interaction.reply({ embeds: [errEmbed], ephemeral: true });
@@ -79,4 +79,5 @@ module.exports = {
     }
   }
 };
+
 

@@ -18,11 +18,11 @@ module.exports = {
       const guild = await Guild.findOne({ guildId: guildId }).lean();
 
       if (!userData || !userData.staff) {
-        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_rank_predict').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_rank_predict').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed(`No staff records found for <@${targetUser.id}> in this server.`)], components: [row] });
       }
       if (!guild || !guild.promotionRequirements) {
-        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_rank_predict').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_rank_predict').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('No promotion requirements configured for this server.')], components: [row] });
       }
 
@@ -42,7 +42,7 @@ module.exports = {
           description: `?? <@${targetUser.id}> is already at the maximum achievable rank!`,
           thumbnail: targetUser.displayAvatarURL()
         });
-        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_rank_predict').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_rank_predict').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [maxEmbed], components: [row] });
       }
 
@@ -81,14 +81,14 @@ module.exports = {
         color: 'premium'
       });
 
-      await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_rank_predict').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_rank_predict').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
     } catch (error) {
       console.error('Rank Predict Error:', error);
       const errEmbed = createErrorEmbed('An error occurred while calculating the velocity trajectory.');
       if (interaction.deferred || interaction.replied) {
-        await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_rank_predict').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_rank_predict').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {
         await interaction.reply({ embeds: [errEmbed], ephemeral: true });
@@ -96,4 +96,5 @@ module.exports = {
     }
   }
 };
+
 

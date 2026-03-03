@@ -29,10 +29,11 @@ module.exports = {
       .addFields({ name: '? Ready for Promotion', value: ready.length.toString(), inline: true })
       
       ;
-    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_progress_notify').setLabel('ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_progress_notify').setLabel('ðŸ„ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
 
 
 

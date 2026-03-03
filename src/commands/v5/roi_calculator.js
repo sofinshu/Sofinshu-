@@ -50,14 +50,15 @@ module.exports = {
                 color: macroscopicROI > 1 ? 'success' : 'premium'
             });
 
-            await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_roi_calculator').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_roi_calculator').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
         } catch (error) {
             console.error('Zenith ROI Calculator Error:', error);
-            await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_roi_calculator').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_roi_calculator').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('ROI Matrix failure: Unable to model macroscopic personnel yield.')], components: [row] });
         }
     }
 };
+
 

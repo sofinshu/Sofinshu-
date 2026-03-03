@@ -43,10 +43,11 @@ module.exports = {
       .setDescription(sortedMonths.map(([month, count]) => `${month}: ${count} activities`).join('\n'))
       ;
 
-    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_monthly_report').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_monthly_report').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
 
 
 

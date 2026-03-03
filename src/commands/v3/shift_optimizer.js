@@ -30,7 +30,7 @@ module.exports = {
       ]);
 
       if (shifts.length === 0) {
-        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_shift_optimizer').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_shift_optimizer').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed(`Insufficient metabolic data recorded in the last \`${period}\` days to generate a Zenith predictive model.`)], components: [row] });
       }
 
@@ -77,14 +77,15 @@ module.exports = {
 
       embed.addFields({ name: '?? Zenith Strategic Recommendation', value: recommendation, inline: false });
 
-      await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_shift_optimizer').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_shift_optimizer').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
     } catch (error) {
       console.error('Zenith Shift Optimizer Error:', error);
-      await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_shift_optimizer').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_shift_optimizer').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('Zenith Strategic failure: Unable to synchronize predictive matrices.')], components: [row] });
     }
   }
 };
+
 

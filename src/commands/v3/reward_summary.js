@@ -20,7 +20,7 @@ module.exports = {
 
       let user = await User.findOne({ userId: targetUser.id, guildId }).lean();
       if (!user || !user.staff) {
-        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_reward_summary').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_reward_summary').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed(`Unregistered Target\n <@${targetUser.id}> isn't mapped inside **${interaction.guild.name}** database clusters.`)], components: [row] });
       }
 
@@ -32,7 +32,7 @@ module.exports = {
       // Dynamic Database Tier Polling instead of legacy Hardcoded Limits
       const guild = await Guild.findOne({ guildId }).lean();
       if (!guild || !guild.promotionRequirements) {
-        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_reward_summary').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_reward_summary').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed(`This server has no backend hierarchy thresholds setup. Admin must map limits via \`/promo_setup\`.`)], components: [row] });
       }
 
@@ -75,14 +75,14 @@ module.exports = {
         ]
       });
 
-      await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_reward_summary').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_reward_summary').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
     } catch (error) {
       console.error('Reward Summary Error:', error);
       const errEmbed = createErrorEmbed('A database tracking error occurred generating hierarchical yield states.');
       if (interaction.deferred || interaction.replied) {
-        await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_reward_summary').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_reward_summary').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {
         await interaction.reply({ embeds: [errEmbed], ephemeral: true });
@@ -102,4 +102,5 @@ function generateProgressBar(points, nextTierPoints) {
   }
   return `\`${bar}\` **${points} / ${nextTierPoints}**`;
 }
+
 

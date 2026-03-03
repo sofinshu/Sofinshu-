@@ -85,15 +85,16 @@ module.exports = {
         footer: 'uwu-chan • Premium Monthly Insights • Last 30 Days'
       });
 
-      await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_monthly_insights').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_monthly_insights').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
     } catch (error) {
       console.error('[monthly_insights] Error:', error);
       const errEmbed = createErrorEmbed('Failed to generate monthly insights.');
-      if (interaction.deferred || interaction.replied) await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_monthly_insights').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+      if (interaction.deferred || interaction.replied) const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_monthly_insights').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [errEmbed], components: [row] });
       else await interaction.reply({ embeds: [errEmbed], ephemeral: true });
     }
   }
 };
+
 

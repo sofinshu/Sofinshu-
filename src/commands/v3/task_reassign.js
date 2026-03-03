@@ -38,7 +38,7 @@ module.exports = {
       }).catch(() => null);
 
       if (!activity) {
-        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_task_reassign').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_task_reassign').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed(`Invalid query target. Hash \`${taskId}\` doesn't trace back to a valid task mapped on this server.`)], components: [row] });
       }
 
@@ -90,14 +90,14 @@ module.exports = {
         footer: 'The chronology log has explicitly mapped parameters permanently to database timeline trackers.'
       });
 
-      await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_task_reassign').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_task_reassign').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
     } catch (error) {
       console.error('Task Reassign Error:', error);
       if (error.kind === 'ObjectId') {
         const errEmbed = createErrorEmbed(`The Hash string provided doesn't structurally align against a 12-byte trace matrix. Verification blocked.`);
-        if (interaction.deferred || interaction.replied) await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_task_reassign').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        if (interaction.deferred || interaction.replied) const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_task_reassign').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [errEmbed], components: [row] });
         else await interaction.reply({ embeds: [errEmbed], ephemeral: true });
         return;
@@ -105,7 +105,7 @@ module.exports = {
 
       const errEmbed = createErrorEmbed('A database tracking error abruptly halted executing array assignment models.');
       if (interaction.deferred || interaction.replied) {
-        await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_task_reassign').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_task_reassign').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {
         await interaction.reply({ embeds: [errEmbed], ephemeral: true });
@@ -113,4 +113,5 @@ module.exports = {
     }
   }
 };
+
 

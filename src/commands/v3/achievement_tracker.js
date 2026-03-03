@@ -20,7 +20,7 @@ module.exports = {
 
       let user = await User.findOne({ userId: targetUser.id, guildId: guildId }).lean();
       if (!user || !user.staff) {
-        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_achievement_tracker').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_achievement_tracker').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed(`No staff records exist for <@${targetUser.id}> in this server.`)], components: [row] });
       }
 
@@ -57,14 +57,15 @@ module.exports = {
         color: 'premium'
       });
 
-      await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_achievement_tracker').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_achievement_tracker').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
     } catch (error) {
       console.error('Achievement Tracker Error:', error);
-      await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_achievement_tracker').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_achievement_tracker').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('Milestone Registry failure: Unable to decode personnel achievement arrays.')], components: [row] });
     }
   }
 };
+
 

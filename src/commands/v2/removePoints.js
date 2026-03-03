@@ -18,7 +18,7 @@ module.exports = {
       const reason = interaction.options.getString('reason') || 'No reason provided';
 
       if (!interaction.member.permissions.has('ModerateMembers') && !interaction.member.permissions.has('ManageGuild')) {
-        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_removePoints').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_removePoints').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('You do not have permission to remove points.')], components: [row] });
       }
 
@@ -26,7 +26,7 @@ module.exports = {
       let user = await User.findOne({ userId: targetUser.id, guildId: interaction.guildId });
 
       if (!user) {
-        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_removePoints').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_removePoints').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed(`No staff record found for <@${targetUser.id}> in this server.`)], components: [row] });
       }
 
@@ -47,14 +47,14 @@ module.exports = {
         color: 'error'
       });
 
-      await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_removePoints').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_removePoints').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
     } catch (error) {
       console.error('Remove Points Error:', error);
       const errEmbed = createErrorEmbed('An error occurred while removing user points.');
       if (interaction.deferred || interaction.replied) {
-        await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_removePoints').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_removePoints').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {
         await interaction.reply({ embeds: [errEmbed], ephemeral: true });
@@ -62,4 +62,5 @@ module.exports = {
     }
   }
 };
+
 

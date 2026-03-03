@@ -39,7 +39,7 @@ module.exports = {
         .lean();
 
       if (!users.length) {
-        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_auto_promotion_visual').setLabel('ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_auto_promotion_visual').setLabel('ðŸ„ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('No staff data found yet. Staff must complete shifts to earn points.')], components: [row] });
       }
 
@@ -93,17 +93,18 @@ module.exports = {
         footer: `uwu-chan • Enterprise Auto-Promotion Visual • Real DB Data`
       });
 
-      await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_auto_promotion_visual').setLabel('ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_auto_promotion_visual').setLabel('ðŸ„ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
     } catch (error) {
       console.error('[auto_promotion_visual] Error:', error);
       const errEmbed = createErrorEmbed('Failed to load auto-promotion dashboard.');
-      if (interaction.deferred || interaction.replied) await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_auto_promotion_visual').setLabel('ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+      if (interaction.deferred || interaction.replied) const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_auto_promotion_visual').setLabel('ðŸ„ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [errEmbed], components: [row] });
       else await interaction.reply({ embeds: [errEmbed], ephemeral: true });
     }
   }
 };
+
 
 
 

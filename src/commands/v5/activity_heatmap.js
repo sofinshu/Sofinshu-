@@ -56,14 +56,15 @@ module.exports = {
         color: 'premium'
       });
 
-      await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_activity_heatmap').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_activity_heatmap').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
     } catch (error) {
       console.error('Heatmap Error:', error);
-      await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_activity_heatmap').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_activity_heatmap').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('Heatmap Intelligence failure: Unable to plot spectral density matrices.')], components: [row] });
     }
   }
 };
+
 

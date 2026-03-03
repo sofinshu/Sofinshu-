@@ -22,7 +22,7 @@ module.exports = {
       ]);
 
       if (!userData || !userData.staff) {
-        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_progress_report').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_progress_report').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed(`No telemetry found for <@${targetUser.id}>.`)], components: [row] });
       }
 
@@ -53,14 +53,15 @@ module.exports = {
         color: 'premium'
       });
 
-      await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_progress_report').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_progress_report').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
     } catch (error) {
       console.error('Progress Report Error:', error);
-      await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_progress_report').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_progress_report').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('Yield failure: Unable to synchronize macroscopic performance report.')], components: [row] });
     }
   }
 };
+
 

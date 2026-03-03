@@ -29,7 +29,7 @@ module.exports = {
             ]);
 
             if (!user || !user.staff) {
-                return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_zenith_passport').setLabel('ğŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+                const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_zenith_passport').setLabel('ğŸ„ğŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed(`No staff record found for <@${target.id}>. They must use the bot first.`)], components: [row] });
             }
 
@@ -84,21 +84,22 @@ module.exports = {
                     { name: 'ğŸ“… Recent Shifts', value: shiftHistory, inline: false },
                     { name: 'ğŸ… Achievements', value: achieveDisplay, inline: false }
                 ],
-                color: 'zenith',
+                color: 'enterprise',
                 footer: `uwu-chan â€¢ Enterprise Passport â€¢ ID: ${target.id}`
             });
 
-            await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_zenith_passport').setLabel('ğŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_zenith_passport').setLabel('ğŸ„ğŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
         } catch (error) {
             console.error('[zenith_passport] Error:', error);
             const errEmbed = createErrorEmbed('Failed to load Enterprise Passport.');
-            if (interaction.deferred || interaction.replied) await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_zenith_passport').setLabel('ğŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+            if (interaction.deferred || interaction.replied) const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_zenith_passport').setLabel('ğŸ„ğŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [errEmbed], components: [row] });
             else await interaction.reply({ embeds: [errEmbed], ephemeral: true });
         }
     }
 };
+
 
 
 

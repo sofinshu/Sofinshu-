@@ -27,7 +27,7 @@ module.exports = {
 
             let config = await ApplicationConfig.findOne({ guildId });
             if (!config) {
-                return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_apply_fields').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+                const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_apply_fields').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('Please run `/apply_setup` first to initialize the configuration in this server.')], components: [row] });
             }
 
@@ -53,13 +53,13 @@ module.exports = {
                     thumbnail: interaction.guild.iconURL({ dynamic: true })
                 });
 
-                return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_apply_fields').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+                const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_apply_fields').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
             }
 
             if (subcommand === 'add') {
                 if (config.questions.length >= 5) {
-                    return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_apply_fields').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+                    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_apply_fields').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('You cannot have more than 5 questions due to Discord API limitations on Modals.')], components: [row] });
                 }
 
@@ -72,13 +72,13 @@ module.exports = {
                     description: `Successfully added:\n> "${newQ}"\n\nYou now have **${config.questions.length}/5** active questions.`,
                     footer: 'Application Form Updated'
                 });
-                return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_apply_fields').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+                const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_apply_fields').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
             }
 
             if (subcommand === 'remove') {
                 if (config.questions.length <= 1) {
-                    return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_apply_fields').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+                    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_apply_fields').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('You must have at least 1 question for the application modal to function.')], components: [row] });
                 }
 
@@ -90,14 +90,14 @@ module.exports = {
                     description: `Removed the last question:\n> "${popped}"\n\nYou now have **${config.questions.length}/5** questions remaining.`,
                     footer: 'Application Form Updated'
                 });
-                return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_apply_fields').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+                const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_apply_fields').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
             }
         } catch (error) {
             console.error('Apply Fields Error:', error);
             const errEmbed = createErrorEmbed('A database error occurred while modifying the application questions.');
             if (interaction.deferred || interaction.replied) {
-                await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_apply_fields').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+                const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_apply_fields').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [errEmbed], components: [row] });
             } else {
                 await interaction.reply({ embeds: [errEmbed], ephemeral: true });
@@ -105,4 +105,5 @@ module.exports = {
         }
     }
 };
+
 

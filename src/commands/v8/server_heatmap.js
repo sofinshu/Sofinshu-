@@ -24,7 +24,7 @@ module.exports = {
       const activities = await Activity.find({ guildId, createdAt: { $gte: thirtyDaysAgo } }).lean();
 
       if (activities.length === 0) {
-        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_server_heatmap').setLabel('ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_server_heatmap').setLabel('ðŸ„ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('No activity data available yet. Use commands to start building your heatmap!')], components: [row] });
       }
 
@@ -74,21 +74,22 @@ module.exports = {
           { name: '?? Busiest Day', value: `\`${peakDay}\``, inline: true },
           { name: '?? Day-of-Week Breakdown', value: `\`\`\`\n${dayBar}\`\`\``, inline: false }
         ],
-        color: 'zenith',
+        color: 'enterprise',
         footer: 'uwu-chan • Enterprise Visual Heatmap • Real DB Data'
       });
 
-      await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_server_heatmap').setLabel('ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_server_heatmap').setLabel('ðŸ„ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
     } catch (error) {
       console.error('[server_heatmap] Error:', error);
       const errEmbed = createErrorEmbed('Failed to generate server heatmap.');
-      if (interaction.deferred || interaction.replied) await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_server_heatmap').setLabel('ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+      if (interaction.deferred || interaction.replied) const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_server_heatmap').setLabel('ðŸ„ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [errEmbed], components: [row] });
       else await interaction.reply({ embeds: [errEmbed], ephemeral: true });
     }
   }
 };
+
 
 
 

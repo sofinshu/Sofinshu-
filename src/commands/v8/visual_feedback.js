@@ -33,10 +33,11 @@ module.exports = {
     if (feedback) embed.setDescription(`?? **Your Feedback:** ${feedback}\n\nThank you! This helps us improve the bot.`);
     else embed.setDescription('Use `/visual_feedback message:Your feedback here` to submit feedback.');
 
-    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_visual_feedback').setLabel('ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_visual_feedback').setLabel('ðŸ„ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
 
 
 

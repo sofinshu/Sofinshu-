@@ -58,10 +58,10 @@ module.exports = {
           title: '?? Elite Badge Catalogue',
           description: `All available badges that can be granted to exceptional staff members.\n\n${badgeList}`,
           fields: [{ name: '?? Total Badges', value: `\`${ELITE_BADGES.length}\` available`, inline: true }],
-          color: 'zenith',
+          color: 'enterprise',
           footer: 'uwu-chan • Elite Badges System'
         });
-        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_elite_badges').setLabel('ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_elite_badges').setLabel('ðŸ„ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
       }
 
@@ -85,16 +85,16 @@ module.exports = {
             { name: '?? Earned Badges', value: badgeDisplay, inline: false },
             { name: '?? Badge Count', value: `\`${badges.length}\` / \`${ELITE_BADGES.length}\``, inline: true }
           ],
-          color: 'zenith',
+          color: 'enterprise',
           footer: 'uwu-chan • Elite Badges System'
         });
-        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_elite_badges').setLabel('ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_elite_badges').setLabel('ðŸ„ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
       }
 
       if (sub === 'grant') {
         if (!interaction.member.permissions.has(PermissionFlagsBits.ManageGuild)) {
-          return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_elite_badges').setLabel('ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+          const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_elite_badges').setLabel('ðŸ„ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('You need the `Manage Server` permission to grant badges.')], components: [row] });
         }
 
@@ -102,7 +102,7 @@ module.exports = {
         const badgeId = interaction.options.getString('badge');
         const badge = ELITE_BADGES.find(b => b.id === badgeId);
 
-        if (!badge) return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_elite_badges').setLabel('ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+        if (!badge) const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_elite_badges').setLabel('ðŸ„ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('Invalid badge selection.')], components: [row] });
 
         // Update user in DB — add to achievements array (no duplicates)
@@ -122,7 +122,7 @@ module.exports = {
             { name: '?? Awarded To', value: `<@${target.id}>`, inline: true },
             { name: '??? Granted By', value: `**${interaction.user.username}**`, inline: true }
           ],
-          color: 'zenith',
+          color: 'enterprise',
           footer: 'uwu-chan • Elite Badges System'
         });
 
@@ -135,18 +135,19 @@ module.exports = {
           await target.send({ embeds: [dmEmbed] });
         } catch { }
 
-        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_elite_badges').setLabel('ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_elite_badges').setLabel('ðŸ„ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
       }
     } catch (error) {
       console.error('[elite_badges] Error:', error);
       const errEmbed = createErrorEmbed('Failed to process elite badge operation.');
-      if (interaction.deferred || interaction.replied) await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_elite_badges').setLabel('ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+      if (interaction.deferred || interaction.replied) const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_elite_badges').setLabel('ðŸ„ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [errEmbed], components: [row] });
       else await interaction.reply({ embeds: [errEmbed], ephemeral: true });
     }
   }
 };
+
 
 
 

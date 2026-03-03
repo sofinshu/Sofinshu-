@@ -38,7 +38,7 @@ module.exports = {
 
             // Must enforce premium limit bypass checking so normal instances don't exploit the architecture
             if (!guildData.premium?.isActive && !guildData.premium?.tier) {
-                return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_set_requirements_premium').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+                const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_set_requirements_premium').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('You do not have the required backend access to write advanced algorithmic requirement vectors.\nPlease ask the owner to bypass limits and support UWU Chan development.')], components: [row] });
             }
 
@@ -66,14 +66,14 @@ module.exports = {
                 ]
             });
 
-            await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_set_requirements_premium').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_set_requirements_premium').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
         } catch (error) {
             console.error('Premium Requirements Set Error:', error);
             const errEmbed = createErrorEmbed('A database backend error occurred mapping custom advanced vector targets.');
             if (interaction.deferred || interaction.replied) {
-                await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_set_requirements_premium').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+                const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_set_requirements_premium').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [errEmbed], components: [row] });
             } else {
                 await interaction.reply({ embeds: [errEmbed], ephemeral: true });
@@ -81,4 +81,5 @@ module.exports = {
         }
     }
 };
+
 

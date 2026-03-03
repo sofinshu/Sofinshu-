@@ -20,7 +20,7 @@ module.exports = {
             ]);
 
             if (!userData || !userData.staff) {
-                return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_staff_review').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+                const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_staff_review').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed(`No intelligence data detected for <@${targetUser.id}>.`)], components: [row] });
             }
 
@@ -63,14 +63,15 @@ module.exports = {
                 color: color
             });
 
-            await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_staff_review').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_staff_review').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
         } catch (error) {
             console.error('Staff Review Error:', error);
-            await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_staff_review').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_staff_review').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('Intelligence suite failure: Unable to process performative telemetry.')], components: [row] });
         }
     }
 };
+
 

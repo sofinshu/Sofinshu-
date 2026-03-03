@@ -19,7 +19,7 @@ module.exports = {
       if (userId) {
         const user = await User.findOne({ userId, guildId }).lean();
         if (!user) {
-          return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_performance_stats').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+          const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_performance_stats').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed(`No performance logs retrieved. <@${targetUser.id}> isn't mapped inside this server.`)], components: [row] });
         }
 
@@ -43,7 +43,7 @@ module.exports = {
           color: 'premium'
         });
 
-        await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_performance_stats').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_performance_stats').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
       } else {
         const users = await User.find({ guildId, 'staff.points': { $exists: true } }).lean();
@@ -71,14 +71,15 @@ module.exports = {
           color: 'enterprise'
         });
 
-        await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_performance_stats').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_performance_stats').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
       }
     } catch (error) {
       console.error('Performance Stats Error:', error);
-      await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_performance_stats').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_performance_stats').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('Yield Intelligence failure: Unable to decode personnel efficiency matrices.')], components: [row] });
     }
   }
 };
+
 

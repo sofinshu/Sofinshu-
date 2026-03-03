@@ -24,7 +24,7 @@ module.exports = {
       const activities = await Activity.find({ guildId, createdAt: { $gte: sixtyDaysAgo } }).lean();
 
       if (activities.length < 30) {
-        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_monthly_forecast').setLabel('ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_monthly_forecast').setLabel('ðŸ„ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('Insufficient historical telemetry signals (min 30 events) to generate a macroscopic 30-day trajectory.')], components: [row] });
       }
 
@@ -78,14 +78,15 @@ module.exports = {
         color: 'premium'
       });
 
-      await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_monthly_forecast').setLabel('ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_monthly_forecast').setLabel('ðŸ„ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
     } catch (error) {
       console.error('Zenith Forecast Error:', error);
-      await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_monthly_forecast').setLabel('ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_monthly_forecast').setLabel('ðŸ„ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('Enterprise Intelligence failure: Unable to decode macroscopic metabolic waves.')], components: [row] });
     }
   }
 };
+
 

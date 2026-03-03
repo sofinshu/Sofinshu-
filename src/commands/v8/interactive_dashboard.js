@@ -106,7 +106,7 @@ module.exports = {
             { name: '?? License Tier', value: `\`${tier.toUpperCase()}\``, inline: true },
             { name: '?? Server Created', value: `<t:${Math.floor(interaction.guild.createdTimestamp / 1000)}:D>`, inline: true }
           ],
-          color: 'zenith',
+          color: 'enterprise',
           footer: 'uwu-chan • Enterprise Interactive Dashboard'
         });
       };
@@ -145,6 +145,7 @@ module.exports = {
     }
   }
 };
+
 
 
 

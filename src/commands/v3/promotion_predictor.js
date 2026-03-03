@@ -21,13 +21,13 @@ module.exports = {
       // Strip legacy execution constraints reading dynamically from object properties defined strictly by users
       const guild = await Guild.findOne({ guildId }).lean();
       if (!guild || !guild.promotionRequirements) {
-        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_promotion_predictor').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_promotion_predictor').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed(`Missing mapping bounds. Admin has not initialized \`/promo_setup\` inside this server yet.`)], components: [row] });
       }
 
       let user = await User.findOne({ userId: targetUser.id, guildId }).lean();
       if (!user || !user.staff) {
-        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_promotion_predictor').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_promotion_predictor').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed(`Unregistered execution. <@${targetUser.id}> isn't tracked globally inside this server footprint.`)], components: [row] });
       }
 
@@ -64,7 +64,7 @@ module.exports = {
             { name: '??? Algorithmic Vector', value: '`MAXIMUM THRESHOLD`', inline: true }
           ]
         });
-        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_promotion_predictor').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_promotion_predictor').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embedMax], components: [row] });
       }
 
@@ -114,14 +114,14 @@ module.exports = {
         footer: 'Dynamic matrices recalculate based securely entirely on local server execution traits.'
       });
 
-      await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_promotion_predictor').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_promotion_predictor').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
     } catch (error) {
       console.error('Promotion Predictor Error:', error);
       const errEmbed = createErrorEmbed('A database execution error occurred indexing algorithmic promotional bounds.');
       if (interaction.deferred || interaction.replied) {
-        await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_promotion_predictor').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_promotion_predictor').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {
         await interaction.reply({ embeds: [errEmbed], ephemeral: true });
@@ -129,4 +129,5 @@ module.exports = {
     }
   }
 };
+
 

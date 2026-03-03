@@ -23,7 +23,7 @@ module.exports = {
       const activities = await Activity.find({ guildId, createdAt: { $gte: thirtyDaysAgo } }).lean();
 
       if (activities.length < 10) {
-        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_forecast').setLabel('ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_forecast').setLabel('ðŸ„ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('Not enough data for forecasting (minimum 10 events needed). Start using commands to build your dataset!')], components: [row] });
       }
 
@@ -82,15 +82,16 @@ module.exports = {
         footer: 'uwu-chan • Enterprise Forecast • Linear Regression on Real Data'
       });
 
-      await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_forecast').setLabel('ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_forecast').setLabel('ðŸ„ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
     } catch (error) {
       console.error('[forecast] Error:', error);
       const errEmbed = createErrorEmbed('Failed to generate forecast. Please try again.');
-      if (interaction.deferred || interaction.replied) await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_forecast').setLabel('ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+      if (interaction.deferred || interaction.replied) const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_forecast').setLabel('ðŸ„ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [errEmbed], components: [row] });
       else await interaction.reply({ embeds: [errEmbed], ephemeral: true });
     }
   }
 };
+
 

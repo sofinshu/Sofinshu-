@@ -25,10 +25,11 @@ module.exports = {
       .addFields(fields)
       
       ;
-    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_staff_showcase').setLabel('ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_staff_showcase').setLabel('ðŸ„ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
 
 
 

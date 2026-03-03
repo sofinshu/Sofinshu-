@@ -63,14 +63,15 @@ module.exports = {
                 color: 'premium'
             });
 
-            await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_executive_briefing').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_executive_briefing').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
         } catch (error) {
             console.error('Zenith Executive Briefing Error:', error);
-            await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_executive_briefing').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_executive_briefing').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('Intelligence failure: Unable to compile executive macroscopic briefing.')], components: [row] });
         }
     }
 };
+
 

@@ -41,10 +41,11 @@ module.exports = {
       
       ;
 
-    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_growth_visuals').setLabel('ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_growth_visuals').setLabel('ðŸ„ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
 
 
 

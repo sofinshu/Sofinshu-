@@ -54,16 +54,17 @@ module.exports = {
                 color: 'premium'
             });
 
-            await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_set_branding').setLabel('ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_set_branding').setLabel('ðŸ„ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
         } catch (error) {
             console.error('Enterprise Set Branding Error:', error);
-            await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_set_branding').setLabel('ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_set_branding').setLabel('ðŸ„ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('Visual Calibration failure: Unable to synchronize sector branding.')], components: [row] });
         }
     }
 };
+
 
 
 

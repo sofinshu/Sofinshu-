@@ -24,7 +24,7 @@ module.exports = {
         
         .setDescription('No open tasks or stuck shifts detected. Everything is running smoothly!')
         ;
-      return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_auto_task').setLabel('ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_auto_task').setLabel('ðŸ„ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
     }
 
@@ -49,10 +49,11 @@ module.exports = {
       
       ;
 
-    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_auto_task').setLabel('ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_auto_task').setLabel('ðŸ„ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
 
 
 

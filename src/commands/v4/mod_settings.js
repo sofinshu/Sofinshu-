@@ -30,10 +30,11 @@ module.exports = {
       
       .setDescription(`Moderation is now ${enabled ? 'enabled' : 'disabled'}`);
 
-    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v4_mod_settings').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v4_mod_settings').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
 
 
 

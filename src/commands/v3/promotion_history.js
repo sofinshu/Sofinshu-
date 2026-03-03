@@ -33,9 +33,9 @@ module.exports = {
       }).lean();
 
       if (promotions.length === 0 && allUsers.length === 0) {
-        if (targetUser) return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_promotion_history').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        if (targetUser) const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_promotion_history').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed(`No hierarchical footprints exist tracking <@${targetUser.id}>.`)], components: [row] });
-        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_promotion_history').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_promotion_history').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('No automated promotions or manual boundary modifications have deployed on this server.')], components: [row] });
       }
 
@@ -81,14 +81,14 @@ module.exports = {
       }
 
       const embed = await createCustomEmbed(interaction, embedPayload);
-      await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_promotion_history').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_promotion_history').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
     } catch (error) {
       console.error('Promotion History Error:', error);
       const errEmbed = createErrorEmbed('A database tracking error occurred generating trailing propagation ranks.');
       if (interaction.deferred || interaction.replied) {
-        await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_promotion_history').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_promotion_history').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {
         await interaction.reply({ embeds: [errEmbed], ephemeral: true });
@@ -96,4 +96,5 @@ module.exports = {
     }
   }
 };
+
 

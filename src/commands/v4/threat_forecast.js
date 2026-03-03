@@ -67,14 +67,15 @@ module.exports = {
                 color: forecastedRisk > 60 ? 'premium' : (forecastedRisk > 30 ? 'enterprise' : 'success')
             });
 
-            await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v4_threat_forecast').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v4_threat_forecast').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
         } catch (error) {
             console.error('Zenith Threat Forecast Error:', error);
-            await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v4_threat_forecast').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v4_threat_forecast').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('Security Intelligence failure: Unable to compute 48h risk models.')], components: [row] });
         }
     }
 };
+
 

@@ -24,7 +24,7 @@ module.exports = {
             const userData = await User.findOne({ userId: targetUser.id, guildId: interaction.guildId }).lean();
 
             if (!userData || !userData.staff) {
-                return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_skill_tree').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+                const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_skill_tree').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed(`No signal dossier found for <@${targetUser.id}>.`)], components: [row] });
             }
 
@@ -69,14 +69,15 @@ module.exports = {
                 color: 'premium'
             });
 
-            await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_skill_tree').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_skill_tree').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
         } catch (error) {
             console.error('Zenith Skill Tree Error:', error);
-            await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_skill_tree').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_skill_tree').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('Skill Matrix failure: Unable to map neural proficiency branches.')], components: [row] });
         }
     }
 };
+
 

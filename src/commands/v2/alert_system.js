@@ -19,7 +19,7 @@ module.exports = {
       const subcommand = interaction.options.getSubcommand();
 
       if (!interaction.member.permissions.has('ManageGuild')) {
-        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_alert_system').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_alert_system').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('You do not have the required `Manage Server` permission.')], components: [row] });
       }
 
@@ -36,7 +36,7 @@ module.exports = {
         const condition = interaction.options.getString('condition');
 
         if (guildData.alerts.length >= 10) {
-          return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_alert_system').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+          const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_alert_system').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('Maximum operational alert capacity (10) has been reached for this sector.')], components: [row] });
         }
 
@@ -53,7 +53,7 @@ module.exports = {
           color: 'success'
         });
 
-        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_alert_system').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_alert_system').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
       }
 
@@ -69,7 +69,7 @@ module.exports = {
           color: 'premium'
         });
 
-        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_alert_system').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_alert_system').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
       }
 
@@ -80,7 +80,7 @@ module.exports = {
         guildData.alerts = guildData.alerts.filter(a => a.name !== name);
 
         if (guildData.alerts.length === originalLength) {
-          return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_alert_system').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+          const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_alert_system').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed(`Search failed: No alert rule designated **${name}** exists.`)], components: [row] });
         }
 
@@ -92,7 +92,7 @@ module.exports = {
           color: 'error'
         });
 
-        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_alert_system').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_alert_system').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
       }
 
@@ -100,7 +100,7 @@ module.exports = {
       console.error('Alert System Error:', error);
       const errEmbed = createErrorEmbed('A database error occurred while modifying the alert configuration matrix.');
       if (interaction.deferred || interaction.replied) {
-        await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_alert_system').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_alert_system').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {
         await interaction.reply({ embeds: [errEmbed], ephemeral: true });
@@ -108,4 +108,5 @@ module.exports = {
     }
   }
 };
+
 

@@ -20,13 +20,13 @@ module.exports = {
 
       const user = await User.findOne({ userId: targetUser.id, guildId }).lean();
       if (!user || !user.staff) {
-        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_staff_rank_advanced').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_staff_rank_advanced').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed(`Missing target footprint. <@${targetUser.id}> is unregistered globally inside this server.`)], components: [row] });
       }
 
       const guild = await Guild.findOne({ guildId }).lean();
       if (!guild || !guild.promotionRequirements) {
-        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_staff_rank_advanced').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_staff_rank_advanced').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed(`Missing mapping. The active administrator has not setup backend /promo_setup values required to project ranking boundaries.`)], components: [row] });
       }
 
@@ -97,14 +97,14 @@ module.exports = {
         footer: 'Algorithms execute locally. They respect arbitrary parameters dynamically selected.'
       });
 
-      await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_staff_rank_advanced').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_staff_rank_advanced').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
     } catch (error) {
       console.error('Rank Advanced Error:', error);
       const errEmbed = createErrorEmbed('A database error occurred generating overlapping requirement boundaries.');
       if (interaction.deferred || interaction.replied) {
-        await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_staff_rank_advanced').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_staff_rank_advanced').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {
         await interaction.reply({ embeds: [errEmbed], ephemeral: true });
@@ -112,4 +112,5 @@ module.exports = {
     }
   }
 };
+
 

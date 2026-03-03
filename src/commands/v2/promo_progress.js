@@ -17,13 +17,13 @@ module.exports = {
             // STRICT SCOPING: Search specifically by BOTH userId and guildId
             const user = await User.findOne({ userId: targetUser.id, guildId: interaction.guildId }).lean();
             if (!user || !user.staff) {
-                return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_promo_progress').setLabel('üÑ Sync Live Data').setStyle(ButtonStyle.Secondary));
+                const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_promo_progress').setLabel('üÑ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed(`The user <@${targetUser.id}> is not registered in the staff system for this server.`)], components: [row] });
             }
 
             const guildData = await Guild.findOne({ guildId: interaction.guildId }).lean();
             if (!guildData || !guildData.promotionRequirements) {
-                return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_promo_progress').setLabel('üÑ Sync Live Data').setStyle(ButtonStyle.Secondary));
+                const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_promo_progress').setLabel('üÑ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('This server has not configured any promotion requirements.')], components: [row] });
             }
 
@@ -45,7 +45,7 @@ module.exports = {
                     thumbnail: targetUser.displayAvatarURL(),
                     footer: 'Top of the command chain'
                 });
-                return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_promo_progress').setLabel('üÑ Sync Live Data').setStyle(ButtonStyle.Secondary));
+                const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_promo_progress').setLabel('üÑ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [maxEmbed], components: [row] });
             }
 
@@ -106,14 +106,14 @@ module.exports = {
                 embed.addFields({ name: '‚è±Ô∏è Flight Time (Hours)', value: `\`${stats.shiftHours}h / ${nextReq.shiftHours}h\` (${hoursStatus})`, inline: true });
             }
 
-            await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_promo_progress').setLabel('üÑ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_promo_progress').setLabel('üÑ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
         } catch (error) {
             console.error('Promo Progress Error:', error);
             const errEmbed = createErrorEmbed('An error occurred while fetching your promotion progress.');
             if (interaction.deferred || interaction.replied) {
-                await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_promo_progress').setLabel('üÑ Sync Live Data').setStyle(ButtonStyle.Secondary));
+                const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_promo_progress').setLabel('üÑ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [errEmbed], components: [row] });
             } else {
                 await interaction.reply({ embeds: [errEmbed], ephemeral: true });
@@ -121,4 +121,5 @@ module.exports = {
         }
     }
 };
+
 

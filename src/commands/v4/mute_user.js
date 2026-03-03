@@ -34,14 +34,14 @@ module.exports = {
       const reason = interaction.options.getString('reason') || 'No reason provided';
 
       if (!interaction.member.permissions.has(PermissionFlagsBits.ModerateMembers)) {
-        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v4_mute_user').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v4_mute_user').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('You lack the `Moderate Members` permission.')], components: [row] });
       }
 
       const member = await interaction.guild.members.fetch(target.id).catch(() => null);
-      if (!member) return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v4_mute_user').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+      if (!member) const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v4_mute_user').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('User not found in this server.')], components: [row] });
-      if (!member.moderatable) return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v4_mute_user').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+      if (!member.moderatable) const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v4_mute_user').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed(`I cannot mute **${target.username}** — their role is higher than mine.`)], components: [row] });
 
       // Apply real Discord timeout
@@ -83,12 +83,12 @@ module.exports = {
         footer: 'uwu-chan • Moderation Log'
       });
 
-      await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v4_mute_user').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v4_mute_user').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
     } catch (error) {
       console.error('[mute_user] Error:', error);
       const errEmbed = createErrorEmbed('Failed to mute user. Check my permissions.');
-      if (interaction.deferred || interaction.replied) await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v4_mute_user').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+      if (interaction.deferred || interaction.replied) const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v4_mute_user').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [errEmbed], components: [row] });
       else await interaction.reply({ embeds: [errEmbed], ephemeral: true });
     }
@@ -102,4 +102,5 @@ function formatDuration(ms) {
   if (s < 86400) return `${Math.round(s / 3600)}h`;
   return `${Math.round(s / 86400)}d`;
 }
+
 

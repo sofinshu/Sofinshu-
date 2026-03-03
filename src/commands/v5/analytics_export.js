@@ -57,14 +57,15 @@ module.exports = {
 
       // Note: In a real bot, we'd attach the file here. 
       // For this environment, we're providing the high-fidelity UI response.
-      await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_analytics_export').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_analytics_export').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
     } catch (error) {
       console.error('Analytics Export Error:', error);
-      await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_analytics_export').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_analytics_export').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('Export Intelligence failure: Unable to serialize sector data streams.')], components: [row] });
     }
   }
 };
+
 

@@ -44,7 +44,7 @@ module.exports = {
       ]);
 
       if (!user || !user.staff) {
-        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_efficiency_chart').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_efficiency_chart').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed(`No analytics found. <@${targetUser.id}> is unmapped in this sector.`)], components: [row] });
       }
 
@@ -73,12 +73,12 @@ module.exports = {
         color: efficiencyScore >= 80 ? 'success' : 'premium'
       });
 
-      await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_efficiency_chart').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_efficiency_chart').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
     } catch (error) {
       console.error('Zenith Efficiency Chart Error:', error);
-      await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_efficiency_chart').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_efficiency_chart').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('Efficiency Analytics failure: Unable to synchronize spectral ribbons.')], components: [row] });
     }
   }
@@ -108,4 +108,5 @@ function getGrade(score) {
   if (score >= 50) return 'C NOMINAL';
   return 'F CRITICAL';
 }
+
 

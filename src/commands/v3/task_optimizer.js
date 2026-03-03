@@ -39,7 +39,7 @@ module.exports = {
       }).lean();
 
       if (users.length === 0) {
-        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_task_optimizer').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_task_optimizer').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed(`No staff hierarchy deployed globally across this server to optimize tasks against.`)], components: [row] });
       }
 
@@ -97,14 +97,14 @@ module.exports = {
       embedPayload.fields.push({ name: '?? Backend Automation Review', value: suggestions, inline: false });
 
       const embed = await createCustomEmbed(interaction, embedPayload);
-      await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_task_optimizer').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_task_optimizer').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
     } catch (error) {
       console.error('Task Optimizer Error:', error);
       const errEmbed = createErrorEmbed('A database tracking error occurred generating hierarchical yield optimization states.');
       if (interaction.deferred || interaction.replied) {
-        await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_task_optimizer').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_task_optimizer').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {
         await interaction.reply({ embeds: [errEmbed], ephemeral: true });
@@ -133,4 +133,5 @@ function generateTaskSuggestions(userStats, period) {
 
   return suggestions.length > 0 ? suggestions.join('\n\n') : '*All tracking arrays resolving optimally internally.*';
 }
+
 
