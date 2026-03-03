@@ -1,5 +1,7 @@
 const { SlashCommandBuilder , ActionRowBuilder , ButtonBuilder , ButtonStyle } = require('discord.js');
-const { createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
+const { validatePremiumLicense } = require('../../utils/enhancedPremiumGuard');
+const { validatePremiumLicense } = require('../../utils/enhancedPremiumGuard');
+const { createCustomEmbed, createErrorEmbed } = require('../../utils/enhancedEmbeds');
 const { User } = require('../../database/mongo');
 
 module.exports = {
@@ -49,6 +51,8 @@ module.exports = {
 
       // Add Pagination Buttons in V2 Expansion logic
       const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { validatePremiumLicense } = require('../../utils/enhancedPremiumGuard');
+const { validatePremiumLicense } = require('../../utils/enhancedPremiumGuard');
       const row = new ActionRowBuilder().addComponents(
         new ButtonBuilder().setCustomId('top_prev').setLabel('Previous').setStyle(ButtonStyle.Secondary).setDisabled(true),
         new ButtonBuilder().setCustomId('top_next').setLabel('Next').setStyle(ButtonStyle.Primary).setDisabled(totalStaff <= 10)

@@ -1,5 +1,5 @@
 const { ContextMenuCommandBuilder, ApplicationCommandType } = require('discord.js');
-const { createCoolEmbed, createErrorEmbed } = require('../../utils/embeds');
+const { createCoolEmbed, createErrorEmbed } = require('../../utils/enhancedEmbeds');
 
 module.exports = {
     data: new ContextMenuCommandBuilder()

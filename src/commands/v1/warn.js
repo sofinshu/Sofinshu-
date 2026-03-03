@@ -1,5 +1,5 @@
 ﻿const { ActionRowBuilder, EmbedBuilder, PermissionFlagsBits, SlashCommandBuilder, StringSelectMenuBuilder } = require('discord.js');
-const { createCoolEmbed, createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
+const { createCoolEmbed, createCustomEmbed, createErrorEmbed } = require('../../utils/enhancedEmbeds');
 
 module.exports = {
   data: new SlashCommandBuilder()

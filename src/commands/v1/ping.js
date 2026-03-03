@@ -1,5 +1,5 @@
 ﻿const { ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, EmbedBuilder, SlashCommandBuilder } = require('discord.js');
-const { createCustomEmbed, createErrorEmbed, createSuccessEmbed } = require('../../utils/embeds');
+const { createCustomEmbed, createErrorEmbed, createSuccessEmbed } = require('../../utils/enhancedEmbeds');
 const os = require('os');
 
 module.exports = {

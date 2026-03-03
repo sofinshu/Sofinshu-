@@ -1,5 +1,6 @@
 ﻿const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType } = require('discord.js');
-const { createCustomEmbed, createErrorEmbed, createPremiumEmbed, createProgressBar, createSuccessEmbed } = require('../../utils/embeds');
+const { validatePremiumLicense } = require('../../utils/enhancedPremiumGuard');
+const { createCustomEmbed, createErrorEmbed, createPremiumEmbed, createProgressBar, createSuccessEmbed } = require('../../utils/enhancedEmbeds');
 const { validatePremiumLicense } = require('../../utils/premium_guard');
 const { Activity, Shift, Warning, User } = require('../../database/mongo');
 

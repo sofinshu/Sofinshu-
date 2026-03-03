@@ -10,7 +10,7 @@
     TextInputStyle,
     EmbedBuilder
 } = require('discord.js');
-const { createCustomEmbed, createErrorEmbed, createSuccessEmbed } = require('../../utils/embeds');
+const { createCustomEmbed, createErrorEmbed, createSuccessEmbed } = require('../../utils/enhancedEmbeds');
 
 // In-memory storage
 const activityHistory = new Map();
