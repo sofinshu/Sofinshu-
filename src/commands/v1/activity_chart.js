@@ -1,5 +1,5 @@
 ﻿const { ActionRowBuilder, ButtonBuilder, ButtonStyle, SlashCommandBuilder } = require('discord.js');
-const { createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
+const { createCustomEmbed, createErrorEmbed } = require('../../utils/enhancedEmbeds');
 const QuickChart = require('quickchart-js');
 const { Activity } = require('../../database/mongo');
 

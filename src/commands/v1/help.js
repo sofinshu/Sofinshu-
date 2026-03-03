@@ -1,5 +1,5 @@
 ﻿const { ActionRowBuilder, ButtonBuilder, ButtonStyle, SlashCommandBuilder, StringSelectMenuBuilder } = require('discord.js');
-const { createCustomEmbed, createErrorEmbed, createTierEmbed } = require('../../utils/embeds');
+const { createCustomEmbed, createErrorEmbed, createTierEmbed } = require('../../utils/enhancedEmbeds');
 
 const CATEGORIES = {
   general: {

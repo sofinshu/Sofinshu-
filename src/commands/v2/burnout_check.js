@@ -1,5 +1,6 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createCustomEmbed, createErrorEmbed, createProgressBar } = require('../../utils/embeds');
+const { validatePremiumLicense } = require('../../utils/enhancedPremiumGuard');
+const { createCustomEmbed, createErrorEmbed, createProgressBar } = require('../../utils/enhancedEmbeds');
 const { Shift, User } = require('../../database/mongo');
 
 const BURNOUT_THRESHOLD_HOURS = 40; // 40h/week

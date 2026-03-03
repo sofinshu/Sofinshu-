@@ -1,5 +1,5 @@
 ﻿const { ActionRowBuilder, ButtonBuilder, ButtonStyle, SlashCommandBuilder } = require('discord.js');
-const { createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
+const { createCustomEmbed, createErrorEmbed } = require('../../utils/enhancedEmbeds');
 const { User } = require('../../database/mongo');
 
 const RANK_THRESHOLDS = { trial: 0, staff: 100, senior: 300, manager: 600, admin: 1000, owner: 2000 };

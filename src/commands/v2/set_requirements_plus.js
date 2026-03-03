@@ -1,5 +1,7 @@
 const { SlashCommandBuilder, PermissionFlagsBits, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
+const { validatePremiumLicense } = require('../../utils/enhancedPremiumGuard');
+const { validatePremiumLicense } = require('../../utils/enhancedPremiumGuard');
+const { createCustomEmbed, createErrorEmbed } = require('../../utils/enhancedEmbeds');
 const { Guild } = require('../../database/mongo');
 
 module.exports = {

@@ -1,5 +1,5 @@
 ﻿const { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, PermissionFlagsBits, SlashCommandBuilder } = require('discord.js');
-const { createCoolEmbed, createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
+const { createCoolEmbed, createCustomEmbed, createErrorEmbed } = require('../../utils/enhancedEmbeds');
 const QRCode = require('qrcode');
 
 module.exports = {

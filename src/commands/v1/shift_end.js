@@ -1,5 +1,5 @@
 ﻿const { ActionRowBuilder, ButtonBuilder, ButtonStyle, SlashCommandBuilder } = require('discord.js');
-const { createCustomEmbed, createErrorEmbed, createProgressBar } = require('../../utils/embeds');
+const { createCustomEmbed, createErrorEmbed, createProgressBar } = require('../../utils/enhancedEmbeds');
 
 module.exports = {
   data: new SlashCommandBuilder()
