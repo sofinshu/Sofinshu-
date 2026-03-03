@@ -69,7 +69,7 @@ module.exports = {
             const errEmbed = createErrorEmbed('A database error occurred while trying to configure the application system.');
             if (interaction.deferred || interaction.replied) {
                 const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_apply_setup').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await return await interaction.editReply({ embeds: [errEmbed], components: [row] });
+            return await interaction.editReply({ embeds: [errEmbed], components: [row] });
             } else {
                 await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
             }

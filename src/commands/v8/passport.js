@@ -1,14 +1,12 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { validatePremiumLicense } = require('../../utils/enhancedPremiumGuard');
-const { validatePremiumLicense } = require('../../utils/enhancedPremiumGuard');
 const { createCustomEmbed, createEnterpriseEmbed, createErrorEmbed, createProgressBar, createSuccessEmbed } = require('../../utils/enhancedEmbeds');
-const { validatePremiumLicense } = require('../../utils/premium_guard');
 const { User, Shift } = require('../../database/mongo');
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('passport')
-        .setDescription('👑 Enterprise Identity Passport — complete staff profile with real shift history')
+        .setDescription('Enterprise Identity Passport — complete staff profile with real shift history')
         .addUserOption(opt => opt.setName('user').setDescription('Staff member to view').setRequired(false)),
 
     async execute(interaction) {
@@ -17,7 +15,7 @@ module.exports = {
 
             const license = await validatePremiumLicense(interaction, 'enterprise');
             if (!license.allowed) {
-                return await return await interaction.editReply({ embeds: [license.embed], components: license.components });
+                return await interaction.editReply({ embeds: [license.embed], components: license.components });
             }
 
             const target = interaction.options.getUser('user') || interaction.user;
@@ -33,7 +31,7 @@ module.exports = {
                 const row = new ActionRowBuilder().addComponents(
                     new ButtonBuilder()
                         .setCustomId('auto_ent_passport')
-                        .setLabel('  Sync Enterprise Data')
+                        .setLabel('Sync Enterprise Data')
                         .setStyle(ButtonStyle.Secondary)
                 );
                 return await interaction.editReply({
@@ -81,17 +79,17 @@ module.exports = {
             const sectorStatus = tiers.map((t, i) => pts > i * 125 ? `\`✅${t}\`` : `\`❌${t}\``).join(' ');
 
             const embed = await createCustomEmbed(interaction, {
-                title: `👑 Enterprise Passport: ${target.username}`,
-                thumbnail: target.displayAvatarURL({ dynamic: true, size: 256 }),
+                title: `Enterprise Passport: ${target.username}`,
+                thumbnail: target.displayAvatarURL({ size: 256 }),
                 description: `The definitive identity record for **${target.username}** in **${interaction.guild.name}**.\n\n${identityRibbon}\n\n**Sector Access:**\n${sectorStatus}`,
                 fields: [
-                    { name: '⭐ Points', value: `\`${pts.toLocaleString()}\``, inline: true },
-                    { name: '📊 Consistency', value: `\`${createProgressBar(consistency)}\` ${consistency}%`, inline: false },
-                    { name: '🤝 Reputation', value: `\`${reputation}\` commendations`, inline: true },
-                    { name: '🔥 Shift Streak', value: `\`${streak}\` days`, inline: true },
-                    { name: '⏱️ Total Shift Time (Last 5)', value: `\`${totalHours}h\` across \`${recentShifts.length}\` shifts`, inline: false },
-                    { name: '📅 Recent Shifts', value: shiftHistory, inline: false },
-                    { name: '🏅 Achievements', value: achieveDisplay, inline: false }
+                    { name: 'Points', value: `\`${pts.toLocaleString()}\``, inline: true },
+                    { name: 'Consistency', value: `\`${createProgressBar(consistency)}\` ${consistency}%`, inline: false },
+                    { name: 'Reputation', value: `\`${reputation}\` commendations`, inline: true },
+                    { name: 'Shift Streak', value: `\`${streak}\` days`, inline: true },
+                    { name: 'Total Shift Time (Last 5)', value: `\`${totalHours}h\` across \`${recentShifts.length}\` shifts`, inline: false },
+                    { name: 'Recent Shifts', value: shiftHistory, inline: false },
+                    { name: 'Achievements', value: achieveDisplay, inline: false }
                 ],
                 color: 'enterprise',
                 footer: `uwu-chan • Enterprise Passport • ID: ${target.id}`
@@ -100,7 +98,7 @@ module.exports = {
             const row = new ActionRowBuilder().addComponents(
                 new ButtonBuilder()
                     .setCustomId('auto_ent_passport')
-                    .setLabel('  Sync Enterprise Data')
+                    .setLabel('Sync Enterprise Data')
                     .setStyle(ButtonStyle.Secondary)
             );
             return await interaction.editReply({ embeds: [embed], components: [row] });
@@ -110,11 +108,11 @@ module.exports = {
             const row = new ActionRowBuilder().addComponents(
                 new ButtonBuilder()
                     .setCustomId('auto_ent_passport')
-                    .setLabel('  Sync Enterprise Data')
+                    .setLabel('Sync Enterprise Data')
                     .setStyle(ButtonStyle.Secondary)
             );
             if (interaction.deferred || interaction.replied) {
-                return await return await interaction.editReply({ embeds: [errEmbed], components: [row] });
+                return await interaction.editReply({ embeds: [errEmbed], components: [row] });
             } else {
                 return await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
             }

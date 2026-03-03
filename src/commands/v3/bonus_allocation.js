@@ -1,8 +1,5 @@
 const { SlashCommandBuilder, PermissionFlagsBits, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { validatePremiumLicense } = require('../../utils/enhancedPremiumGuard');
-const { validatePremiumLicense } = require('../../utils/enhancedPremiumGuard');
 const { createCustomEmbed, createErrorEmbed, createPremiumEmbed, createSuccessEmbed } = require('../../utils/enhancedEmbeds');
-const { validatePremiumLicense } = require('../../utils/premium_guard');
 const { User, Activity } = require('../../database/mongo');
 
 module.exports = {
@@ -88,7 +85,7 @@ module.exports = {
       const errEmbed = createErrorEmbed('A database tracking error abruptly halted executing the allocation logic.');
             if (interaction.deferred || interaction.replied) {
         const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_bonus_allocation').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await return await interaction.editReply({ embeds: [errEmbed], components: [row] });
+            return await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {
         await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
       }

@@ -1,6 +1,4 @@
 const { SlashCommandBuilder, PermissionFlagsBits, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { validatePremiumLicense } = require('../../utils/enhancedPremiumGuard');
-const { validatePremiumLicense } = require('../../utils/enhancedPremiumGuard');
 const { createCustomEmbed, createErrorEmbed } = require('../../utils/enhancedEmbeds');
 const { ApplicationConfig } = require('../../database/mongo');
 
@@ -100,7 +98,7 @@ module.exports = {
             const errEmbed = createErrorEmbed('A database error occurred while modifying the application questions.');
             if (interaction.deferred || interaction.replied) {
                 const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_apply_fields').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await return await interaction.editReply({ embeds: [errEmbed], components: [row] });
+            return await interaction.editReply({ embeds: [errEmbed], components: [row] });
             } else {
                 await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
             }

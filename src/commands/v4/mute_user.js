@@ -1,13 +1,12 @@
 const { SlashCommandBuilder, PermissionFlagsBits, StringSelectMenuBuilder, ActionRowBuilder , ButtonBuilder , ButtonStyle } = require('discord.js');
 const { validatePremiumLicense } = require('../../utils/enhancedPremiumGuard');
 const { createCustomEmbed, createErrorEmbed, createPremiumEmbed, createSuccessEmbed } = require('../../utils/enhancedEmbeds');
-const { validatePremiumLicense } = require('../../utils/premium_guard');
 const { Activity } = require('../../database/mongo');
 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('mute_user')
-    .setDescription('?? Timeout/mute a member using Discord native timeout API')
+    .setDescription('Timeout/mute a member using Discord native timeout API')
     .addUserOption(opt => opt.setName('user').setDescription('User to mute').setRequired(true))
     .addStringOption(opt =>
       opt.setName('duration')
@@ -35,15 +34,19 @@ module.exports = {
       const reason = interaction.options.getString('reason') || 'No reason provided';
 
       if (!interaction.member.permissions.has(PermissionFlagsBits.ModerateMembers)) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v4_mute_user').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [createErrorEmbed('You lack the `Moderate Members` permission.')], components: [row] });
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v4_mute_user').setLabel('Sync Live Data').setStyle(ButtonStyle.Secondary));
+        return await interaction.editReply({ embeds: [createErrorEmbed('You lack the `Moderate Members` permission.')], components: [row] });
       }
 
       const member = await interaction.guild.members.fetch(target.id).catch(() => null);
-      if (!member) const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v4_mute_user').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [createErrorEmbed('User not found in this server.')], components: [row] });
-      if (!member.moderatable) const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v4_mute_user').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [createErrorEmbed(`I cannot mute **${target.username}** � their role is higher than mine.`)], components: [row] });
+      if (!member) {
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v4_mute_user').setLabel('Sync Live Data').setStyle(ButtonStyle.Secondary));
+        return await interaction.editReply({ embeds: [createErrorEmbed('User not found in this server.')], components: [row] });
+      }
+      if (!member.moderatable) {
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v4_mute_user').setLabel('Sync Live Data').setStyle(ButtonStyle.Secondary));
+        return await interaction.editReply({ embeds: [createErrorEmbed(`I cannot mute **${target.username}** - their role is higher than mine.`)], components: [row] });
+      }
 
       // Apply real Discord timeout
       await member.timeout(durationMs, `${reason} | By: ${interaction.user.tag}`);
@@ -58,39 +61,43 @@ module.exports = {
       }).catch(() => { });
 
       // DM the user
-      let dmStatus = '? DM Sent';
+      let dmStatus = 'DM Sent';
       try {
         const dmEmbed = createCustomEmbed(interaction, {
-          title: '?? You have been muted',
+          title: 'You have been muted',
           description: `You were timed out in **${interaction.guild.name}**.\n**Reason:** ${reason}\n**Duration:** ${formatDuration(durationMs)}\n**Moderator:** ${interaction.user.tag}`,
           color: 'warning'
         });
         await target.send({ embeds: [await dmEmbed] });
-      } catch { dmStatus = '? DMs closed'; }
+      } catch { dmStatus = 'DMs closed'; }
 
       const embed = await createCustomEmbed(interaction, {
-        title: '?? User Muted',
-        thumbnail: target.displayAvatarURL({ dynamic: true }),
+        title: 'User Muted',
+        thumbnail: target.displayAvatarURL(),
         description: `**${target.username}** has been timed out in **${interaction.guild.name}**.`,
         fields: [
-          { name: '?? User', value: `**${target.username}** (\`${target.id}\`)`, inline: true },
-          { name: '??? Moderator', value: `**${interaction.user.username}**`, inline: true },
-          { name: '?? Duration', value: `\`${formatDuration(durationMs)}\``, inline: true },
-          { name: '?? Unmuted At', value: `<t:${Math.floor((Date.now() + durationMs) / 1000)}:f>`, inline: true },
-          { name: '?? Reason', value: reason, inline: false },
-          { name: '?? DM Status', value: `\`${dmStatus}\``, inline: true }
+          { name: 'User', value: `**${target.username}** (\`${target.id}\`)`, inline: true },
+          { name: 'Moderator', value: `**${interaction.user.username}**`, inline: true },
+          { name: 'Duration', value: `\`${formatDuration(durationMs)}\``, inline: true },
+          { name: 'Unmuted At', value: `<t:${Math.floor((Date.now() + durationMs) / 1000)}:f>`, inline: true },
+          { name: 'Reason', value: reason, inline: false },
+          { name: 'DM Status', value: `\`${dmStatus}\``, inline: true }
         ],
         color: 'warning',
-        footer: 'uwu-chan � Moderation Log'
+        footer: 'uwu-chan - Moderation Log'
       });
 
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v4_mute_user').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [embed], components: [row] });
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v4_mute_user').setLabel('Sync Live Data').setStyle(ButtonStyle.Secondary));
+      await interaction.editReply({ embeds: [embed], components: [row] });
     } catch (error) {
       console.error('[mute_user] Error:', error);
       const errEmbed = createErrorEmbed('Failed to mute user. Check my permissions.');
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v4_mute_user').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary)); if (interaction.deferred || interaction.replied) {
-            return await interaction.editReply({ embeds: [errEmbed], components: [row] }); } else await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v4_mute_user').setLabel('Sync Live Data').setStyle(ButtonStyle.Secondary));
+      if (interaction.deferred || interaction.replied) {
+        return await interaction.editReply({ embeds: [errEmbed], components: [row] });
+      } else {
+        await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
+      }
     }
   }
 };
@@ -102,5 +109,3 @@ function formatDuration(ms) {
   if (s < 86400) return `${Math.round(s / 3600)}h`;
   return `${Math.round(s / 86400)}d`;
 }
-
-

@@ -1,7 +1,6 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { validatePremiumLicense } = require('../../utils/enhancedPremiumGuard');
 const { createEnterpriseEmbed } = require('../../utils/enhancedEmbeds');
-const { validatePremiumLicense } = require('../../utils/premium_guard');
 
 const WEEKLY_EVENTS = [
   { name: '? Speed Challenge', desc: 'Complete 20 commands in one day', reward: '+30 bonus pts', active: true },

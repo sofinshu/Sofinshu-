@@ -1,6 +1,4 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { validatePremiumLicense } = require('../../utils/enhancedPremiumGuard');
-const { validatePremiumLicense } = require('../../utils/enhancedPremiumGuard');
 const { createCustomEmbed, createErrorEmbed } = require('../../utils/enhancedEmbeds');
 const { Shift } = require('../../database/mongo');
 
@@ -53,7 +51,7 @@ module.exports = {
       const errEmbed = createErrorEmbed('Failed to load shift statistics.');
       const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_shiftStats').setLabel('  Retry').setStyle(ButtonStyle.Secondary));
             if (interaction.deferred || interaction.replied) {
-        await return await interaction.editReply({ embeds: [errEmbed], components: [row] });
+        return await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {
         await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
       }
