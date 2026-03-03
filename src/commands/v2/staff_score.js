@@ -52,7 +52,7 @@ module.exports = {
       const errEmbed = createErrorEmbed('An error occurred while running the grading algorithm.');
             if (interaction.deferred || interaction.replied) {
         const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_staff_score').setLabel('  Sync Live Data').setStyle(ButtonStyle.Secondary));
-        await return await interaction.editReply({ embeds: [errEmbed], components: [row] });
+        return await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {
         await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
       }

@@ -115,7 +115,7 @@ module.exports = {
             const errEmbed = createErrorEmbed('Failed to run burnout analysis. Please try again.');
             if (interaction.deferred || interaction.replied) {
                 const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_burnout_check').setLabel('  Sync Live Data').setStyle(ButtonStyle.Secondary));
-                await return await interaction.editReply({ embeds: [errEmbed], components: [row] });
+                return await interaction.editReply({ embeds: [errEmbed], components: [row] });
             } else {
                 await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
             }

@@ -1,7 +1,6 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { validatePremiumLicense } = require('../../utils/enhancedPremiumGuard');
 const { createEnterpriseEmbed } = require('../../utils/enhancedEmbeds');
-const { validatePremiumLicense } = require('../../utils/premium_guard');
 const { User } = require('../../database/mongo');
 
 const REWARD_THRESHOLDS = [50, 150, 300, 500, 1000];

@@ -1,8 +1,5 @@
 ﻿const { SlashCommandBuilder , ActionRowBuilder , ButtonBuilder , ButtonStyle } = require('discord.js');
-const { validatePremiumLicense } = require('../../utils/enhancedPremiumGuard');
-const { validatePremiumLicense } = require('../../utils/enhancedPremiumGuard');
 const { createCustomEmbed, createEnterpriseEmbed, createErrorEmbed, createProgressBar, createSuccessEmbed } = require('../../utils/enhancedEmbeds');
-const { validatePremiumLicense } = require('../../utils/premium_guard');
 const { User, Warning } = require('../../database/mongo');
 
 const REWARD_TIERS = [
@@ -29,8 +26,6 @@ module.exports = {
       }
 
       const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { validatePremiumLicense } = require('../../utils/enhancedPremiumGuard');
-const { validatePremiumLicense } = require('../../utils/enhancedPremiumGuard');
       const target = interaction.options.getUser('user') || interaction.user;
       const user = await User.findOne({ userId: target.id, 'guilds.guildId': interaction.guildId }).lean();
       const points = user?.staff?.points || 0;

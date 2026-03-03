@@ -54,7 +54,7 @@ module.exports = {
       const errEmbed = createErrorEmbed('Failed to load time tracking data.');
       const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_time_tracking').setLabel('  Retry').setStyle(ButtonStyle.Secondary));
             if (interaction.deferred || interaction.replied) {
-        await return await interaction.editReply({ embeds: [errEmbed], components: [row] });
+        return await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {
         await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
       }

@@ -225,9 +225,12 @@ async function checkStaffLimit(interaction) {
     const tier = guildData?.premium?.tier || 'free';
     const limit = TIER_FEATURES[tier].maxStaff;
     
-    // Count current staff
-    const { Staff } = require('../database/mongo');
-    const staffCount = await Staff.countDocuments({ guildId });
+    // Count current staff - users with staff data in this guild
+    const { User } = require('../database/mongo');
+    const staffCount = await User.countDocuments({
+        'guilds.guildId': guildId,
+        'guilds.staff': { $exists: true }
+    });
     
     if (staffCount >= limit) {
         const nextTier = tier === 'free' ? 'premium' : 'enterprise';

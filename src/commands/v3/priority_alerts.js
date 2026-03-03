@@ -1,7 +1,6 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { validatePremiumLicense } = require('../../utils/enhancedPremiumGuard');
 const { createCustomEmbed, createErrorEmbed, createPremiumEmbed, createSuccessEmbed } = require('../../utils/enhancedEmbeds');
-const { validatePremiumLicense } = require('../../utils/premium_guard');
 const { Activity } = require('../../database/mongo');
 
 module.exports = {
@@ -78,7 +77,7 @@ module.exports = {
       const errEmbed = createErrorEmbed('A database tracking error occurred resolving backend threat aggregators.');
             if (interaction.deferred || interaction.replied) {
         const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_priority_alerts').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await return await interaction.editReply({ embeds: [errEmbed], components: [row] });
+            return await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {
         await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
       }

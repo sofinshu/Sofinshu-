@@ -1,7 +1,6 @@
 ﻿const { SlashCommandBuilder, PermissionFlagsBits, AuditLogEvent, ComponentType, ButtonBuilder, ActionRowBuilder, ButtonStyle } = require('discord.js');
 const { validatePremiumLicense } = require('../../utils/enhancedPremiumGuard');
 const { createCustomEmbed, createErrorEmbed, createPremiumEmbed, createSuccessEmbed } = require('../../utils/enhancedEmbeds');
-const { validatePremiumLicense } = require('../../utils/premium_guard');
 
 const ACTION_MAP = {
   all: null,

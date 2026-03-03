@@ -1,7 +1,6 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { validatePremiumLicense } = require('../../utils/enhancedPremiumGuard');
 const { createCustomEmbed, createErrorEmbed, createPremiumEmbed, createSuccessEmbed } = require('../../utils/enhancedEmbeds');
-const { validatePremiumLicense } = require('../../utils/premium_guard');
 const { Activity, User } = require('../../database/mongo');
 
 module.exports = {
@@ -17,10 +16,10 @@ module.exports = {
     try {
       await interaction.deferReply();
 
-            const license = await validatePremiumLicense(interaction, 'premium');
-            if (!license.allowed) {
-                return await interaction.editReply({ embeds: [license.embed], components: [license.components] });
-            }
+      const license = await validatePremiumLicense(interaction, 'premium');
+      if (!license.allowed) {
+        return await interaction.editReply({ embeds: [license.embed], components: [license.components] });
+      }
       const guildId = interaction.guildId;
       const targetUser = interaction.options.getUser('user');
 
@@ -39,25 +38,26 @@ module.exports = {
       }).lean();
 
       if (promotions.length === 0 && allUsers.length === 0) {
-        if (targetUser) const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_promotion_history').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [createErrorEmbed(`No hierarchical footprints exist tracking <@${targetUser.id}>.`)], components: [row] });
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_promotion_history').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [createErrorEmbed('No automated promotions or manual boundary modifications have deployed on this server.')], components: [row] });
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_promotion_history').setLabel('Sync Live Data').setStyle(ButtonStyle.Secondary));
+        if (targetUser) {
+          return await interaction.editReply({ embeds: [createErrorEmbed(`No hierarchical footprints exist tracking <@${targetUser.id}>.`)], components: [row] });
+        }
+        return await interaction.editReply({ embeds: [createErrorEmbed('No automated promotions or manual boundary modifications have deployed on this server.')], components: [row] });
       }
 
       const embedPayload = {
-        title: '?? Network Hierarchy Ledgers',
+        title: 'Network Hierarchy Ledgers',
         description: targetUser
           ? `Filtering footprint sequences explicitly mapped to <@${targetUser.id}> in **${interaction.guild.name}**.`
           : `Reviewing the top ${Math.min(20, promotions.length)} rank executions logged inside **${interaction.guild.name}**.`,
-        thumbnail: targetUser ? targetUser.displayAvatarURL() : interaction.guild.iconURL({ dynamic: true }),
+        thumbnail: targetUser ? targetUser.displayAvatarURL() : interaction.guild.iconURL(),
         fields: []
       };
 
       const promotedUsers = [...new Set(promotions.map(p => p.userId))];
       embedPayload.fields.push(
-        { name: '?? Global Operations', value: `\`${promotions.length}\` Sequences`, inline: true },
-        { name: '?? Target Subjects', value: `\`${promotedUsers.length}\` Operators`, inline: true }
+        { name: 'Global Operations', value: `\`${promotions.length}\` Sequences`, inline: true },
+        { name: 'Target Subjects', value: `\`${promotedUsers.length}\` Operators`, inline: true }
       );
 
       if (promotions.length > 0) {
@@ -66,10 +66,10 @@ module.exports = {
           const toRank = promo.data?.toRank || 'undefined';
           const unixTime = Math.floor(new Date(promo.createdAt).getTime() / 1000);
 
-          return `> **<@${promo.userId}>:** \`${fromRank.toUpperCase()}\` ? \`${toRank.toUpperCase()}\` (<t:${unixTime}:d>)`;
+          return `> **<@${promo.userId}>:** \`${fromRank.toUpperCase()}\` -> \`${toRank.toUpperCase()}\` (<t:${unixTime}:d>)`;
         }));
 
-        embedPayload.fields.push({ name: '?? Recent Trailing Matrix', value: promoList.join('\n'), inline: false });
+        embedPayload.fields.push({ name: 'Recent Trailing Matrix', value: promoList.join('\n'), inline: false });
       }
 
       const rankCounts = {};
@@ -83,24 +83,22 @@ module.exports = {
         .join(', ');
 
       if (rankSummary && !targetUser) {
-        embedPayload.fields.push({ name: '?? Cumulative Network Bounds', value: rankSummary, inline: false });
+        embedPayload.fields.push({ name: 'Cumulative Network Bounds', value: rankSummary, inline: false });
       }
 
       const embed = await createCustomEmbed(interaction, embedPayload);
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_promotion_history').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [embed], components: [row] });
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_promotion_history').setLabel('Sync Live Data').setStyle(ButtonStyle.Secondary));
+      await interaction.editReply({ embeds: [embed], components: [row] });
 
     } catch (error) {
       console.error('Promotion History Error:', error);
       const errEmbed = createErrorEmbed('A database tracking error occurred generating trailing propagation ranks.');
-            if (interaction.deferred || interaction.replied) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_promotion_history').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await return await interaction.editReply({ embeds: [errEmbed], components: [row] });
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_promotion_history').setLabel('Sync Live Data').setStyle(ButtonStyle.Secondary));
+      if (interaction.deferred || interaction.replied) {
+        return await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {
         await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
       }
     }
   }
 };
-
-
