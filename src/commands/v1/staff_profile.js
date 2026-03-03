@@ -38,7 +38,8 @@ module.exports = {
 
       const meritDensity = (points / Math.max(1, level)).toFixed(1);
 
-      const trophies = dbUser.staff?.trophies || [];
+      const staffSync = dbUser.guilds?.find(g => g.guildId === interaction.guildId)?.staff || {};
+      const trophies = staffSync.trophies || [];
       const trophyDisplay = trophies.length > 0 ? trophies.map(t => `🏆 ${t}`).join('\n') : 'No Trophies Yet';
 
       const warningPenalty = Math.max(0, 100 - ((warnings?.total || 0) * 20));

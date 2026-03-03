@@ -133,7 +133,23 @@ const userSchema = new mongoose.Schema({
     guildId: String,
     joinedAt: Date,
     roles: [String],
-    nickname: String
+    nickname: String,
+    // Multi-Server Isolated Staff Stats
+    staff: {
+      rank: { type: String, default: 'trial' },
+      points: { type: Number, default: 0 },
+      warnings: { type: Number, default: 0 },
+      shiftTime: { type: Number, default: 0 },
+      lastShift: Date,
+      consistency: { type: Number, default: 100 },
+      reputation: { type: Number, default: 0 },
+      achievements: [String],
+      streak: { type: Number, default: 0 },
+      trophies: { type: [String], default: [] },
+      promotionPending: { type: Boolean, default: false },
+      lastPromotionCheck: Date,
+      lastPromotionDate: Date
+    }
   }],
   licenses: [{
     licenseKey: String,
@@ -143,30 +159,17 @@ const userSchema = new mongoose.Schema({
     expiresAt: Date,
     isActive: Boolean
   }],
+  // Global staff profile (Cross-Server identity)
   staff: {
-    rank: { type: String, default: 'member' },
-    points: { type: Number, default: 0 },
-    warnings: { type: Number, default: 0 },
-    shiftTime: { type: Number, default: 0 },
-    lastShift: Date,
-    consistency: { type: Number, default: 100 },
-    reputation: { type: Number, default: 0 },
-    achievements: [String],
-    // [Phase 3] Gamification & Personalization (V2 Ultra)
     tagline: { type: String, default: 'Operational Personnel' },
     profileColor: { type: String, default: null },
-    xp: { type: Number, default: 0 },
-    level: { type: Number, default: 1 },
+    xp: { type: Number, default: 0 }, // Global XP
+    level: { type: Number, default: 1 }, // Global Level
     commandUsage: { type: mongoose.Schema.Types.Mixed, default: {} },
     perks: { type: [String], default: [] },
     equippedPerk: { type: String, default: null },
     honorPoints: { type: Number, default: 0 },
-    honorific: { type: String, default: 'Unranked' },
-    trophies: { type: [String], default: [] },
-    streak: { type: Number, default: 0 },
-    promotionPending: { type: Boolean, default: false },
-    lastPromotionCheck: Date,
-    lastPromotionDate: Date
+    honorific: { type: String, default: 'Unranked' }
   },
   stats: {
     commandsUsed: { type: Number, default: 0 },

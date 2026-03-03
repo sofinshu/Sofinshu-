@@ -13,16 +13,34 @@ class StaffSystem {
   async getOrCreateUser(userId, guildId, username) {
     let user = await User.findOne({ userId });
     if (!user) {
-      user = new User({ userId, username, guilds: [{ guildId, joinedAt: new Date() }] });
+      user = new User({
+        userId,
+        username,
+        guilds: [{
+          guildId,
+          joinedAt: new Date(),
+          staff: { rank: 'trial', points: 0, warnings: 0, shiftTime: 0, consistency: 100 }
+        }]
+      });
       await user.save();
     } else {
       const guildIndex = user.guilds.findIndex(g => g.guildId === guildId);
       if (guildIndex === -1) {
-        user.guilds.push({ guildId, joinedAt: new Date() });
+        user.guilds.push({
+          guildId,
+          joinedAt: new Date(),
+          staff: { rank: 'trial', points: 0, warnings: 0, shiftTime: 0, consistency: 100 }
+        });
         await user.save();
       }
     }
     return user;
+  }
+
+  getGuildStats(user, guildId) {
+    if (!user || !user.guilds) return null;
+    const guild = user.guilds.find(g => g.guildId === guildId);
+    return guild ? guild.staff : null;
   }
 
   async startShift(userId, guildId) {
@@ -72,8 +90,9 @@ class StaffSystem {
       startTime: { $lt: new Date(now.getTime() - 12 * 60 * 60 * 1000) } // At least 12 hours ago to prevent double counting same day
     }).sort({ startTime: -1 });
 
-    if (user && user.staff) {
-      streakDays = user.staff.streak || 0;
+    const guildStats = this.getGuildStats(user, guildId);
+    if (guildStats) {
+      streakDays = guildStats.streak || 0;
 
       if (lastShiftBeforeToday) {
         const timeDiffHours = (now - lastShiftBeforeToday.startTime) / (1000 * 60 * 60);
@@ -89,7 +108,7 @@ class StaffSystem {
         streakDays = 1;
       }
 
-      user.staff.streak = streakDays;
+      guildStats.streak = streakDays;
       await user.save();
     }
 
@@ -127,16 +146,18 @@ class StaffSystem {
     await shift.save();
 
     let pointsEarned = 0;
-    const user = await User.findOne({ userId });
-    if (user && user.staff) {
-      user.staff.shiftTime = (user.staff.shiftTime || 0) + shift.duration;
-      user.staff.lastShift = new Date();
+    const user = await User.findOne({ userId, 'guilds.guildId': guildId });
+    const guildStats = this.getGuildStats(user, guildId);
+
+    if (guildStats) {
+      guildStats.shiftTime = (guildStats.shiftTime || 0) + shift.duration;
+      guildStats.lastShift = new Date();
 
       pointsEarned = Math.floor(shift.duration / 300);
-      user.staff.points = (user.staff.points || 0) + pointsEarned;
+      guildStats.points = (guildStats.points || 0) + pointsEarned;
 
       const consistency = await this.calculateConsistency(userId, guildId);
-      user.staff.consistency = consistency;
+      guildStats.consistency = consistency;
 
       await user.save();
     }
@@ -160,25 +181,25 @@ class StaffSystem {
     const minutes = Math.floor((shift.duration % 3600) / 60);
 
     // --- Shift Trophies Check ---
-    if (user && user.staff) {
-      if (!user.staff.trophies) user.staff.trophies = [];
+    if (guildStats) {
+      if (!guildStats.trophies) guildStats.trophies = [];
       let newTrophies = false;
 
       // 1. First Shift Trophy
-      if (!user.staff.trophies.includes('First Shift Completed')) {
-        user.staff.trophies.push('First Shift Completed');
+      if (!guildStats.trophies.includes('First Shift Completed')) {
+        guildStats.trophies.push('First Shift Completed');
         newTrophies = true;
       }
 
       // 2. Iron Man Trophy (Shift longer than 4 hours)
-      if (hours >= 4 && !user.staff.trophies.includes('Iron Worker (4hr+ Shift)')) {
-        user.staff.trophies.push('Iron Worker (4hr+ Shift)');
+      if (hours >= 4 && !guildStats.trophies.includes('Iron Worker (4hr+ Shift)')) {
+        guildStats.trophies.push('Iron Worker (4hr+ Shift)');
         newTrophies = true;
       }
 
       // 3. Streak Trophy
-      if (user.staff.streak >= 7 && !user.staff.trophies.includes('7-Day Streak Master')) {
-        user.staff.trophies.push('7-Day Streak Master');
+      if (guildStats.streak >= 7 && !guildStats.trophies.includes('7-Day Streak Master')) {
+        guildStats.trophies.push('7-Day Streak Master');
         newTrophies = true;
       }
 
@@ -257,24 +278,26 @@ class StaffSystem {
     });
     await warning.save();
 
-    const user = await User.findOne({ userId });
-    if (user && user.staff) {
-      user.staff.warnings = (user.staff.warnings || 0) + points;
+    const user = await this.getOrCreateUser(userId, guildId);
+    const guildStats = this.getGuildStats(user, guildId);
+    if (guildStats) {
+      guildStats.warnings = (guildStats.warnings || 0) + points;
       await user.save();
     }
 
     // --- Moderation Trophies Check (For the Moderator) ---
-    const moderator = await User.findOne({ userId: moderatorId });
-    if (moderator && moderator.staff) {
-      if (!moderator.staff.trophies) moderator.staff.trophies = [];
+    const moderator = await User.findOne({ userId: moderatorId, 'guilds.guildId': guildId });
+    const modStats = this.getGuildStats(moderator, guildId);
+    if (modStats) {
+      if (!modStats.trophies) modStats.trophies = [];
 
-      const modWarnings = await Warning.countDocuments({ moderatorId });
+      const modWarnings = await Warning.countDocuments({ moderatorId, guildId });
 
-      if (modWarnings === 1 && !moderator.staff.trophies.includes('First Warning Issued')) {
-        moderator.staff.trophies.push('First Warning Issued');
+      if (modWarnings === 1 && !modStats.trophies.includes('First Warning Issued')) {
+        modStats.trophies.push('First Warning Issued');
         await moderator.save();
-      } else if (modWarnings === 50 && !moderator.staff.trophies.includes('Justice Hammer (50 Warns)')) {
-        moderator.staff.trophies.push('Justice Hammer (50 Warns)');
+      } else if (modWarnings === 50 && !modStats.trophies.includes('Justice Hammer (50 Warns)')) {
+        modStats.trophies.push('Justice Hammer (50 Warns)');
         await moderator.save();
       }
     }
@@ -311,13 +334,11 @@ class StaffSystem {
   }
 
   async addPoints(userId, guildId, points, reason) {
-    const user = await User.findOne({ userId });
-    if (!user) return { success: false, message: 'User not found' };
+    const user = await this.getOrCreateUser(userId, guildId);
+    const guildStats = this.getGuildStats(user, guildId);
+    if (!guildStats) return { success: false, message: 'Could not resolve guild statistics' };
 
-    if (!user.staff) {
-      user.staff = { points: 0, rank: 'member' };
-    }
-    user.staff.points = (user.staff.points || 0) + points;
+    guildStats.points = (guildStats.points || 0) + points;
     await user.save();
 
     await Activity.create({
@@ -339,16 +360,18 @@ class StaffSystem {
   }
 
   async getPoints(userId, guildId) {
-    const user = await User.findOne({ userId });
-    if (!user || !user.staff) return 0;
-    return user.staff.points || 0;
+    const user = await User.findOne({ userId, 'guilds.guildId': guildId });
+    const stats = this.getGuildStats(user, guildId);
+    return stats ? (stats.points || 0) : 0;
   }
 
   async setRank(userId, guildId, rank) {
     const user = await this.getOrCreateUser(userId, guildId);
-    if (!user.staff) user.staff = {};
-    user.staff.rank = rank;
-    await user.save();
+    const stats = this.getGuildStats(user, guildId);
+    if (stats) {
+      stats.rank = rank;
+      await user.save();
+    }
 
     await Activity.create({
       guildId,
@@ -361,19 +384,20 @@ class StaffSystem {
   }
 
   async getRank(userId, guildId) {
-    const user = await User.findOne({ userId });
-    if (!user || !user.staff) return 'member';
-    return user.staff.rank || 'member';
+    const user = await User.findOne({ userId, 'guilds.guildId': guildId });
+    const stats = this.getGuildStats(user, guildId);
+    return stats ? (stats.rank || 'trial') : 'trial';
   }
 
   async calculateStaffScore(userId, guildId) {
-    const user = await User.findOne({ userId });
-    if (!user || !user.staff) return 0;
+    const user = await User.findOne({ userId, 'guilds.guildId': guildId });
+    const stats = this.getGuildStats(user, guildId);
+    if (!stats) return 0;
 
-    const points = user.staff.points || 0;
-    const warnings = user.staff.warnings || 0;
-    const shiftTime = user.staff.shiftTime || 0;
-    const consistency = user.staff.consistency || 100;
+    const points = stats.points || 0;
+    const warnings = stats.warnings || 0;
+    const shiftTime = stats.shiftTime || 0;
+    const consistency = stats.consistency || 100;
 
     const score = Math.min(100,
       (points / 10) +
@@ -386,8 +410,9 @@ class StaffSystem {
   }
 
   async updateConsistency(userId, guildId) {
-    const user = await User.findOne({ userId });
-    if (!user || !user.staff) return 0;
+    const user = await User.findOne({ userId, 'guilds.guildId': guildId });
+    const stats = this.getGuildStats(user, guildId);
+    if (!stats) return 0;
 
     const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
     const activities = await Activity.find({
@@ -400,24 +425,27 @@ class StaffSystem {
     const actualShifts = activities.filter(a => a.type === 'shift').length;
     const consistency = Math.min(100, Math.round((actualShifts / expectedShifts) * 100));
 
-    user.staff.consistency = consistency;
+    stats.consistency = consistency;
     await user.save();
 
     return consistency;
   }
 
   async getLeaderboard(guildId, limit = 10) {
-    const users = await User.find({ 'guilds.guildId': guildId, 'staff.points': { $gt: 0 } })
-      .sort({ 'staff.points': -1 })
+    const users = await User.find({ 'guilds.guildId': guildId, 'guilds.staff.points': { $gt: 0 } })
+      .sort({ 'guilds.staff.points': -1 })
       .limit(limit);
 
-    return users.map(u => ({
-      userId: u.userId,
-      username: u.username,
-      points: u.staff?.points || 0,
-      rank: u.staff?.rank || 'member',
-      warnings: u.staff?.warnings || 0
-    }));
+    return users.map(u => {
+      const stats = this.getGuildStats(u, guildId);
+      return {
+        userId: u.userId,
+        username: u.username,
+        points: stats?.points || 0,
+        rank: stats?.rank || 'trial',
+        warnings: stats?.warnings || 0
+      };
+    });
   }
 
   async calculateConsistency(userId, guildId) {

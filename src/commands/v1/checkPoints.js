@@ -14,14 +14,10 @@ module.exports = {
       const targetUser = interaction.options.getUser('user') || interaction.user;
       const userData = await User.findOne({ userId: targetUser.id, 'guilds.guildId': interaction.guildId }).lean();
 
-      if (!userData || !userData.staff) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_checkPoints').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
-        return await interaction.editReply({ embeds: [createErrorEmbed(`No localized staff telemetry found for **${targetUser.username}**.`)], components: [row] });
-      }
-
-      const points = userData.staff.points || 0;
-      const rank = userData.staff.rank || 'trial';
-      const consistency = userData.staff.consistency || 100;
+      const staffSync = userData.guilds?.find(g => g.guildId === interaction.guildId)?.staff || {};
+      const points = staffSync.points || 0;
+      const rank = staffSync.rank || 'trial';
+      const consistency = staffSync.consistency || 100;
 
       const embed = await createCustomEmbed(interaction, {
         title: `💰 Personnel Asset Profile: ${targetUser.username}`,
