@@ -1,4 +1,5 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { createZenithEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { createEnterpriseEmbed } = require('../../utils/embeds');
 const { User } = require('../../database/mongo');
 
@@ -14,9 +15,9 @@ module.exports = {
     let user;
     if (!target) {
       user = await User.findOne({ 'staff.points': { $gt: 0 } }).sort({ 'staff.points': -1 }).lean();
-      if (!user) return interaction.editReply('📊 No staff data found yet.');
+      if (!user) return interaction.editReply('?? No staff data found yet.');
       target = await interaction.client.users.fetch(user.userId).catch(() => null);
-      if (!target) return interaction.editReply('📊 Could not resolve top staff user.');
+      if (!target) return interaction.editReply('?? Could not resolve top staff user.');
     } else {
       user = await User.findOne({ userId: target.id }).lean();
     }
@@ -25,21 +26,23 @@ module.exports = {
     const consistency = user?.staff?.consistency || 100;
     const achievements = user?.staff?.achievements || [];
     const embed = createEnterpriseEmbed()
-      .setTitle('⭐ Staff Highlight of the Week!')
+      .setTitle('? Staff Highlight of the Week!')
       
       .setThumbnail(target.displayAvatarURL({ size: 256 }))
-      .setDescription(`🎉 Congratulations to **${target.username}** for this week's outstanding performance!`)
+      .setDescription(`?? Congratulations to **${target.username}** for this week's outstanding performance!`)
       .addFields(
-        { name: '🎖️ Rank', value: rank.toUpperCase(), inline: true },
-        { name: '⭐ Points', value: pts.toString(), inline: true },
-        { name: '📈 Consistency', value: `${consistency}%`, inline: true },
-        { name: '🏅 Achievements', value: achievements.length ? achievements.slice(0, 3).join(', ') : 'Working on it!' }
+        { name: '??? Rank', value: rank.toUpperCase(), inline: true },
+        { name: '? Points', value: pts.toString(), inline: true },
+        { name: '?? Consistency', value: `${consistency}%`, inline: true },
+        { name: '?? Achievements', value: achievements.length ? achievements.slice(0, 3).join(', ') : 'Working on it!' }
       )
       
       ;
-    await interaction.editReply({ embeds: [embed] });
+    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_zen_staff_highlight').setLabel('� Refresh Hyper-Apex Metrics').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
 
 
 

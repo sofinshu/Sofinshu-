@@ -1,4 +1,4 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { createEnterpriseEmbed } = require('../../utils/embeds');
 const { User } = require('../../database/mongo');
 
@@ -18,29 +18,31 @@ module.exports = {
 
     const nextThreshold = REWARD_THRESHOLDS.find(t => points < t);
     if (!nextThreshold) {
-      return interaction.editReply(`🏆 **${target.username}** has unlocked all reward tiers with **${points}** points!`);
+      return interaction.editReply(`?? **${target.username}** has unlocked all reward tiers with **${points}** points!`);
     }
 
     const needed = nextThreshold - points;
     const progress = Math.round((points / nextThreshold) * 100);
-    const bar = '▓'.repeat(Math.round(progress / 10)) + '░'.repeat(10 - Math.round(progress / 10));
+    const bar = '�'.repeat(Math.round(progress / 10)) + '�'.repeat(10 - Math.round(progress / 10));
 
     const embed = createEnterpriseEmbed()
-      .setTitle(`🎯 Reward Prediction — ${target.username}`)
+      .setTitle(`?? Reward Prediction � ${target.username}`)
       
       .setThumbnail(target.displayAvatarURL())
       .addFields(
-        { name: '⭐ Current Points', value: points.toString(), inline: true },
-        { name: '🎯 Next Reward at', value: nextThreshold.toString(), inline: true },
-        { name: '📊 Needed', value: `${needed} more points`, inline: true },
-        { name: '📈 Progress', value: `\`${bar}\` **${progress}%**` }
+        { name: '? Current Points', value: points.toString(), inline: true },
+        { name: '?? Next Reward at', value: nextThreshold.toString(), inline: true },
+        { name: '?? Needed', value: `${needed} more points`, inline: true },
+        { name: '?? Progress', value: `\`${bar}\` **${progress}%**` }
       )
       
       ;
 
-    await interaction.editReply({ embeds: [embed] });
+    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_reward_prediction').setLabel('� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
 
 
 

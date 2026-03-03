@@ -1,4 +1,5 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { createZenithEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { createEnterpriseEmbed } = require('../../utils/embeds');
 const { Shift } = require('../../database/mongo');
 
@@ -15,22 +16,24 @@ module.exports = {
     const totalHrs = shifts.reduce((s, sh) => s + (sh.duration || (new Date(sh.endTime) - new Date(sh.startTime)) / 3600000), 0);
     const goal = 40;
     const pct = Math.min(100, Math.round((totalHrs / goal) * 100));
-    const bar = '▓'.repeat(Math.round(pct / 10)) + '░'.repeat(10 - Math.round(pct / 10));
-    const frames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
+    const bar = '�'.repeat(Math.round(pct / 10)) + '�'.repeat(10 - Math.round(pct / 10));
+    const frames = ['?', '?', '?', '?', '?', '?', '?', '?', '?', '?'];
     const frame = frames[Math.floor(Date.now() / 100) % frames.length];
     const embed = createEnterpriseEmbed()
-      .setTitle(`${frame} Progress Animation — ${interaction.user.username}`)
+      .setTitle(`${frame} Progress Animation � ${interaction.user.username}`)
       
       .addFields(
-        { name: '⏱️ Shift Hours (30d)', value: `${totalHrs.toFixed(1)}h / ${goal}h goal`, inline: true },
-        { name: '✅ Shifts Completed', value: shifts.length.toString(), inline: true },
-        { name: '📊 Monthly Goal Progress', value: `\`${bar}\` **${pct}%**` }
+        { name: '?? Shift Hours (30d)', value: `${totalHrs.toFixed(1)}h / ${goal}h goal`, inline: true },
+        { name: '? Shifts Completed', value: shifts.length.toString(), inline: true },
+        { name: '?? Monthly Goal Progress', value: `\`${bar}\` **${pct}%**` }
       )
       
       ;
-    await interaction.editReply({ embeds: [embed] });
+    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_zen_progress_animation').setLabel('� Refresh Hyper-Apex Metrics').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
 
 
 

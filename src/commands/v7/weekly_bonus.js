@@ -1,4 +1,4 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { createEnterpriseEmbed } = require('../../utils/embeds');
 const { User } = require('../../database/mongo');
 
@@ -19,25 +19,27 @@ module.exports = {
     const weekMap = {};
     weekActivity.forEach(a => { weekMap[a.userId] = (weekMap[a.userId] || 0) + (a.data?.bonusPoints || 10); });
 
-    const medals = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣'];
+    const medals = ['??', '??', '??', '4??', '5??'];
     const list = users.map((u, i) =>
-      `${medals[i]} **${u.username || 'Unknown'}** — ${u.staff?.points || 0} pts total | +${weekMap[u.userId] || 0} this week`
+      `${medals[i]} **${u.username || 'Unknown'}** � ${u.staff?.points || 0} pts total | +${weekMap[u.userId] || 0} this week`
     ).join('\n') || 'No data yet.';
 
     const embed = createEnterpriseEmbed()
-      .setTitle('📅 Weekly Bonus Leaders')
+      .setTitle('?? Weekly Bonus Leaders')
       
       .setDescription(list)
       .addFields(
-        { name: '🎁 Bonus Events (7d)', value: weekActivity.length.toString(), inline: true },
-        { name: '👥 Total Bonus Recipients', value: Object.keys(weekMap).length.toString(), inline: true }
+        { name: '?? Bonus Events (7d)', value: weekActivity.length.toString(), inline: true },
+        { name: '?? Total Bonus Recipients', value: Object.keys(weekMap).length.toString(), inline: true }
       )
       
       ;
 
-    await interaction.editReply({ embeds: [embed] });
+    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_weekly_bonus').setLabel('� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
 
 
 

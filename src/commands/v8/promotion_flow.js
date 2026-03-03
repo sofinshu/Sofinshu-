@@ -1,10 +1,11 @@
-﻿const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType } = require('discord.js');
+const { createZenithEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { createCustomEmbed, createErrorEmbed, createProgressBar } = require('../../utils/embeds');
 const { validatePremiumLicense } = require('../../utils/premium_guard');
 const { User, Guild, Shift, Warning } = require('../../database/mongo');
 
 const RANK_ORDER = ['member', 'trial', 'staff', 'senior', 'manager', 'admin'];
-const RANK_EMOJIS = { member: '👤', trial: '🔰', staff: '⭐', senior: '🌟', manager: '💎', admin: '👑' };
+const RANK_EMOJIS = { member: '??', trial: '??', staff: '?', senior: '??', manager: '??', admin: '??' };
 const DEFAULT_THRESHOLDS = {
   trial: { points: 0, shifts: 0, consistency: 0, maxWarnings: 99 },
   staff: { points: 100, shifts: 5, consistency: 70, maxWarnings: 3 },
@@ -16,7 +17,7 @@ const DEFAULT_THRESHOLDS = {
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('promotion_flow')
-    .setDescription('🚀 Visual rank progression path with real stats and next-promotion progress bars')
+    .setDescription('?? Visual rank progression path with real stats and next-promotion progress bars')
     .addUserOption(opt => opt.setName('user').setDescription('Staff member to check').setRequired(false)),
 
   async execute(interaction) {
@@ -56,11 +57,11 @@ module.exports = {
         const req = thresholds[rank] || {};
 
         let symbol;
-        if (isPast) symbol = '✅';
-        else if (isCurrentRank) symbol = '▶️';
-        else symbol = '⬜';
+        if (isPast) symbol = '?';
+        else if (isCurrentRank) symbol = '??';
+        else symbol = '?';
 
-        const emoji = RANK_EMOJIS[rank] || '•';
+        const emoji = RANK_EMOJIS[rank] || '�';
         const label = `${symbol} ${emoji} **${rank.toUpperCase()}**`;
 
         if (isPast || rank === 'member') return `${label}`;
@@ -71,7 +72,7 @@ module.exports = {
         const bar = createProgressBar(pct, 10);
 
         if (isCurrentRank) {
-          return `${label} ← *You are here*\n> \`${points.toLocaleString()} pts\` | \`${shiftCount}\` shifts | \`${consistency}%\` consistency`;
+          return `${label} ? *You are here*\n> \`${points.toLocaleString()} pts\` | \`${shiftCount}\` shifts | \`${consistency}%\` consistency`;
         }
 
         return `${label} (\`${reqPts.toLocaleString()} pts\` needed)\n> \`${bar}\` ${pct}%`;
@@ -96,38 +97,38 @@ module.exports = {
         const all4Met = meetsPoints && meetsShifts && meetsConsistency && meetsWarnings;
 
         progressSection = [
-          `${meetsPoints ? '🟢' : '🔴'} Points: \`${points.toLocaleString()} / ${reqPts.toLocaleString()}\``,
-          `${meetsShifts ? '🟢' : '🔴'} Shifts: \`${shiftCount} / ${reqShifts}\``,
-          `${meetsConsistency ? '🟢' : '🔴'} Consistency: \`${consistency}% / ${reqConsistency}%\``,
-          `${meetsWarnings ? '🟢' : '🔴'} Warnings: \`${warningCount} / ≤${reqMaxWarns}\``,
-          all4Met ? '\n✅ **All requirements met! Eligible for promotion!**' : ''
+          `${meetsPoints ? '??' : '??'} Points: \`${points.toLocaleString()} / ${reqPts.toLocaleString()}\``,
+          `${meetsShifts ? '??' : '??'} Shifts: \`${shiftCount} / ${reqShifts}\``,
+          `${meetsConsistency ? '??' : '??'} Consistency: \`${consistency}% / ${reqConsistency}%\``,
+          `${meetsWarnings ? '??' : '??'} Warnings: \`${warningCount} / =${reqMaxWarns}\``,
+          all4Met ? '\n? **All requirements met! Eligible for promotion!**' : ''
         ].filter(Boolean).join('\n');
       } else {
-        progressSection = '👑 **Maximum rank achieved!** You are at the top.';
+        progressSection = '?? **Maximum rank achieved!** You are at the top.';
       }
 
       const embed = await createCustomEmbed(interaction, {
-        title: `🚀 Rank Progression — ${target.username}`,
+        title: `?? Rank Progression � ${target.username}`,
         thumbnail: target.displayAvatarURL({ dynamic: true }),
         description: ladder.join('\n\n'),
         fields: [
           {
-            name: `📊 Progress → ${nextRank ? nextRank.toUpperCase() : 'MAX'}`,
+            name: `?? Progress ? ${nextRank ? nextRank.toUpperCase() : 'MAX'}`,
             value: progressSection,
             inline: false
           }
         ],
         color: currentRank === 'admin' ? '#f1c40f' : '#5865F2',
-        footer: `uwu-chan • Promotion Flow • Auto-checks every 15min if automation is enabled`
+        footer: `uwu-chan � Promotion Flow � Auto-checks every 15min if automation is enabled`
       });
 
       const row = new ActionRowBuilder().addComponents(
         new ButtonBuilder()
           .setCustomId(`promo_check_${target.id}`)
-          .setLabel('🔍 Re-check Eligibility')
+          .setLabel('?? Re-check Eligibility')
           .setStyle(ButtonStyle.Primary),
         new ButtonBuilder()
-          .setLabel('📋 See Requirements')
+          .setLabel('?? See Requirements')
           .setStyle(ButtonStyle.Secondary)
           .setCustomId('show_promo_reqs')
       );
@@ -141,3 +142,4 @@ module.exports = {
     }
   }
 };
+

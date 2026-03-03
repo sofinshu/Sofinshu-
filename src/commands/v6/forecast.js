@@ -1,4 +1,5 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { createEnterpriseEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { createCustomEmbed, createErrorEmbed, createProgressBar } = require('../../utils/embeds');
 const { validatePremiumLicense } = require('../../utils/premium_guard');
 const { Activity } = require('../../database/mongo');
@@ -6,7 +7,7 @@ const { Activity } = require('../../database/mongo');
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('forecast')
-    .setDescription('🔮 Enterprise 30-Day growth forecast using real linear regression on activity data'),
+    .setDescription('?? Enterprise 30-Day growth forecast using real linear regression on activity data'),
 
   async execute(interaction) {
     try {
@@ -22,7 +23,8 @@ module.exports = {
       const activities = await Activity.find({ guildId, createdAt: { $gte: thirtyDaysAgo } }).lean();
 
       if (activities.length < 10) {
-        return interaction.editReply({ embeds: [createErrorEmbed('Not enough data for forecasting (minimum 10 events needed). Start using commands to build your dataset!')] });
+        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_forecast').setLabel('� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [createErrorEmbed('Not enough data for forecasting (minimum 10 events needed). Start using commands to build your dataset!')], components: [row] });
       }
 
       // Group by day (last 30 days)
@@ -51,41 +53,44 @@ module.exports = {
       const forecastValues = forecastDays.map(d => Math.max(0, Math.round(slope * d + intercept)));
       const projectedTotal = forecastValues.reduce((s, v) => s + v, 0);
       const currentTotal = counts.reduce((s, v) => s + v, 0);
-      const forecastGrowth = currentTotal > 0 ? ((projectedTotal - currentTotal) / currentTotal * 100).toFixed(1) : '∞';
+      const forecastGrowth = currentTotal > 0 ? ((projectedTotal - currentTotal) / currentTotal * 100).toFixed(1) : '8';
 
       // ASCII trend line (12 points)
       const trendSample = forecastValues.filter((_, i) => i % 3 === 0); // every 3rd day
       const trendMax = Math.max(...trendSample, 1);
       const trendLine = trendSample.map(v => {
         const h = Math.round((v / trendMax) * 4);
-        return ['_', '▁', '▃', '▅', '▇'][h];
+        return ['_', '?', '?', '?', '?'][h];
       }).join(' ');
 
       const growthColor = parseFloat(forecastGrowth) >= 0 ? '#43b581' : '#f04747';
-      const growthArrow = parseFloat(forecastGrowth) >= 0 ? '📈' : '📉';
+      const growthArrow = parseFloat(forecastGrowth) >= 0 ? '??' : '??';
 
       const embed = await createCustomEmbed(interaction, {
-        title: `🔮 30-Day Forecast — ${interaction.guild.name}`,
+        title: `?? 30-Day Forecast � ${interaction.guild.name}`,
         thumbnail: interaction.guild.iconURL({ dynamic: true }),
         description: `Activity forecast using **linear regression** on the last **${activities.length}** real events.\n\n**Trend Line:** \`${trendLine}\``,
         fields: [
-          { name: '📊 Current 30d Total', value: `\`${currentTotal.toLocaleString()}\` events`, inline: true },
-          { name: '🔮 Projected 30d Total', value: `\`${projectedTotal.toLocaleString()}\` events`, inline: true },
+          { name: '?? Current 30d Total', value: `\`${currentTotal.toLocaleString()}\` events`, inline: true },
+          { name: '?? Projected 30d Total', value: `\`${projectedTotal.toLocaleString()}\` events`, inline: true },
           { name: `${growthArrow} Projected Growth`, value: `\`${forecastGrowth}%\``, inline: true },
-          { name: '📐 Regression Slope', value: `\`${slope.toFixed(2)}\` events/day`, inline: true },
-          { name: '🗓️ Forecast Period', value: `Next 30 days`, inline: true },
-          { name: '📈 Engagement Bar', value: `\`${createProgressBar(Math.min(100, Math.round((currentTotal / Math.max(interaction.guild.memberCount, 1)) * 100 * 2)))} \``, inline: false }
+          { name: '?? Regression Slope', value: `\`${slope.toFixed(2)}\` events/day`, inline: true },
+          { name: '??? Forecast Period', value: `Next 30 days`, inline: true },
+          { name: '?? Engagement Bar', value: `\`${createProgressBar(Math.min(100, Math.round((currentTotal / Math.max(interaction.guild.memberCount, 1)) * 100 * 2)))} \``, inline: false }
         ],
         color: growthColor,
-        footer: 'uwu-chan • Enterprise Forecast • Linear Regression on Real Data'
+        footer: 'uwu-chan � Enterprise Forecast � Linear Regression on Real Data'
       });
 
-      await interaction.editReply({ embeds: [embed] });
+      await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_forecast').setLabel('� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
     } catch (error) {
       console.error('[forecast] Error:', error);
       const errEmbed = createErrorEmbed('Failed to generate forecast. Please try again.');
-      if (interaction.deferred || interaction.replied) await interaction.editReply({ embeds: [errEmbed] });
+      if (interaction.deferred || interaction.replied) await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_forecast').setLabel('� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [errEmbed], components: [row] });
       else await interaction.reply({ embeds: [errEmbed], ephemeral: true });
     }
   }
 };
+

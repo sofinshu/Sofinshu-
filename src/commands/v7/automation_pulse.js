@@ -1,4 +1,5 @@
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { createEnterpriseEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { createCustomEmbed, createErrorEmbed, createProgressBar } = require('../../utils/embeds');
 const { validatePremiumLicense } = require('../../utils/premium_guard');
 const { Guild, Activity, Shift } = require('../../database/mongo');
@@ -83,12 +84,15 @@ module.exports = {
                 footer: 'uwu-chan â€¢ Enterprise Automation Pulse â€¢ Real DB Config'
             });
 
-            await interaction.editReply({ embeds: [embed] });
+            await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_automation_pulse').setLabel('ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
         } catch (error) {
             console.error('[automation_pulse] Error:', error);
             const errEmbed = createErrorEmbed('Failed to load automation pulse data.');
-            if (interaction.deferred || interaction.replied) await interaction.editReply({ embeds: [errEmbed] });
+            if (interaction.deferred || interaction.replied) await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_automation_pulse').setLabel('ðŸ„ Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [errEmbed], components: [row] });
             else await interaction.reply({ embeds: [errEmbed], ephemeral: true });
         }
     }
 };
+

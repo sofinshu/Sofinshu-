@@ -1,4 +1,5 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { createZenithEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { createEnterpriseEmbed } = require('../../utils/embeds');
 const { Guild } = require('../../database/mongo');
 
@@ -16,27 +17,29 @@ module.exports = {
     const expiryText = expiresAt ? `<t:${Math.floor(new Date(expiresAt).getTime() / 1000)}:R>` : 'Never (Lifetime)';
 
     const tierEffects = {
-      free: ['✅ v1 & v2 commands (50 commands)', '✅ Basic staff tracking', '✅ Shift management'],
-      premium: ['✅ All free features', '✅ v3, v4, v5 commands (75 commands total)', '✅ Advanced moderation', '✅ Performance analytics'],
-      enterprise: ['✅ All premium features', '✅ v6, v7, v8 commands (175 commands total)', '✅ AI-powered insights', '✅ Visual dashboards', '✅ Automation ecosystem', '✅ Elite badges & rewards']
+      free: ['? v1 & v2 commands (50 commands)', '? Basic staff tracking', '? Shift management'],
+      premium: ['? All free features', '? v3, v4, v5 commands (75 commands total)', '? Advanced moderation', '? Performance analytics'],
+      enterprise: ['? All premium features', '? v6, v7, v8 commands (175 commands total)', '? AI-powered insights', '? Visual dashboards', '? Automation ecosystem', '? Elite badges & rewards']
     };
 
     const benefits = (tierEffects[tier] || tierEffects.free).join('\n');
     const colors = { free: 0x95a5a6, premium: 0x3498db, enterprise: 0xf1c40f };
 
     const embed = createEnterpriseEmbed()
-      .setTitle('💎 Premium Effects & Benefits')
+      .setTitle('?? Premium Effects & Benefits')
       
       .addFields(
-        { name: '🎖️ Current Tier', value: tier.toUpperCase(), inline: true },
-        { name: '⏰ Expires', value: tier === 'free' ? 'N/A' : expiryText, inline: true },
-        { name: '✨ Your Benefits', value: benefits }
+        { name: '??? Current Tier', value: tier.toUpperCase(), inline: true },
+        { name: '? Expires', value: tier === 'free' ? 'N/A' : expiryText, inline: true },
+        { name: '? Your Benefits', value: benefits }
       )
       
       ;
-    await interaction.editReply({ embeds: [embed] });
+    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_zen_premium_effects').setLabel('� Refresh Hyper-Apex Metrics').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
 
 
 

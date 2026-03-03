@@ -1,4 +1,5 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { createZenithEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { createEnterpriseEmbed } = require('../../utils/embeds');
 const { User } = require('../../database/mongo');
 
@@ -10,9 +11,9 @@ module.exports = {
   async execute(interaction, client) {
     await interaction.deferReply();
     const users = await User.find({}).lean();
-    if (!users.length) return interaction.editReply('📊 No staff data yet.');
+    if (!users.length) return interaction.editReply('?? No staff data yet.');
     const RANK_ORDER = ['owner', 'admin', 'manager', 'senior', 'staff', 'trial', 'member'];
-    const rankEmojis = { owner: '👑', admin: '💜', manager: '💎', senior: '🌟', staff: '⭐', trial: '🔰', member: '👤' };
+    const rankEmojis = { owner: '??', admin: '??', manager: '??', senior: '??', staff: '?', trial: '??', member: '??' };
     const rankGroups = {};
     users.forEach(u => {
       const r = u.staff?.rank || 'member';
@@ -20,24 +21,26 @@ module.exports = {
       rankGroups[r].push(u.username || 'Unknown');
     });
     const fields = RANK_ORDER.filter(r => rankGroups[r]?.length).map(r => ({
-      name: `${rankEmojis[r] || '👤'} ${r.toUpperCase()} — ${rankGroups[r].length} member(s)`,
-      value: rankGroups[r].slice(0, 5).map(n => `• **${n}**`).join('\n') + (rankGroups[r].length > 5 ? `\n*+${rankGroups[r].length - 5} more*` : ''),
+      name: `${rankEmojis[r] || '??'} ${r.toUpperCase()} � ${rankGroups[r].length} member(s)`,
+      value: rankGroups[r].slice(0, 5).map(n => `� **${n}**`).join('\n') + (rankGroups[r].length > 5 ? `\n*+${rankGroups[r].length - 5} more*` : ''),
       inline: true
     }));
     const embed = createEnterpriseEmbed()
-      .setTitle('🎖️ Visual Rankings')
+      .setTitle('??? Visual Rankings')
       
       .setThumbnail(interaction.guild.iconURL())
       .addFields(
-        { name: '👥 Total Staff', value: users.length.toString(), inline: true },
-        { name: '🎖️ Rank Tiers', value: fields.length.toString(), inline: true },
+        { name: '?? Total Staff', value: users.length.toString(), inline: true },
+        { name: '??? Rank Tiers', value: fields.length.toString(), inline: true },
         ...fields
       )
       
       ;
-    await interaction.editReply({ embeds: [embed] });
+    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_zen_visual_rankings').setLabel('� Refresh Hyper-Apex Metrics').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
 
 
 

@@ -1,4 +1,5 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { createZenithEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { createEnterpriseEmbed } = require('../../utils/embeds');
 
 module.exports = {
@@ -15,27 +16,29 @@ module.exports = {
     const cmds = guild?.stats?.commandsUsed || 0;
 
     const milestones = [
-      { label: '👥 50 Members', val: memberCount, target: 50 },
-      { label: '👥 100 Members', val: memberCount, target: 100 },
-      { label: '⚡ 500 Commands', val: cmds, target: 500 },
-      { label: '⚡ 1K Commands', val: cmds, target: 1000 },
+      { label: '?? 50 Members', val: memberCount, target: 50 },
+      { label: '?? 100 Members', val: memberCount, target: 100 },
+      { label: '? 500 Commands', val: cmds, target: 500 },
+      { label: '? 1K Commands', val: cmds, target: 1000 },
     ];
 
     const effects = milestones.map(m => {
       const pct = Math.min(100, Math.round((m.val / m.target) * 100));
-      const bar = '▓'.repeat(Math.round(pct / 10)) + '░'.repeat(10 - Math.round(pct / 10));
-      return `${m.val >= m.target ? '✨' : '🎯'} **${m.label}**: \`${bar}\` ${pct}%`;
+      const bar = '�'.repeat(Math.round(pct / 10)) + '�'.repeat(10 - Math.round(pct / 10));
+      return `${m.val >= m.target ? '?' : '??'} **${m.label}**: \`${bar}\` ${pct}%`;
     }).join('\n');
 
     const embed = createEnterpriseEmbed()
-      .setTitle('✨ Milestone Effects')
+      .setTitle('? Milestone Effects')
       
       .setDescription(effects)
       
       ;
-    await interaction.editReply({ embeds: [embed] });
+    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_zen_milestone_effects').setLabel('� Refresh Hyper-Apex Metrics').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
 
 
 

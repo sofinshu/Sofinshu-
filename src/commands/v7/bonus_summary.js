@@ -1,4 +1,4 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { createEnterpriseEmbed } = require('../../utils/embeds');
 const { Activity } = require('../../database/mongo');
 
@@ -19,7 +19,7 @@ module.exports = {
     }).lean();
 
     if (!bonusActivities.length) {
-      return interaction.editReply('📊 No bonus events recorded this month.');
+      return interaction.editReply('?? No bonus events recorded this month.');
     }
 
     const bonusByUser = {};
@@ -31,24 +31,26 @@ module.exports = {
     const totalBonus = Object.values(bonusByUser).reduce((s, v) => s + v, 0);
 
     const leaderboard = sorted.map(([uid, pts], i) =>
-      `\`${String(i + 1).padStart(2)}\` <@${uid}> — **+${pts}** bonus pts`
+      `\`${String(i + 1).padStart(2)}\` <@${uid}> � **+${pts}** bonus pts`
     ).join('\n');
 
     const embed = createEnterpriseEmbed()
-      .setTitle('🎁 Bonus Point Summary — This Month')
+      .setTitle('?? Bonus Point Summary � This Month')
       
       .addFields(
-        { name: '🎁 Total Bonus Events', value: bonusActivities.length.toString(), inline: true },
-        { name: '⭐ Total Bonus Points', value: totalBonus.toString(), inline: true },
-        { name: '👥 Recipients', value: sorted.length.toString(), inline: true },
-        { name: '🏆 Bonus Leaderboard', value: leaderboard }
+        { name: '?? Total Bonus Events', value: bonusActivities.length.toString(), inline: true },
+        { name: '? Total Bonus Points', value: totalBonus.toString(), inline: true },
+        { name: '?? Recipients', value: sorted.length.toString(), inline: true },
+        { name: '?? Bonus Leaderboard', value: leaderboard }
       )
       
       ;
 
-    await interaction.editReply({ embeds: [embed] });
+    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_bonus_summary').setLabel('� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
 
 
 

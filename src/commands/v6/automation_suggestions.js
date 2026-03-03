@@ -1,4 +1,4 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { createEnterpriseEmbed } = require('../../utils/embeds');
 const { Guild, Warning, Shift } = require('../../database/mongo');
 
@@ -23,32 +23,34 @@ module.exports = {
     const suggestions = [];
 
     if (!settings.moderation && warnings > 5)
-      suggestions.push({ name: '🛡️ Enable Auto-Moderation', value: 'You have 5+ warnings this month. Auto-moderation can handle repeated offenders automatically.' });
+      suggestions.push({ name: '??? Enable Auto-Moderation', value: 'You have 5+ warnings this month. Auto-moderation can handle repeated offenders automatically.' });
     if (!settings.automation)
-      suggestions.push({ name: '⚙️ Enable Automation Module', value: 'Automation can handle shift reminders, rank-ups, and reward distributions without manual effort.' });
+      suggestions.push({ name: '?? Enable Automation Module', value: 'Automation can handle shift reminders, rank-ups, and reward distributions without manual effort.' });
     if (stuckShifts > 0)
-      suggestions.push({ name: '⏰ Set Shift Auto-End', value: `${stuckShifts} shift(s) are currently stuck. Consider auto-ending shifts after 8 hours of inactivity.` });
+      suggestions.push({ name: '? Set Shift Auto-End', value: `${stuckShifts} shift(s) are currently stuck. Consider auto-ending shifts after 8 hours of inactivity.` });
     if (!settings.tickets && stats.commandsUsed > 100)
-      suggestions.push({ name: '🎫 Enable Ticket System', value: 'High command usage detected. A ticket system can reduce repetitive support interactions.' });
+      suggestions.push({ name: '?? Enable Ticket System', value: 'High command usage detected. A ticket system can reduce repetitive support interactions.' });
     if (suggestions.length === 0)
-      suggestions.push({ name: '✅ Everything Looks Good!', value: 'Your server automation is well-configured. Keep monitoring your trends.' });
+      suggestions.push({ name: '? Everything Looks Good!', value: 'Your server automation is well-configured. Keep monitoring your trends.' });
 
     const embed = createEnterpriseEmbed()
-      .setTitle('🤖 Automation Suggestions')
+      .setTitle('?? Automation Suggestions')
       
       .setDescription('Based on your server\'s data, here are the top recommendations:')
       .addFields(suggestions)
       .addFields(
-        { name: '📊 Warnings (30d)', value: warnings.toString(), inline: true },
-        { name: '🕐 Stuck Shifts', value: stuckShifts.toString(), inline: true },
-        { name: '⚡ Commands Used', value: (stats.commandsUsed || 0).toString(), inline: true }
+        { name: '?? Warnings (30d)', value: warnings.toString(), inline: true },
+        { name: '?? Stuck Shifts', value: stuckShifts.toString(), inline: true },
+        { name: '? Commands Used', value: (stats.commandsUsed || 0).toString(), inline: true }
       )
       
       ;
 
-    await interaction.editReply({ embeds: [embed] });
+    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_automation_suggestions').setLabel('� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
 
 
 

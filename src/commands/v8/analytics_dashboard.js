@@ -1,4 +1,5 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { createZenithEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { createEnterpriseEmbed } = require('../../utils/embeds');
 const { Activity, Guild, User } = require('../../database/mongo');
 
@@ -20,30 +21,32 @@ module.exports = {
 
     const activeUsers = [...new Set(weekActs.map(a => a.userId))].length;
     const engRate = Math.round((activeUsers / Math.max(interaction.guild.memberCount, 1)) * 100);
-    const bar = '▓'.repeat(Math.round(engRate / 10)) + '░'.repeat(10 - Math.round(engRate / 10));
+    const bar = '�'.repeat(Math.round(engRate / 10)) + '�'.repeat(10 - Math.round(engRate / 10));
     const stats = guild?.stats || {};
 
     const embed = createEnterpriseEmbed()
-      .setTitle('📊 Full Analytics Dashboard')
+      .setTitle('?? Full Analytics Dashboard')
       
       .setThumbnail(interaction.guild.iconURL())
       .addFields(
-        { name: '👥 Members', value: interaction.guild.memberCount.toString(), inline: true },
-        { name: '✅ Active (7d)', value: activeUsers.toString(), inline: true },
-        { name: '📈 Engagement', value: `${engRate}%`, inline: true },
-        { name: '⚡ Total Commands', value: (stats.commandsUsed || 0).toString(), inline: true },
-        { name: '⚠️ Total Warnings', value: (stats.warnings || 0).toString(), inline: true },
-        { name: '💬 Messages', value: (stats.messagesProcessed || 0).toString(), inline: true },
-        { name: '🏆 Top Staff', value: topUser ? `**${topUser.username || 'Unknown'}** — ${topUser.staff?.points || 0} pts` : 'No data', inline: true },
-        { name: '🎖️ Tier', value: (guild?.premium?.tier || 'free').toUpperCase(), inline: true },
-        { name: '📊 Engagement Meter', value: `\`${bar}\` ${engRate}%` }
+        { name: '?? Members', value: interaction.guild.memberCount.toString(), inline: true },
+        { name: '? Active (7d)', value: activeUsers.toString(), inline: true },
+        { name: '?? Engagement', value: `${engRate}%`, inline: true },
+        { name: '? Total Commands', value: (stats.commandsUsed || 0).toString(), inline: true },
+        { name: '?? Total Warnings', value: (stats.warnings || 0).toString(), inline: true },
+        { name: '?? Messages', value: (stats.messagesProcessed || 0).toString(), inline: true },
+        { name: '?? Top Staff', value: topUser ? `**${topUser.username || 'Unknown'}** � ${topUser.staff?.points || 0} pts` : 'No data', inline: true },
+        { name: '??? Tier', value: (guild?.premium?.tier || 'free').toUpperCase(), inline: true },
+        { name: '?? Engagement Meter', value: `\`${bar}\` ${engRate}%` }
       )
       
       ;
 
-    await interaction.editReply({ embeds: [embed] });
+    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_zen_analytics_dashboard').setLabel('� Refresh Hyper-Apex Metrics').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
 
 
 

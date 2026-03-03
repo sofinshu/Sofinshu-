@@ -1,4 +1,5 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { createZenithEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { createEnterpriseEmbed } = require('../../utils/embeds');
 const { User } = require('../../database/mongo');
 
@@ -19,18 +20,20 @@ module.exports = {
       return next && pts >= THRESHOLDS[next];
     });
     const txt = ready.length
-      ? ready.map(u => `🔔 **${u.username || '?'}** is ready to promote to **${RANK_ORDER[RANK_ORDER.indexOf(u.staff?.rank || 'trial') + 1]}**`).join('\n')
-      : '✅ No staff are pending promotion right now.';
+      ? ready.map(u => `?? **${u.username || '?'}** is ready to promote to **${RANK_ORDER[RANK_ORDER.indexOf(u.staff?.rank || 'trial') + 1]}**`).join('\n')
+      : '? No staff are pending promotion right now.';
     const embed = createEnterpriseEmbed()
-      .setTitle('🔔 Progress Notifications')
+      .setTitle('?? Progress Notifications')
       
       .setDescription(txt)
-      .addFields({ name: '✅ Ready for Promotion', value: ready.length.toString(), inline: true })
+      .addFields({ name: '? Ready for Promotion', value: ready.length.toString(), inline: true })
       
       ;
-    await interaction.editReply({ embeds: [embed] });
+    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_zen_progress_notify').setLabel('� Refresh Hyper-Apex Metrics').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
 
 
 

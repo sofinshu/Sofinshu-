@@ -1,4 +1,4 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { createEnterpriseEmbed } = require('../../utils/embeds');
 const { Shift } = require('../../database/mongo');
 
@@ -13,13 +13,13 @@ module.exports = {
     const thirtyDaysAgo = new Date(Date.now() - 30 * 86400000);
 
     const shifts = await Shift.find({ guildId, startTime: { $gte: thirtyDaysAgo } }).lean();
-    if (!shifts.length) return interaction.editReply('📊 No shift data found for the past 30 days.');
+    if (!shifts.length) return interaction.editReply('?? No shift data found for the past 30 days.');
 
     const completed = shifts.filter(s => s.endTime).length;
     const withNotes = shifts.filter(s => s.endTime && s.notes && s.notes.trim() !== '').length;
     const rate = ((completed / shifts.length) * 100).toFixed(1);
     const noteRate = completed > 0 ? ((withNotes / completed) * 100).toFixed(1) : '0';
-    const bar = '▓'.repeat(Math.round(parseFloat(rate) / 10)) + '░'.repeat(10 - Math.round(parseFloat(rate) / 10));
+    const bar = '�'.repeat(Math.round(parseFloat(rate) / 10)) + '�'.repeat(10 - Math.round(parseFloat(rate) / 10));
 
     const uniqueStaff = [...new Set(shifts.map(s => s.userId))].length;
     const avgDuration = completed > 0
@@ -29,23 +29,25 @@ module.exports = {
       : '0';
 
     const embed = createEnterpriseEmbed()
-      .setTitle('✅ Task Completion Report')
+      .setTitle('? Task Completion Report')
        >= 80 ? 0x2ecc71 : parseFloat(rate) >= 50 ? 0xf39c12 : 0xe74c3c)
       .addFields(
-        { name: '🔄 Total Shifts', value: shifts.length.toString(), inline: true },
-        { name: '✅ Completed', value: completed.toString(), inline: true },
-        { name: '❌ Incomplete', value: (shifts.length - completed).toString(), inline: true },
-        { name: '📊 Completion Rate', value: `\`${bar}\` **${rate}%**` },
-        { name: '📝 Note Rate', value: `${noteRate}%`, inline: true },
-        { name: '⏱️ Avg Duration', value: `${avgDuration}h`, inline: true },
-        { name: '👥 Staff Involved', value: uniqueStaff.toString(), inline: true }
+        { name: '?? Total Shifts', value: shifts.length.toString(), inline: true },
+        { name: '? Completed', value: completed.toString(), inline: true },
+        { name: '? Incomplete', value: (shifts.length - completed).toString(), inline: true },
+        { name: '?? Completion Rate', value: `\`${bar}\` **${rate}%**` },
+        { name: '?? Note Rate', value: `${noteRate}%`, inline: true },
+        { name: '?? Avg Duration', value: `${avgDuration}h`, inline: true },
+        { name: '?? Staff Involved', value: uniqueStaff.toString(), inline: true }
       )
       
       ;
 
-    await interaction.editReply({ embeds: [embed] });
+    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_task_completion').setLabel('� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
 
 
 

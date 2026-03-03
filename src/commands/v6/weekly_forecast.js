@@ -1,4 +1,4 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { createEnterpriseEmbed } = require('../../utils/embeds');
 const { Activity } = require('../../database/mongo');
 
@@ -19,7 +19,7 @@ module.exports = {
     ]);
 
     if (!twoWeeks.length) {
-      return interaction.editReply('📊 Not enough data for a weekly forecast.');
+      return interaction.editReply('?? Not enough data for a weekly forecast.');
     }
 
     const firstWeekCount = twoWeeks.length - lastWeek.length;
@@ -37,25 +37,27 @@ module.exports = {
       const dow = day.getDay();
       const base = lastWeekByDay[dow];
       const predicted = Math.max(0, Math.round(base * (1 + parseFloat(growth) / 200)));
-      const bar = '▓'.repeat(Math.min(8, Math.round(predicted / Math.max(...lastWeekByDay, 1) * 8)));
+      const bar = '�'.repeat(Math.min(8, Math.round(predicted / Math.max(...lastWeekByDay, 1) * 8)));
       nextWeekLines.push(`${dayNames[dow]} ${day.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}: ${bar.padEnd(8)} ~${predicted}`);
     }
 
     const embed = createEnterpriseEmbed()
-      .setTitle('📅 Weekly Activity Forecast')
+      .setTitle('?? Weekly Activity Forecast')
       
       .setDescription(`\`\`\`${nextWeekLines.join('\n')}\`\`\``)
       .addFields(
-        { name: '📊 Last Week Total', value: lastWeek.length.toString(), inline: true },
-        { name: '📈 Week-over-Week Growth', value: `${growth}%`, inline: true },
-        { name: '🔮 Predicted Next Week', value: predictedTotal.toString(), inline: true }
+        { name: '?? Last Week Total', value: lastWeek.length.toString(), inline: true },
+        { name: '?? Week-over-Week Growth', value: `${growth}%`, inline: true },
+        { name: '?? Predicted Next Week', value: predictedTotal.toString(), inline: true }
       )
       
       ;
 
-    await interaction.editReply({ embeds: [embed] });
+    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_weekly_forecast').setLabel('� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
 
 
 

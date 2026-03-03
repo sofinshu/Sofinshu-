@@ -1,4 +1,5 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { createZenithEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { createEnterpriseEmbed } = require('../../utils/embeds');
 const { User } = require('../../database/mongo');
 
@@ -18,26 +19,28 @@ module.exports = {
     const nextTier = TIERS.find(t => points < t) || TIERS[TIERS.length - 1];
     const prevTier = TIERS.filter(t => points >= t).pop() || 0;
     const progress = Math.min(100, Math.round(((points - prevTier) / (nextTier - prevTier)) * 100));
-    const bar = '▓'.repeat(Math.round(progress / 10)) + '░'.repeat(10 - Math.round(progress / 10));
+    const bar = '�'.repeat(Math.round(progress / 10)) + '�'.repeat(10 - Math.round(progress / 10));
 
-    const tiersDisplay = TIERS.map(t => `${points >= t ? '✅' : '🔒'} **${t} pts**`).join('  →  ');
+    const tiersDisplay = TIERS.map(t => `${points >= t ? '?' : '??'} **${t} pts**`).join('  ?  ');
 
     const embed = createEnterpriseEmbed()
-      .setTitle(`🎯 Bonus Tracker — ${target.username}`)
+      .setTitle(`?? Bonus Tracker � ${target.username}`)
       
       .setThumbnail(target.displayAvatarURL())
       .addFields(
-        { name: '⭐ Current Points', value: points.toString(), inline: true },
-        { name: '🎯 Next Tier', value: points >= 1000 ? '👑 MAX' : nextTier.toString(), inline: true },
-        { name: '📊 Progress', value: `\`${bar}\` **${progress}%**` },
-        { name: '🏆 Tier Progress', value: tiersDisplay }
+        { name: '? Current Points', value: points.toString(), inline: true },
+        { name: '?? Next Tier', value: points >= 1000 ? '?? MAX' : nextTier.toString(), inline: true },
+        { name: '?? Progress', value: `\`${bar}\` **${progress}%**` },
+        { name: '?? Tier Progress', value: tiersDisplay }
       )
       
       ;
 
-    await interaction.editReply({ embeds: [embed] });
+    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_zen_bonus_tracker').setLabel('� Refresh Hyper-Apex Metrics').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
 
 
 

@@ -1,4 +1,4 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { createEnterpriseEmbed } = require('../../utils/embeds');
 const { Activity } = require('../../database/mongo');
 
@@ -15,7 +15,7 @@ module.exports = {
     const activities = await Activity.find({ guildId, createdAt: { $gte: thirtyDaysAgo } }).lean();
 
     if (!activities.length) {
-      return interaction.editReply('📊 No activity data found for the past 30 days.');
+      return interaction.editReply('?? No activity data found for the past 30 days.');
     }
 
     const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -29,7 +29,7 @@ module.exports = {
 
     const maxDay = Math.max(...dayCounts);
     const dayBars = dayNames.map((d, i) => {
-      const bar = '▓'.repeat(Math.round((dayCounts[i] / Math.max(maxDay, 1)) * 8)) + '░'.repeat(8 - Math.round((dayCounts[i] / Math.max(maxDay, 1)) * 8));
+      const bar = '�'.repeat(Math.round((dayCounts[i] / Math.max(maxDay, 1)) * 8)) + '�'.repeat(8 - Math.round((dayCounts[i] / Math.max(maxDay, 1)) * 8));
       return `${d}: ${bar} ${dayCounts[i]}`;
     }).join('\n');
 
@@ -37,23 +37,25 @@ module.exports = {
     const weekends = dayCounts[0] + dayCounts[6];
 
     const embed = createEnterpriseEmbed()
-      .setTitle('📅 Activity Patterns — Last 30 Days')
+      .setTitle('?? Activity Patterns � Last 30 Days')
       
       .addFields(
-        { name: '📊 Total Events', value: activities.length.toString(), inline: true },
-        { name: '📅 Weekday Activity', value: weekdays.toString(), inline: true },
-        { name: '🏖️ Weekend Activity', value: weekends.toString(), inline: true },
-        { name: '⚡ Commands', value: typeCounts.command.toString(), inline: true },
-        { name: '🔔 Warnings', value: typeCounts.warning.toString(), inline: true },
-        { name: '🏆 Promotions', value: typeCounts.promotion.toString(), inline: true },
-        { name: '📆 Weekly Pattern', value: `\`\`\`${dayBars}\`\`\`` }
+        { name: '?? Total Events', value: activities.length.toString(), inline: true },
+        { name: '?? Weekday Activity', value: weekdays.toString(), inline: true },
+        { name: '??? Weekend Activity', value: weekends.toString(), inline: true },
+        { name: '? Commands', value: typeCounts.command.toString(), inline: true },
+        { name: '?? Warnings', value: typeCounts.warning.toString(), inline: true },
+        { name: '?? Promotions', value: typeCounts.promotion.toString(), inline: true },
+        { name: '?? Weekly Pattern', value: `\`\`\`${dayBars}\`\`\`` }
       )
       
       ;
 
-    await interaction.editReply({ embeds: [embed] });
+    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_activity_patterns').setLabel('� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
 
 
 

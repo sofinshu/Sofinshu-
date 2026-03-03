@@ -1,4 +1,4 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { createEnterpriseEmbed } = require('../../utils/embeds');
 const { Guild, Activity } = require('../../database/mongo');
 
@@ -28,27 +28,29 @@ module.exports = {
       return d >= today && a.type === 'command';
     }).length;
 
-    const bar = '▓'.repeat(Math.round(parseFloat(engagementRate) / 10)) + '░'.repeat(10 - Math.round(parseFloat(engagementRate) / 10));
+    const bar = '�'.repeat(Math.round(parseFloat(engagementRate) / 10)) + '�'.repeat(10 - Math.round(parseFloat(engagementRate) / 10));
 
     const embed = createEnterpriseEmbed()
-      .setTitle('💬 Engagement Summary')
+      .setTitle('?? Engagement Summary')
       
       .setThumbnail(interaction.guild.iconURL())
       .addFields(
-        { name: '👥 Total Members', value: memberCount.toString(), inline: true },
-        { name: '✅ Active This Week', value: activeUsers.toString(), inline: true },
-        { name: '📊 Engagement Rate', value: `${engagementRate}%`, inline: true },
-        { name: '⚡ Commands Today', value: cmdToday.toString(), inline: true },
-        { name: '💬 Messages Processed', value: (stats.messagesProcessed || 0).toString(), inline: true },
-        { name: '🏅 Total Commands Used', value: (stats.commandsUsed || 0).toString(), inline: true },
-        { name: '📈 Engagement Bar', value: `\`${bar}\` ${engagementRate}%` }
+        { name: '?? Total Members', value: memberCount.toString(), inline: true },
+        { name: '? Active This Week', value: activeUsers.toString(), inline: true },
+        { name: '?? Engagement Rate', value: `${engagementRate}%`, inline: true },
+        { name: '? Commands Today', value: cmdToday.toString(), inline: true },
+        { name: '?? Messages Processed', value: (stats.messagesProcessed || 0).toString(), inline: true },
+        { name: '?? Total Commands Used', value: (stats.commandsUsed || 0).toString(), inline: true },
+        { name: '?? Engagement Bar', value: `\`${bar}\` ${engagementRate}%` }
       )
       
       ;
 
-    await interaction.editReply({ embeds: [embed] });
+    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_engagement_summary').setLabel('� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
 
 
 

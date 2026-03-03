@@ -1,12 +1,12 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { createEnterpriseEmbed } = require('../../utils/embeds');
 
 const MILESTONES = [
-  { label: '👥 50 Members', type: 'members', target: 50 },
-  { label: '👥 100 Members', type: 'members', target: 100 },
-  { label: '👥 500 Members', type: 'members', target: 500 },
-  { label: '⚡ 1,000 Commands', type: 'commands', target: 1000 },
-  { label: '⚡ 10,000 Commands', type: 'commands', target: 10000 },
+  { label: '?? 50 Members', type: 'members', target: 50 },
+  { label: '?? 100 Members', type: 'members', target: 100 },
+  { label: '?? 500 Members', type: 'members', target: 500 },
+  { label: '? 1,000 Commands', type: 'commands', target: 1000 },
+  { label: '? 10,000 Commands', type: 'commands', target: 10000 },
 ];
 
 module.exports = {
@@ -36,11 +36,11 @@ module.exports = {
     const fields = MILESTONES.map(m => {
       const current = getValue(m.type);
       const progress = Math.min(100, Math.round((current / m.target) * 100));
-      const bar = '▓'.repeat(Math.round(progress / 10)) + '░'.repeat(10 - Math.round(progress / 10));
-      const status = current >= m.target ? '✅ Achieved!' : `${current}/${m.target}`;
+      const bar = '�'.repeat(Math.round(progress / 10)) + '�'.repeat(10 - Math.round(progress / 10));
+      const status = current >= m.target ? '? Achieved!' : `${current}/${m.target}`;
       return {
-        name: `${current >= m.target ? '✅' : '🎯'} ${m.label}`,
-        value: `\`${bar}\` **${progress}%** — ${status}`,
+        name: `${current >= m.target ? '?' : '??'} ${m.label}`,
+        value: `\`${bar}\` **${progress}%** � ${status}`,
         inline: false
       };
     });
@@ -48,21 +48,23 @@ module.exports = {
     const nextMilestone = MILESTONES.find(m => getValue(m.type) < m.target);
 
     const embed = createEnterpriseEmbed()
-      .setTitle('🎯 Server Milestone Progress')
+      .setTitle('?? Server Milestone Progress')
       
       .setThumbnail(interaction.guild.iconURL())
       .addFields(
-        { name: '👥 Current Members', value: memberCount.toString(), inline: true },
-        { name: '⚡ Commands Used', value: commandsUsed.toString(), inline: true },
-        { name: '🎯 Next Milestone', value: nextMilestone?.label || '🏆 All achieved!', inline: true },
+        { name: '?? Current Members', value: memberCount.toString(), inline: true },
+        { name: '? Commands Used', value: commandsUsed.toString(), inline: true },
+        { name: '?? Next Milestone', value: nextMilestone?.label || '?? All achieved!', inline: true },
         ...fields
       )
       
       ;
 
-    await interaction.editReply({ embeds: [embed] });
+    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_milestone_summary').setLabel('� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
 
 
 

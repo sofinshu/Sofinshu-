@@ -1,4 +1,4 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { createEnterpriseEmbed } = require('../../utils/embeds');
 const { User } = require('../../database/mongo');
 
@@ -19,7 +19,7 @@ module.exports = {
       .lean();
 
     if (!users.length) {
-      return interaction.editReply('📊 No staff data found yet.');
+      return interaction.editReply('?? No staff data found yet.');
     }
 
     // Score based on rank, points, consistency, reputation
@@ -33,25 +33,27 @@ module.exports = {
     })).sort((a, b) => b.totalScore - a.totalScore);
 
     const top3 = scored.slice(0, 3);
-    const medals = ['🥇', '🥈', '🥉'];
+    const medals = ['??', '??', '??'];
 
     const fields = top3.map((u, i) => ({
-      name: `${medals[i]} ${u.username || 'Unknown'} — ${u.staff?.rank || 'member'}`,
+      name: `${medals[i]} ${u.username || 'Unknown'} � ${u.staff?.rank || 'member'}`,
       value: `Points: **${u.staff?.points || 0}** | Consistency: **${u.staff?.consistency || 100}%** | Rep: **${u.staff?.reputation || 0}**`,
       inline: false
     }));
 
     const embed = createEnterpriseEmbed()
-      .setTitle(`👤 Staff Recommendations — ${taskType.charAt(0).toUpperCase() + taskType.slice(1)}`)
+      .setTitle(`?? Staff Recommendations � ${taskType.charAt(0).toUpperCase() + taskType.slice(1)}`)
       
       .setDescription('Best staff picks based on rank, points, consistency, and reputation:')
       .addFields(fields)
       
       ;
 
-    await interaction.editReply({ embeds: [embed] });
+    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_staff_recommend').setLabel('� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
 
 
 

@@ -1,4 +1,4 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { createEnterpriseEmbed } = require('../../utils/embeds');
 const { Activity } = require('../../database/mongo');
 
@@ -29,26 +29,28 @@ module.exports = {
     const warnNow = thisWeek.filter(a => a.type === 'warning').length;
     const warnLast = lastWeek.filter(a => a.type === 'warning').length;
 
-    const trend = (tw, lw) => lw === 0 ? '➡️' : tw > lw ? '📈' : tw < lw ? '📉' : '➡️';
+    const trend = (tw, lw) => lw === 0 ? '??' : tw > lw ? '??' : tw < lw ? '??' : '??';
 
     const embed = createEnterpriseEmbed()
-      .setTitle('📈 Engagement Trends')
+      .setTitle('?? Engagement Trends')
       
       .addFields(
-        { name: '📊 Activity This Week', value: thisWeek.length.toString(), inline: true },
-        { name: '📅 Activity Last Week', value: lastWeek.length.toString(), inline: true },
+        { name: '?? Activity This Week', value: thisWeek.length.toString(), inline: true },
+        { name: '?? Activity Last Week', value: lastWeek.length.toString(), inline: true },
         { name: `${trend(thisWeek.length, lastWeek.length)} Change`, value: actChange === 'N/A' ? 'N/A' : `${actChange}%`, inline: true },
         { name: `${trend(activeNow, activeLast)} Active Users`, value: `${activeNow} vs ${activeLast}`, inline: true },
         { name: `${trend(cmdNow, cmdLast)} Commands`, value: `${cmdNow} vs ${cmdLast}`, inline: true },
         { name: `${trend(warnLast, warnNow)} Warnings`, value: `${warnNow} vs ${warnLast}`, inline: true },
-        { name: '👥 User Change', value: userChange === 'N/A' ? 'N/A' : `${userChange}%`, inline: true }
+        { name: '?? User Change', value: userChange === 'N/A' ? 'N/A' : `${userChange}%`, inline: true }
       )
       
       ;
 
-    await interaction.editReply({ embeds: [embed] });
+    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_engagement_trends').setLabel('� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
 
 
 

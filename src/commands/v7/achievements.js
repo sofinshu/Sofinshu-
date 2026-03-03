@@ -1,4 +1,4 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { createEnterpriseEmbed } = require('../../utils/embeds');
 const { User } = require('../../database/mongo');
 
@@ -16,11 +16,11 @@ module.exports = {
     const points = userData?.staff?.points || 0;
 
     const allAchievements = [
-      { name: '🌟 First Shift', desc: 'Complete your first shift', req: 1 },
-      { name: '⏰ Night Owl', desc: 'Work 50 hours', req: 180000 },
-      { name: '🎯 Dedicated', desc: 'Earn 100 points', req: 100 },
-      { name: '👑 Top Performer', desc: 'Reach 500 points', req: 500 },
-      { name: '🏆 Champion', desc: 'Reach 1000 points', req: 1000 }
+      { name: '?? First Shift', desc: 'Complete your first shift', req: 1 },
+      { name: '? Night Owl', desc: 'Work 50 hours', req: 180000 },
+      { name: '?? Dedicated', desc: 'Earn 100 points', req: 100 },
+      { name: '?? Top Performer', desc: 'Reach 500 points', req: 500 },
+      { name: '?? Champion', desc: 'Reach 1000 points', req: 1000 }
     ];
 
     const earned = allAchievements.filter(a => {
@@ -30,22 +30,24 @@ module.exports = {
 
     const list = allAchievements.map(a => {
       const isEarned = earned.some(e => e.name === a.name);
-      return `${isEarned ? '✅' : '❌'} **${a.name}** - ${a.desc}`;
+      return `${isEarned ? '?' : '?'} **${a.name}** - ${a.desc}`;
     }).join('\n');
 
     const embed = createEnterpriseEmbed()
-      .setTitle(`🏅 Achievements - ${user.username}`)
+      .setTitle(`?? Achievements - ${user.username}`)
       .setDescription(list)
       .addFields(
-        { name: '⭐ Points', value: points.toString(), inline: true },
-        { name: '🏆 Earned', value: `${earned.length}/${allAchievements.length}`, inline: true }
+        { name: '? Points', value: points.toString(), inline: true },
+        { name: '?? Earned', value: `${earned.length}/${allAchievements.length}`, inline: true }
       )
       
       ;
 
-    await interaction.reply({ embeds: [embed] });
+    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_achievements').setLabel('� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
 
 
 

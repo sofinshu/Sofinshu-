@@ -1,4 +1,5 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { createZenithEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { createEnterpriseEmbed } = require('../../utils/embeds');
 const { User } = require('../../database/mongo');
 
@@ -12,25 +13,27 @@ module.exports = {
     const THRESHOLDS = { trial: 0, staff: 100, senior: 300, manager: 600, admin: 1000, owner: 2000 };
     const RANK_ORDER = ['trial', 'staff', 'senior', 'manager', 'admin', 'owner'];
     const users = await User.find({ 'staff.points': { $gt: 0 } }).sort({ 'staff.points': -1 }).limit(8).lean();
-    if (!users.length) return interaction.editReply('📊 No staff data yet.');
+    if (!users.length) return interaction.editReply('?? No staff data yet.');
     const lines = users.map(u => {
       const rank = u.staff?.rank || 'trial';
       const pts = u.staff?.points || 0;
       const nextRank = RANK_ORDER[RANK_ORDER.indexOf(rank) + 1];
-      if (!nextRank) return `👑 **${u.username || '?'}** — MAX`;
+      if (!nextRank) return `?? **${u.username || '?'}** � MAX`;
       const pct = Math.min(100, Math.round((pts / THRESHOLDS[nextRank]) * 100));
-      const bar = '▓'.repeat(Math.round(pct / 10)) + '░'.repeat(10 - Math.round(pct / 10));
-      return `**${u.username || '?'}**: \`${bar}\` ${pct}% → ${nextRank}`;
+      const bar = '�'.repeat(Math.round(pct / 10)) + '�'.repeat(10 - Math.round(pct / 10));
+      return `**${u.username || '?'}**: \`${bar}\` ${pct}% ? ${nextRank}`;
     }).join('\n');
     const embed = createEnterpriseEmbed()
-      .setTitle('📊 Staff Progress Chart')
+      .setTitle('?? Staff Progress Chart')
       
       .setDescription(lines)
       
       ;
-    await interaction.editReply({ embeds: [embed] });
+    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_zen_progress_chart').setLabel('� Refresh Hyper-Apex Metrics').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
 
 
 

@@ -1,4 +1,5 @@
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { createZenithEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { createCustomEmbed, createErrorEmbed, createProgressBar } = require('../../utils/embeds');
 const { validatePremiumLicense } = require('../../utils/premium_guard');
 const { User, Shift } = require('../../database/mongo');
@@ -28,7 +29,8 @@ module.exports = {
             ]);
 
             if (!user || !user.staff) {
-                return interaction.editReply({ embeds: [createErrorEmbed(`No staff record found for <@${target.id}>. They must use the bot first.`)] });
+                return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_zen_zenith_passport').setLabel('ðŸ„ Refresh Hyper-Apex Metrics').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [createErrorEmbed(`No staff record found for <@${target.id}>. They must use the bot first.`)], components: [row] });
             }
 
             const staff = user.staff;
@@ -86,12 +88,15 @@ module.exports = {
                 footer: `uwu-chan â€¢ Zenith Passport â€¢ ID: ${target.id}`
             });
 
-            await interaction.editReply({ embeds: [embed] });
+            await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_zen_zenith_passport').setLabel('ðŸ„ Refresh Hyper-Apex Metrics').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
         } catch (error) {
             console.error('[zenith_passport] Error:', error);
             const errEmbed = createErrorEmbed('Failed to load Zenith Passport.');
-            if (interaction.deferred || interaction.replied) await interaction.editReply({ embeds: [errEmbed] });
+            if (interaction.deferred || interaction.replied) await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_zen_zenith_passport').setLabel('ðŸ„ Refresh Hyper-Apex Metrics').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [errEmbed], components: [row] });
             else await interaction.reply({ embeds: [errEmbed], ephemeral: true });
         }
     }
 };
+

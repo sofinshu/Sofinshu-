@@ -1,4 +1,5 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { createZenithEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { createEnterpriseEmbed } = require('../../utils/embeds');
 const { User } = require('../../database/mongo');
 
@@ -15,23 +16,25 @@ module.exports = {
     const pts = user?.staff?.points || 0;
     const rank = user?.staff?.rank || 'member';
     const consistency = user?.staff?.consistency || 100;
-    const rankEmojis = { owner: '👑', admin: '💜', manager: '💎', senior: '🌟', staff: '⭐', trial: '🔰', member: '👤' };
+    const rankEmojis = { owner: '??', admin: '??', manager: '??', senior: '??', staff: '?', trial: '??', member: '??' };
     const colors = { owner: 0xffd700, admin: 0x9b59b6, manager: 0x00bfff, senior: 0x2ecc71, staff: 0x3498db, trial: 0x95a5a6, member: 0x7f8c8d };
     const embed = createEnterpriseEmbed()
-      .setTitle(`${rankEmojis[rank] || '👤'} Rank Display — ${target.username}`)
+      .setTitle(`${rankEmojis[rank] || '??'} Rank Display � ${target.username}`)
       
       .setThumbnail(target.displayAvatarURL({ size: 256 }))
       .setDescription(`**${rankEmojis[rank] || ''} ${rank.toUpperCase()}**`)
       .addFields(
-        { name: '⭐ Points', value: pts.toString(), inline: true },
-        { name: '📈 Consistency', value: `${consistency}%`, inline: true },
-        { name: '🏅 Achievements', value: (user?.staff?.achievements?.length || 0).toString(), inline: true }
+        { name: '? Points', value: pts.toString(), inline: true },
+        { name: '?? Consistency', value: `${consistency}%`, inline: true },
+        { name: '?? Achievements', value: (user?.staff?.achievements?.length || 0).toString(), inline: true }
       )
       
       ;
-    await interaction.editReply({ embeds: [embed] });
+    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_zen_rank_display').setLabel('� Refresh Hyper-Apex Metrics').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
 
 
 

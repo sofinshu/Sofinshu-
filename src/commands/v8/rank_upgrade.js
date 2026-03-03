@@ -1,4 +1,5 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { createZenithEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { createEnterpriseEmbed } = require('../../utils/embeds');
 const { User, Activity } = require('../../database/mongo');
 
@@ -12,26 +13,28 @@ module.exports = {
 
   async execute(interaction, client) {
     await interaction.deferReply();
-    if (!interaction.member.permissions.has('ManageRoles')) return interaction.editReply('❌ Need Manage Roles.');
+    if (!interaction.member.permissions.has('ManageRoles')) return interaction.editReply('? Need Manage Roles.');
     const target = interaction.options.getUser('user');
     const newRank = interaction.options.getString('rank');
     await User.findOneAndUpdate({ userId: target.id }, { $set: { 'staff.rank': newRank, username: target.username } }, { upsert: true });
     await Activity.create({ guildId: interaction.guildId, userId: target.id, type: 'promotion', data: { newRank, promotedBy: interaction.user.id } });
-    const rankEmojis = { staff: '⭐', senior: '🌟', manager: '💎', admin: '👑' };
+    const rankEmojis = { staff: '?', senior: '??', manager: '??', admin: '??' };
     const embed = createEnterpriseEmbed()
-      .setTitle('🚀 RANK UPGRADE!')
+      .setTitle('?? RANK UPGRADE!')
       
       .setThumbnail(target.displayAvatarURL())
-      .setDescription(`🎊 **${target.username}** has been upgraded to **${rankEmojis[newRank] || '⭐'} ${newRank.toUpperCase()}**! 🎊\n\n*Keep up the outstanding work!* 💪`)
+      .setDescription(`?? **${target.username}** has been upgraded to **${rankEmojis[newRank] || '?'} ${newRank.toUpperCase()}**! ??\n\n*Keep up the outstanding work!* ??`)
       .addFields(
-        { name: '👤 Staff', value: `<@${target.id}>`, inline: true },
-        { name: '🆙 New Rank', value: `${rankEmojis[newRank] || ''} ${newRank.toUpperCase()}`, inline: true }
+        { name: '?? Staff', value: `<@${target.id}>`, inline: true },
+        { name: '?? New Rank', value: `${rankEmojis[newRank] || ''} ${newRank.toUpperCase()}`, inline: true }
       )
       
       ;
-    await interaction.editReply({ embeds: [embed] });
+    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_zen_rank_upgrade').setLabel('� Refresh Hyper-Apex Metrics').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
 
 
 

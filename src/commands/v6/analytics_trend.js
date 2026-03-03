@@ -1,4 +1,4 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { createEnterpriseEmbed } = require('../../utils/embeds');
 const { Activity } = require('../../database/mongo');
 
@@ -23,7 +23,7 @@ module.exports = {
       ? (((thisWeek.length - lastWeek.length) / lastWeek.length) * 100).toFixed(1)
       : 'N/A';
 
-    const trend = lastWeek.length === 0 ? '➡️' : thisWeek.length > lastWeek.length ? '📈' : thisWeek.length < lastWeek.length ? '📉' : '➡️';
+    const trend = lastWeek.length === 0 ? '??' : thisWeek.length > lastWeek.length ? '??' : thisWeek.length < lastWeek.length ? '??' : '??';
 
     // Daily breakdown this week
     const dayLabels = [];
@@ -39,7 +39,7 @@ module.exports = {
 
     const maxCount = Math.max(...dayCounts, 1);
     const chart = dayLabels.map((d, i) => {
-      const bar = '█'.repeat(Math.round((dayCounts[i] / maxCount) * 8)) + '░'.repeat(8 - Math.round((dayCounts[i] / maxCount) * 8));
+      const bar = '�'.repeat(Math.round((dayCounts[i] / maxCount) * 8)) + '�'.repeat(8 - Math.round((dayCounts[i] / maxCount) * 8));
       return `${d}: ${bar} ${dayCounts[i]}`;
     }).join('\n');
 
@@ -50,20 +50,22 @@ module.exports = {
       .setTitle(`${trend} Analytics Trend`)
       
       .addFields(
-        { name: '📊 This Week', value: thisWeek.length.toString(), inline: true },
-        { name: '📅 Last Week', value: lastWeek.length.toString(), inline: true },
-        { name: '📈 Change', value: change === 'N/A' ? 'N/A' : `${change}%`, inline: true },
-        { name: '⚡ Commands This Week', value: cmdThis.toString(), inline: true },
-        { name: '⚡ Commands Last Week', value: cmdLast.toString(), inline: true },
-        { name: '👥 Active Users (7d)', value: [...new Set(thisWeek.map(a => a.userId))].length.toString(), inline: true },
-        { name: '📆 This Week Daily', value: `\`\`\`${chart}\`\`\`` }
+        { name: '?? This Week', value: thisWeek.length.toString(), inline: true },
+        { name: '?? Last Week', value: lastWeek.length.toString(), inline: true },
+        { name: '?? Change', value: change === 'N/A' ? 'N/A' : `${change}%`, inline: true },
+        { name: '? Commands This Week', value: cmdThis.toString(), inline: true },
+        { name: '? Commands Last Week', value: cmdLast.toString(), inline: true },
+        { name: '?? Active Users (7d)', value: [...new Set(thisWeek.map(a => a.userId))].length.toString(), inline: true },
+        { name: '?? This Week Daily', value: `\`\`\`${chart}\`\`\`` }
       )
       
       ;
 
-    await interaction.editReply({ embeds: [embed] });
+    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_analytics_trend').setLabel('� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
 
 
 

@@ -1,8 +1,9 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { createZenithEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { createEnterpriseEmbed } = require('../../utils/embeds');
 const { User } = require('../../database/mongo');
 
-const ALL_ACHIEVEMENTS = ['🔥 First Shift', '⭐ Point Collector', '💎 Elite Member', '🎯 Consistent', '🏆 Top Performer', '⚡ Power User'];
+const ALL_ACHIEVEMENTS = ['?? First Shift', '? Point Collector', '?? Elite Member', '?? Consistent', '?? Top Performer', '? Power User'];
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -20,28 +21,30 @@ module.exports = {
 
     const progress = ALL_ACHIEVEMENTS.map(a => {
       const done = earned.includes(a);
-      return `${done ? '✅' : '🔲'} ${a}`;
+      return `${done ? '?' : '??'} ${a}`;
     }).join('\n');
 
     const pct = Math.round((earned.length / ALL_ACHIEVEMENTS.length) * 100);
-    const bar = '▓'.repeat(Math.round(pct / 10)) + '░'.repeat(10 - Math.round(pct / 10));
+    const bar = '�'.repeat(Math.round(pct / 10)) + '�'.repeat(10 - Math.round(pct / 10));
 
     const embed = createEnterpriseEmbed()
-      .setTitle(`🎯 Achievement Tracker — ${target.username}`)
+      .setTitle(`?? Achievement Tracker � ${target.username}`)
       
       .setThumbnail(target.displayAvatarURL())
       .addFields(
-        { name: '📊 Completion', value: `\`${bar}\` **${pct}%** (${earned.length}/${ALL_ACHIEVEMENTS.length})` },
-        { name: '⭐ Points', value: points.toString(), inline: true },
-        { name: '📈 Consistency', value: `${consistency}%`, inline: true },
-        { name: '🏅 Achievements', value: progress }
+        { name: '?? Completion', value: `\`${bar}\` **${pct}%** (${earned.length}/${ALL_ACHIEVEMENTS.length})` },
+        { name: '? Points', value: points.toString(), inline: true },
+        { name: '?? Consistency', value: `${consistency}%`, inline: true },
+        { name: '?? Achievements', value: progress }
       )
       
       ;
 
-    await interaction.editReply({ embeds: [embed] });
+    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_zen_achievement_tracker_visual').setLabel('� Refresh Hyper-Apex Metrics').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
 
 
 

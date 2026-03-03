@@ -1,4 +1,5 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { createZenithEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { createEnterpriseEmbed } = require('../../utils/embeds');
 const { Activity } = require('../../database/mongo');
 
@@ -21,26 +22,28 @@ module.exports = {
     }
     const max = Math.max(...weeks.map(w => w.count), 1);
     const chart = weeks.map(w => {
-      const bar = '█'.repeat(Math.round((w.count / max) * 12)).padEnd(12, '░');
+      const bar = '�'.repeat(Math.round((w.count / max) * 12)).padEnd(12, '�');
       return `${w.label}: ${bar} ${w.count}`;
     }).join('\n');
 
-    const trend = weeks[3].count >= weeks[0].count ? '📈 Growing' : '📉 Declining';
+    const trend = weeks[3].count >= weeks[0].count ? '?? Growing' : '?? Declining';
 
     const embed = createEnterpriseEmbed()
-      .setTitle('📊 4-Week Engagement Chart')
+      .setTitle('?? 4-Week Engagement Chart')
       
       .setDescription(`\`\`\`${chart}\n\n(W-0 = this week, W-3 = 3 weeks ago)\`\`\``)
       .addFields(
-        { name: '📈 Trend', value: trend, inline: true },
-        { name: '🔝 Best Week', value: `${weeks.find(w => w.count === Math.max(...weeks.map(x => x.count)))?.label}: ${Math.max(...weeks.map(w => w.count))} events`, inline: true }
+        { name: '?? Trend', value: trend, inline: true },
+        { name: '?? Best Week', value: `${weeks.find(w => w.count === Math.max(...weeks.map(x => x.count)))?.label}: ${Math.max(...weeks.map(w => w.count))} events`, inline: true }
       )
       
       ;
 
-    await interaction.editReply({ embeds: [embed] });
+    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_zen_engagement_chart').setLabel('� Refresh Hyper-Apex Metrics').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
 
 
 

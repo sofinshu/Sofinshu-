@@ -1,4 +1,4 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { createEnterpriseEmbed } = require('../../utils/embeds');
 const { User } = require('../../database/mongo');
 
@@ -17,7 +17,7 @@ module.exports = {
     const users = await User.find({ 'staff.points': { $gt: 0 } }).lean();
 
     if (!users.length) {
-      return interaction.editReply('📊 No staff data found yet.');
+      return interaction.editReply('?? No staff data found yet.');
     }
 
     const rankOrder = ['trial', 'staff', 'senior', 'manager', 'admin', 'owner'];
@@ -40,29 +40,31 @@ module.exports = {
       .slice(0, 8);
 
     if (!predictions.length) {
-      return interaction.editReply('📊 No staff are currently close to a promotion (need 50%+ progress).');
+      return interaction.editReply('?? No staff are currently close to a promotion (need 50%+ progress).');
     }
 
     const fields = predictions.map(p => {
-      const bar = '▓'.repeat(Math.round(p.progress / 10)) + '░'.repeat(10 - Math.round(p.progress / 10));
+      const bar = '�'.repeat(Math.round(p.progress / 10)) + '�'.repeat(10 - Math.round(p.progress / 10));
       return {
-        name: `${p.username} (${p.currentRank} → ${p.nextRank})`,
+        name: `${p.username} (${p.currentRank} ? ${p.nextRank})`,
         value: `\`${bar}\` **${p.progress}%** | ${p.points}/${p.threshold} pts | Need **${p.needed}** more`,
         inline: false
       };
     });
 
     const embed = createEnterpriseEmbed()
-      .setTitle('🔮 Staff Promotion Predictions')
+      .setTitle('?? Staff Promotion Predictions')
       
       .setDescription('Staff members close to their next rank promotion:')
       .addFields(fields)
       
       ;
 
-    await interaction.editReply({ embeds: [embed] });
+    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_staff_prediction').setLabel('� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
 
 
 

@@ -1,4 +1,4 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { createEnterpriseEmbed } = require('../../utils/embeds');
 const { Activity, Warning } = require('../../database/mongo');
 
@@ -32,23 +32,25 @@ module.exports = {
     const weekText = weeks.map((c, i) => `Week ${4 - i}: **${c}** events`).reverse().join('\n');
 
     const embed = createEnterpriseEmbed()
-      .setTitle('📋 Automation Report — Last 30 Days')
+      .setTitle('?? Automation Report � Last 30 Days')
       
       .addFields(
-        { name: '⬆️ Promotions', value: promotions.toString(), inline: true },
-        { name: '🔄 Shifts Tracked', value: shifts.toString(), inline: true },
-        { name: '⚡ Commands Executed', value: commands.toString(), inline: true },
-        { name: '🤖 Auto-Warnings', value: autoWarnings.toString(), inline: true },
-        { name: '⚠️ Manual Warnings', value: (warnings.length - autoWarnings).toString(), inline: true },
-        { name: '📊 Total Events', value: activities.length.toString(), inline: true },
-        { name: '📅 Weekly Breakdown', value: weekText }
+        { name: '?? Promotions', value: promotions.toString(), inline: true },
+        { name: '?? Shifts Tracked', value: shifts.toString(), inline: true },
+        { name: '? Commands Executed', value: commands.toString(), inline: true },
+        { name: '?? Auto-Warnings', value: autoWarnings.toString(), inline: true },
+        { name: '?? Manual Warnings', value: (warnings.length - autoWarnings).toString(), inline: true },
+        { name: '?? Total Events', value: activities.length.toString(), inline: true },
+        { name: '?? Weekly Breakdown', value: weekText }
       )
       
       ;
 
-    await interaction.editReply({ embeds: [embed] });
+    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_automation_report').setLabel('� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
 
 
 

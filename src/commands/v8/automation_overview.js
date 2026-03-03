@@ -1,4 +1,5 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { createZenithEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { createEnterpriseEmbed } = require('../../utils/embeds');
 const { Guild } = require('../../database/mongo');
 
@@ -15,34 +16,36 @@ module.exports = {
     const settings = guild?.settings || {};
 
     const moduleStatus = [
-      ['🛡️ Moderation', modules.moderation],
-      ['📊 Analytics', modules.analytics],
-      ['⚙️ Automation', modules.automation],
-      ['🎫 Tickets', modules.tickets],
-    ].map(([name, enabled]) => `${enabled ? '🟢' : '🔴'} ${name}: **${enabled ? 'ON' : 'OFF'}**`).join('\n');
+      ['??? Moderation', modules.moderation],
+      ['?? Analytics', modules.analytics],
+      ['?? Automation', modules.automation],
+      ['?? Tickets', modules.tickets],
+    ].map(([name, enabled]) => `${enabled ? '??' : '??'} ${name}: **${enabled ? 'ON' : 'OFF'}**`).join('\n');
 
     const configStatus = [
-      ['📣 Log Channel', settings.logChannel ? `<#${settings.logChannel}>` : '❌ Not set'],
-      ['👤 Muted Role', settings.mutedRole ? `<@&${settings.mutedRole}>` : '❌ Not set'],
-      ['🌍 Timezone', settings.timezone || 'UTC'],
-      ['🔔 Welcome Channel', settings.welcomeChannel ? `<#${settings.welcomeChannel}>` : '❌ Not set'],
+      ['?? Log Channel', settings.logChannel ? `<#${settings.logChannel}>` : '? Not set'],
+      ['?? Muted Role', settings.mutedRole ? `<@&${settings.mutedRole}>` : '? Not set'],
+      ['?? Timezone', settings.timezone || 'UTC'],
+      ['?? Welcome Channel', settings.welcomeChannel ? `<#${settings.welcomeChannel}>` : '? Not set'],
     ].map(([name, val]) => `${name}: **${val}**`).join('\n');
 
     const activeCount = [modules.moderation, modules.analytics, modules.automation, modules.tickets].filter(Boolean).length;
 
     const embed = createEnterpriseEmbed()
-      .setTitle('⚙️ Automation Overview')
+      .setTitle('?? Automation Overview')
       
       .addFields(
-        { name: `🤖 Modules (${activeCount}/4 Active)`, value: moduleStatus },
-        { name: '🔧 Configuration', value: configStatus }
+        { name: `?? Modules (${activeCount}/4 Active)`, value: moduleStatus },
+        { name: '?? Configuration', value: configStatus }
       )
       
       ;
 
-    await interaction.editReply({ embeds: [embed] });
+    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_zen_automation_overview').setLabel('� Refresh Hyper-Apex Metrics').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
 
 
 

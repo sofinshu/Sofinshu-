@@ -1,4 +1,4 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { createEnterpriseEmbed } = require('../../utils/embeds');
 const { User, Warning } = require('../../database/mongo');
 
@@ -18,7 +18,7 @@ module.exports = {
     ]);
 
     if (!users.length) {
-      return interaction.editReply('📊 No staff data found yet.');
+      return interaction.editReply('?? No staff data found yet.');
     }
 
     const warnMap = {};
@@ -38,27 +38,29 @@ module.exports = {
       : '0';
 
     const lowText = lowPerformers.length
-      ? lowPerformers.map(u => `• **${u.username || 'Unknown'}** — ${u.staff?.points || 0} pts, ${warnMap[u.userId] || 0} warns`).join('\n')
-      : '✅ No underperforming staff found!';
+      ? lowPerformers.map(u => `� **${u.username || 'Unknown'}** � ${u.staff?.points || 0} pts, ${warnMap[u.userId] || 0} warns`).join('\n')
+      : '? No underperforming staff found!';
 
-    const topText = topPerformers.map(u => `• **${u.username || 'Unknown'}** — ${u.staff?.points || 0} pts`).join('\n');
+    const topText = topPerformers.map(u => `� **${u.username || 'Unknown'}** � ${u.staff?.points || 0} pts`).join('\n');
 
     const embed = createEnterpriseEmbed()
-      .setTitle('🔧 Optimization Report')
+      .setTitle('?? Optimization Report')
       
       .addFields(
-        { name: '👥 Staff Tracked', value: users.length.toString(), inline: true },
-        { name: '📊 Average Points', value: avgPoints, inline: true },
-        { name: '⚠️ Warnings (30d)', value: recentWarnings.length.toString(), inline: true },
-        { name: '⬇️ Needs Attention', value: lowText },
-        { name: '🏆 Top Performers', value: topText }
+        { name: '?? Staff Tracked', value: users.length.toString(), inline: true },
+        { name: '?? Average Points', value: avgPoints, inline: true },
+        { name: '?? Warnings (30d)', value: recentWarnings.length.toString(), inline: true },
+        { name: '?? Needs Attention', value: lowText },
+        { name: '?? Top Performers', value: topText }
       )
       
       ;
 
-    await interaction.editReply({ embeds: [embed] });
+    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_optimization_report').setLabel('� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
 
 
 

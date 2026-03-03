@@ -1,4 +1,5 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { createZenithEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { createEnterpriseEmbed } = require('../../utils/embeds');
 const { Activity } = require('../../database/mongo');
 
@@ -17,22 +18,24 @@ module.exports = {
     const warnings = events.filter(e => e.type === 'warning').length;
     const latest = events.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 5);
     const latestText = latest.length
-      ? latest.map(e => `${e.type === 'promotion' ? '⬆️' : '⚠️'} <@${e.userId}> — <t:${Math.floor(new Date(e.createdAt).getTime() / 1000)}:R>`).join('\n')
+      ? latest.map(e => `${e.type === 'promotion' ? '??' : '??'} <@${e.userId}> � <t:${Math.floor(new Date(e.createdAt).getTime() / 1000)}:R>`).join('\n')
       : 'No notifications this week.';
 
     const embed = createEnterpriseEmbed()
-      .setTitle('🔔 Notification Effects')
+      .setTitle('?? Notification Effects')
       
       .addFields(
-        { name: '⬆️ Promotions (7d)', value: promotions.toString(), inline: true },
-        { name: '⚠️ Warnings (7d)', value: warnings.toString(), inline: true },
-        { name: '📋 Recent Notifications', value: latestText }
+        { name: '?? Promotions (7d)', value: promotions.toString(), inline: true },
+        { name: '?? Warnings (7d)', value: warnings.toString(), inline: true },
+        { name: '?? Recent Notifications', value: latestText }
       )
       
       ;
-    await interaction.editReply({ embeds: [embed] });
+    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_zen_notification_effect').setLabel('� Refresh Hyper-Apex Metrics').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
 
 
 

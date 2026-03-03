@@ -1,4 +1,4 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { createEnterpriseEmbed } = require('../../utils/embeds');
 const { Guild } = require('../../database/mongo');
 
@@ -17,7 +17,7 @@ module.exports = {
 
     if (roleToAdd) {
       if (!interaction.member.permissions.has('ManageRoles')) {
-        return interaction.editReply('❌ You need **Manage Roles** permission to configure auto-assign.');
+        return interaction.editReply('? You need **Manage Roles** permission to configure auto-assign.');
       }
       if (!guild) guild = new Guild({ guildId, name: interaction.guild.name });
       if (!guild.settings.autoRoles) guild.settings.autoRoles = [];
@@ -33,19 +33,21 @@ module.exports = {
       : 'No auto-assign roles configured.';
 
     const embed = createEnterpriseEmbed()
-      .setTitle('⚙️ Auto-Assign Role Configuration')
+      .setTitle('?? Auto-Assign Role Configuration')
       
       .addFields(
-        { name: '📋 Auto-Assign Roles', value: roleList },
-        { name: '✅ Status', value: currentRoles.length > 0 ? `Active — ${currentRoles.length} role(s)` : 'Inactive', inline: true },
-        { name: '📌 How it works', value: 'Listed roles are automatically assigned to new members when they join.' }
+        { name: '?? Auto-Assign Roles', value: roleList },
+        { name: '? Status', value: currentRoles.length > 0 ? `Active � ${currentRoles.length} role(s)` : 'Inactive', inline: true },
+        { name: '?? How it works', value: 'Listed roles are automatically assigned to new members when they join.' }
       )
       
       ;
 
-    await interaction.editReply({ embeds: [embed] });
+    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_auto_assign').setLabel('� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
 
 
 

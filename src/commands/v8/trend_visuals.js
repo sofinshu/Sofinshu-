@@ -1,4 +1,5 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { createZenithEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { createEnterpriseEmbed } = require('../../utils/embeds');
 const { Activity } = require('../../database/mongo');
 
@@ -18,7 +19,7 @@ module.exports = {
       Activity.find({ guildId, createdAt: { $gte: w2, $lt: w1 } }).lean()
     ]);
 
-    const arrow = (a, b) => a > b ? '📈' : a < b ? '📉' : '➡️';
+    const arrow = (a, b) => a > b ? '??' : a < b ? '??' : '??';
     const pct = (a, b) => b > 0 ? `${((a - b) / b * 100).toFixed(1)}%` : 'N/A';
 
     const rows = [
@@ -31,14 +32,16 @@ module.exports = {
     const display = rows.map(([name, cur, prev]) => `${arrow(cur, prev)} **${name}**: ${cur} vs ${prev} (${pct(cur, prev)})`).join('\n');
 
     const embed = createEnterpriseEmbed()
-      .setTitle('📊 Trend Visuals')
+      .setTitle('?? Trend Visuals')
       
       .setDescription(display)
       
       ;
-    await interaction.editReply({ embeds: [embed] });
+    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_zen_trend_visuals').setLabel('� Refresh Hyper-Apex Metrics').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
 
 
 

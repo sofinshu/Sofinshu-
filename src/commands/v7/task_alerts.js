@@ -1,4 +1,4 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { createEnterpriseEmbed } = require('../../utils/embeds');
 const { Shift } = require('../../database/mongo');
 
@@ -18,29 +18,31 @@ module.exports = {
     ]);
 
     const noNotesList = noNotes.slice(0, 5).map(s =>
-      `• <@${s.userId}> — <t:${Math.floor(new Date(s.startTime).getTime() / 1000)}:d> — No notes`
-    ).join('\n') || '✅ All shifts have notes.';
+      `� <@${s.userId}> � <t:${Math.floor(new Date(s.startTime).getTime() / 1000)}:d> � No notes`
+    ).join('\n') || '? All shifts have notes.';
 
     const stuckList = stuck.slice(0, 5).map(s => {
       const hrs = ((Date.now() - new Date(s.startTime).getTime()) / 3600000).toFixed(1);
-      return `• <@${s.userId}> — Open **${hrs}h**`;
-    }).join('\n') || '✅ No stuck shifts.';
+      return `� <@${s.userId}> � Open **${hrs}h**`;
+    }).join('\n') || '? No stuck shifts.';
 
     const embed = createEnterpriseEmbed()
-      .setTitle('⚠️ Task Alerts')
+      .setTitle('?? Task Alerts')
       
       .addFields(
-        { name: '📝 Shifts Without Notes (7d)', value: noNotes.length.toString(), inline: true },
-        { name: '🕐 Stuck Shifts (4h+)', value: stuck.length.toString(), inline: true },
-        { name: '📋 Missing Notes', value: noNotesList },
-        { name: '⏰ Stuck Shifts', value: stuckList }
+        { name: '?? Shifts Without Notes (7d)', value: noNotes.length.toString(), inline: true },
+        { name: '?? Stuck Shifts (4h+)', value: stuck.length.toString(), inline: true },
+        { name: '?? Missing Notes', value: noNotesList },
+        { name: '? Stuck Shifts', value: stuckList }
       )
       
       ;
 
-    await interaction.editReply({ embeds: [embed] });
+    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_task_alerts').setLabel('� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
 
 
 

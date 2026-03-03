@@ -1,4 +1,4 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { createEnterpriseEmbed } = require('../../utils/embeds');
 const { User, Shift, Activity } = require('../../database/mongo');
 
@@ -18,7 +18,7 @@ module.exports = {
     ]);
 
     if (!shifts.length) {
-      return interaction.editReply('📊 No completed shift data found in the past 30 days.');
+      return interaction.editReply('?? No completed shift data found in the past 30 days.');
     }
 
     // Map commands per user
@@ -49,24 +49,26 @@ module.exports = {
     const avgCmds = activities.length / Math.max(Object.keys(cmdMap).length, 1);
 
     const leaderboard = productivity.length
-      ? productivity.map((p, i) => `\`${String(i + 1).padStart(2)}\` <@${p.uid}> — **${p.productivityScore}** cmds/h | ${p.hours}h, ${p.cmds} cmds`).join('\n')
+      ? productivity.map((p, i) => `\`${String(i + 1).padStart(2)}\` <@${p.uid}> � **${p.productivityScore}** cmds/h | ${p.hours}h, ${p.cmds} cmds`).join('\n')
       : 'No data.';
 
     const embed = createEnterpriseEmbed()
-      .setTitle('⚡ Productivity Analysis')
+      .setTitle('? Productivity Analysis')
       
       .addFields(
-        { name: '🔄 Total Shifts (30d)', value: shifts.length.toString(), inline: true },
-        { name: '⏱️ Avg Shift Length', value: `${avgHours.toFixed(1)}h`, inline: true },
-        { name: '⚡ Avg Commands/Staff', value: avgCmds.toFixed(1), inline: true },
-        { name: '🏆 Productivity Ranking (cmds/hour)', value: leaderboard }
+        { name: '?? Total Shifts (30d)', value: shifts.length.toString(), inline: true },
+        { name: '?? Avg Shift Length', value: `${avgHours.toFixed(1)}h`, inline: true },
+        { name: '? Avg Commands/Staff', value: avgCmds.toFixed(1), inline: true },
+        { name: '?? Productivity Ranking (cmds/hour)', value: leaderboard }
       )
       
       ;
 
-    await interaction.editReply({ embeds: [embed] });
+    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_productivity_analysis').setLabel('� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
 
 
 

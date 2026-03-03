@@ -1,10 +1,11 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { createZenithEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { createCustomEmbed, createErrorEmbed, createProgressBar } = require('../../utils/embeds');
 const { validatePremiumLicense } = require('../../utils/premium_guard');
 const { User, Guild, Shift, Warning } = require('../../database/mongo');
 
 const RANK_ORDER = ['member', 'trial', 'staff', 'senior', 'manager', 'admin'];
-const RANK_EMOJIS = { member: '👤', trial: '🔰', staff: '⭐', senior: '🌟', manager: '💎', admin: '👑' };
+const RANK_EMOJIS = { member: '??', trial: '??', staff: '?', senior: '??', manager: '??', admin: '??' };
 const DEFAULT_THRESHOLDS = {
   staff: { points: 100, shifts: 5, consistency: 70, maxWarnings: 3 },
   senior: { points: 300, shifts: 10, consistency: 75, maxWarnings: 2 },
@@ -15,7 +16,7 @@ const DEFAULT_THRESHOLDS = {
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('auto_promotion_visual')
-    .setDescription('📊 Enterprise auto-promotion dashboard — shows all staff eligibility with real-time progress bars'),
+    .setDescription('?? Enterprise auto-promotion dashboard � shows all staff eligibility with real-time progress bars'),
 
   async execute(interaction) {
     try {
@@ -38,7 +39,8 @@ module.exports = {
         .lean();
 
       if (!users.length) {
-        return interaction.editReply({ embeds: [createErrorEmbed('No staff data found yet. Staff must complete shifts to earn points.')] });
+        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_zen_auto_promotion_visual').setLabel('� Refresh Hyper-Apex Metrics').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [createErrorEmbed('No staff data found yet. Staff must complete shifts to earn points.')], components: [row] });
       }
 
       // Build per-user eligibility lines with real warning/shift counts
@@ -51,7 +53,7 @@ module.exports = {
         const currentIdx = RANK_ORDER.indexOf(rank);
         const nextRank = RANK_ORDER[currentIdx + 1];
 
-        if (!nextRank) return `👑 **${username}** — \`${rank.toUpperCase()}\` (MAX RANK) — \`${pts.toLocaleString()} pts\``;
+        if (!nextRank) return `?? **${username}** � \`${rank.toUpperCase()}\` (MAX RANK) � \`${pts.toLocaleString()} pts\``;
 
         const req = thresholds[nextRank] || {};
         const reqPts = req.points || 0;
@@ -70,33 +72,36 @@ module.exports = {
 
         const pct = reqPts > 0 ? Math.min(100, Math.round((pts / reqPts) * 100)) : 100;
         const bar = createProgressBar(pct, 10);
-        const status = meetsAll ? '✅' : '🔄';
-        const emoji = RANK_EMOJIS[rank] || '•';
+        const status = meetsAll ? '?' : '??';
+        const emoji = RANK_EMOJIS[rank] || '�';
 
-        return `${status} ${emoji} **${username}** [\`${rank.toUpperCase()}\` → \`${nextRank.toUpperCase()}\`]\n> \`${bar}\` **${pct}%** | \`${pts}/${reqPts} pts\` | \`${shiftCount}/${reqShifts} shifts\`${meetsAll ? '\n> 🟢 **ELIGIBLE NOW**' : ''}`;
+        return `${status} ${emoji} **${username}** [\`${rank.toUpperCase()}\` ? \`${nextRank.toUpperCase()}\`]\n> \`${bar}\` **${pct}%** | \`${pts}/${reqPts} pts\` | \`${shiftCount}/${reqShifts} shifts\`${meetsAll ? '\n> ?? **ELIGIBLE NOW**' : ''}`;
       }));
 
       const eligible = lines.filter(l => l.includes('ELIGIBLE NOW')).length;
 
       const embed = await createCustomEmbed(interaction, {
-        title: `📊 Auto-Promotion Dashboard — ${interaction.guild.name}`,
+        title: `?? Auto-Promotion Dashboard � ${interaction.guild.name}`,
         thumbnail: interaction.guild.iconURL({ dynamic: true }),
         description: lines.join('\n\n'),
         fields: [
-          { name: '✅ Eligible for Promotion', value: `\`${eligible}\` staff members`, inline: true },
-          { name: '⚙️ Auto-Promotion', value: automationEnabled ? '`🟢 ENABLED` — Runs every 15 min' : '`🔴 DISABLED` — Enable via setup', inline: true },
-          { name: '👥 Total Tracked', value: `\`${users.length}\` staff`, inline: true }
+          { name: '? Eligible for Promotion', value: `\`${eligible}\` staff members`, inline: true },
+          { name: '?? Auto-Promotion', value: automationEnabled ? '`?? ENABLED` � Runs every 15 min' : '`?? DISABLED` � Enable via setup', inline: true },
+          { name: '?? Total Tracked', value: `\`${users.length}\` staff`, inline: true }
         ],
         color: automationEnabled ? '#f1c40f' : '#5865F2',
-        footer: `uwu-chan • Enterprise Auto-Promotion Visual • Real DB Data`
+        footer: `uwu-chan � Enterprise Auto-Promotion Visual � Real DB Data`
       });
 
-      await interaction.editReply({ embeds: [embed] });
+      await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_zen_auto_promotion_visual').setLabel('� Refresh Hyper-Apex Metrics').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
     } catch (error) {
       console.error('[auto_promotion_visual] Error:', error);
       const errEmbed = createErrorEmbed('Failed to load auto-promotion dashboard.');
-      if (interaction.deferred || interaction.replied) await interaction.editReply({ embeds: [errEmbed] });
+      if (interaction.deferred || interaction.replied) await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_zen_auto_promotion_visual').setLabel('� Refresh Hyper-Apex Metrics').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [errEmbed], components: [row] });
       else await interaction.reply({ embeds: [errEmbed], ephemeral: true });
     }
   }
 };
+

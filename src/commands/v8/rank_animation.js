@@ -1,4 +1,5 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { createZenithEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { createEnterpriseEmbed } = require('../../utils/embeds');
 const { User } = require('../../database/mongo');
 
@@ -16,27 +17,29 @@ module.exports = {
     const rank = user?.staff?.rank || 'trial';
     const RANK_ORDER = ['trial', 'staff', 'senior', 'manager', 'admin', 'owner'];
     const THRESHOLDS = { trial: 0, staff: 100, senior: 300, manager: 600, admin: 1000, owner: 2000 };
-    const rankEmojis = { trial: '🔰', staff: '⭐', senior: '🌟', manager: '💎', admin: '👑', owner: '🏆' };
+    const rankEmojis = { trial: '??', staff: '?', senior: '??', manager: '??', admin: '??', owner: '??' };
     const nextRank = RANK_ORDER[RANK_ORDER.indexOf(rank) + 1];
     const nextThresh = nextRank ? THRESHOLDS[nextRank] : null;
     const pct = nextThresh ? Math.min(100, Math.round((pts / nextThresh) * 100)) : 100;
-    const bar = '▓'.repeat(Math.round(pct / 10)) + '░'.repeat(10 - Math.round(pct / 10));
-    const steps = RANK_ORDER.map(r => `${r === rank ? `**→ ${rankEmojis[r]} ${r.toUpperCase()}** ←` : `${rankEmojis[r]} ${r}`}`).join(' | ');
+    const bar = '�'.repeat(Math.round(pct / 10)) + '�'.repeat(10 - Math.round(pct / 10));
+    const steps = RANK_ORDER.map(r => `${r === rank ? `**? ${rankEmojis[r]} ${r.toUpperCase()}** ?` : `${rankEmojis[r]} ${r}`}`).join(' | ');
     const embed = createEnterpriseEmbed()
-      .setTitle(`🎭 Rank Animation — ${target.username}`)
+      .setTitle(`?? Rank Animation � ${target.username}`)
       
       .setThumbnail(target.displayAvatarURL())
       .addFields(
-        { name: '🎖️ Rank Path', value: steps },
-        { name: '⭐ Points', value: pts.toString(), inline: true },
-        { name: '⬆️ Next Rank', value: nextRank ? `${rankEmojis[nextRank]} ${nextRank}` : '👑 MAX', inline: true },
-        { name: '📊 Progress', value: `\`${bar}\` **${pct}%**` }
+        { name: '??? Rank Path', value: steps },
+        { name: '? Points', value: pts.toString(), inline: true },
+        { name: '?? Next Rank', value: nextRank ? `${rankEmojis[nextRank]} ${nextRank}` : '?? MAX', inline: true },
+        { name: '?? Progress', value: `\`${bar}\` **${pct}%**` }
       )
       
       ;
-    await interaction.editReply({ embeds: [embed] });
+    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_zen_rank_animation').setLabel('� Refresh Hyper-Apex Metrics').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
 
 
 

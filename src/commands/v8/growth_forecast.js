@@ -1,4 +1,5 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { createZenithEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { createEnterpriseEmbed } = require('../../utils/embeds');
 const { Activity } = require('../../database/mongo');
 
@@ -52,21 +53,23 @@ module.exports = {
         );
 
         const embed = createEnterpriseEmbed()
-          .setTitle('📈 Growth Forecast')
+          .setTitle('?? Growth Forecast')
           .setImage(chartUrl)
           .setThumbnail(interaction.guild.iconURL())
           .addFields(
-            { name: '👥 Current Members', value: memberCount.toString(), inline: true },
-            { name: '📈 Avg Daily Growth', value: dailyGrowth, inline: true },
-            { name: '📅 Projected Monthly', value: projectedMonthly.toString(), inline: true },
-            { name: '🔮 30-Day Projection', value: forecasts[0].projected.toString(), inline: true },
-            { name: '🔮 60-Day Projection', value: forecasts[1].projected.toString(), inline: true },
-            { name: '🔮 90-Day Projection', value: forecasts[2].projected.toString(), inline: true },
-            { name: '⚡ Activity (30d)', value: acts.length.toString(), inline: true }
+            { name: '?? Current Members', value: memberCount.toString(), inline: true },
+            { name: '?? Avg Daily Growth', value: dailyGrowth, inline: true },
+            { name: '?? Projected Monthly', value: projectedMonthly.toString(), inline: true },
+            { name: '?? 30-Day Projection', value: forecasts[0].projected.toString(), inline: true },
+            { name: '?? 60-Day Projection', value: forecasts[1].projected.toString(), inline: true },
+            { name: '?? 90-Day Projection', value: forecasts[2].projected.toString(), inline: true },
+            { name: '? Activity (30d)', value: acts.length.toString(), inline: true }
           )
 
           ;
 
-        await interaction.editReply({ embeds: [embed] });
+        await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_zen_growth_forecast').setLabel('� Refresh Hyper-Apex Metrics').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
       }
     };
+

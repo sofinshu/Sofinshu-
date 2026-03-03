@@ -1,4 +1,5 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { createZenithEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { createEnterpriseEmbed } = require('../../utils/embeds');
 const { User } = require('../../database/mongo');
 
@@ -17,25 +18,27 @@ module.exports = {
       User.find({ 'staff.points': { $gt: 0 } }).sort({ 'staff.points': -1 }).limit(3).lean()
     ]);
 
-    const medals = ['🥇', '🥈', '🥉'];
-    const topList = topStaff.map((u, i) => `${medals[i]} **${u.username || '?'}** — ${u.staff?.points || 0} pts`).join('\n') || 'No data.';
+    const medals = ['??', '??', '??'];
+    const topList = topStaff.map((u, i) => `${medals[i]} **${u.username || '?'}** � ${u.staff?.points || 0} pts`).join('\n') || 'No data.';
     const activeCount = [...new Set(weekActs.map(a => a.userId))].length;
     const promotions = weekActs.filter(a => a.type === 'promotion').length;
 
     const embed = createEnterpriseEmbed()
-      .setTitle(`✨ Team Highlights — Week of ${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`)
+      .setTitle(`? Team Highlights � Week of ${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`)
       
       .addFields(
-        { name: '👥 Active Staff (7d)', value: activeCount.toString(), inline: true },
-        { name: '⬆️ Promotions (7d)', value: promotions.toString(), inline: true },
-        { name: '⚡ Total Events (7d)', value: weekActs.length.toString(), inline: true },
-        { name: '🏆 Top Performers This Week', value: topList }
+        { name: '?? Active Staff (7d)', value: activeCount.toString(), inline: true },
+        { name: '?? Promotions (7d)', value: promotions.toString(), inline: true },
+        { name: '? Total Events (7d)', value: weekActs.length.toString(), inline: true },
+        { name: '?? Top Performers This Week', value: topList }
       )
       
       ;
-    await interaction.editReply({ embeds: [embed] });
+    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_zen_team_highlights').setLabel('� Refresh Hyper-Apex Metrics').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
 
 
 

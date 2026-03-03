@@ -1,4 +1,5 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { createZenithEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { createEnterpriseEmbed } = require('../../utils/embeds');
 const { Activity } = require('../../database/mongo');
 
@@ -30,19 +31,21 @@ module.exports = {
     );
 
     const embed = createEnterpriseEmbed()
-      .setTitle('🔮 Prediction Summary')
+      .setTitle('?? Prediction Summary')
       
       .addFields(
-        { name: '📊 This Week Total', value: thisWeek.length.toString(), inline: true },
-        { name: '📅 Last Week Total', value: lastWeek.length.toString(), inline: true },
-        { name: '🔮 Next Week Predicted', value: `~${totalPred.val} (${totalPred.change > 0 ? '+' : ''}${totalPred.change}%)`, inline: true },
-        { name: '⚡ Commands Predicted', value: `~${cmdPred.val} next week`, inline: true }
+        { name: '?? This Week Total', value: thisWeek.length.toString(), inline: true },
+        { name: '?? Last Week Total', value: lastWeek.length.toString(), inline: true },
+        { name: '?? Next Week Predicted', value: `~${totalPred.val} (${totalPred.change > 0 ? '+' : ''}${totalPred.change}%)`, inline: true },
+        { name: '? Commands Predicted', value: `~${cmdPred.val} next week`, inline: true }
       )
       
       ;
-    await interaction.editReply({ embeds: [embed] });
+    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_zen_prediction_summary').setLabel('� Refresh Hyper-Apex Metrics').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
 
 
 

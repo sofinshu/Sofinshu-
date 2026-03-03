@@ -1,4 +1,5 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { createZenithEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { createEnterpriseEmbed } = require('../../utils/embeds');
 const { User } = require('../../database/mongo');
 
@@ -17,20 +18,22 @@ module.exports = {
     const pts = user?.staff?.points || 0;
     const rank = user?.staff?.rank || 'member';
     const embed = createEnterpriseEmbed()
-      .setTitle('🌟 Staff Recognition')
+      .setTitle('?? Staff Recognition')
       
       .setThumbnail(target.displayAvatarURL())
-      .setDescription(`🎊 **${target.username}** is being recognized by <@${interaction.user.id}>!`)
+      .setDescription(`?? **${target.username}** is being recognized by <@${interaction.user.id}>!`)
       .addFields(
-        { name: '🎖️ Rank', value: rank.toUpperCase(), inline: true },
-        { name: '⭐ Points', value: pts.toString(), inline: true },
-        { name: '💬 Recognition Reason', value: reason }
+        { name: '??? Rank', value: rank.toUpperCase(), inline: true },
+        { name: '? Points', value: pts.toString(), inline: true },
+        { name: '?? Recognition Reason', value: reason }
       )
       
       ;
-    await interaction.editReply({ embeds: [embed] });
+    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_zen_staff_recognition').setLabel('� Refresh Hyper-Apex Metrics').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
 
 
 

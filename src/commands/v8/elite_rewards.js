@@ -1,4 +1,5 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { createZenithEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { createEnterpriseEmbed } = require('../../utils/embeds');
 const { User } = require('../../database/mongo');
 
@@ -15,32 +16,34 @@ module.exports = {
     const rank = user?.staff?.rank || 'member';
 
     const rewards = [
-      { threshold: 500, name: '🥇 Gold Status', perks: 'Gold role + priority support', icon: '🥇' },
-      { threshold: 1000, name: '💎 Diamond Status', perks: 'Diamond role + custom title', icon: '💎' },
-      { threshold: 2000, name: '👑 Legend Status', perks: 'Legend role + server recognition', icon: '👑' },
+      { threshold: 500, name: '?? Gold Status', perks: 'Gold role + priority support', icon: '??' },
+      { threshold: 1000, name: '?? Diamond Status', perks: 'Diamond role + custom title', icon: '??' },
+      { threshold: 2000, name: '?? Legend Status', perks: 'Legend role + server recognition', icon: '??' },
     ];
 
     const fields = rewards.map(r => ({
-      name: `${points >= r.threshold ? '✅' : '🔒'} ${r.name} (${r.threshold} pts)`,
-      value: `Perks: ${r.perks}${points >= r.threshold ? '\n✨ **UNLOCKED!**' : `\nNeed: **${Math.max(0, r.threshold - points)}** more points`}`,
+      name: `${points >= r.threshold ? '?' : '??'} ${r.name} (${r.threshold} pts)`,
+      value: `Perks: ${r.perks}${points >= r.threshold ? '\n? **UNLOCKED!**' : `\nNeed: **${Math.max(0, r.threshold - points)}** more points`}`,
       inline: false
     }));
 
     const embed = createEnterpriseEmbed()
-      .setTitle('👑 Elite Rewards Program')
+      .setTitle('?? Elite Rewards Program')
       
       .setThumbnail(target.displayAvatarURL())
       .addFields(
-        { name: '⭐ Your Points', value: points.toString(), inline: true },
-        { name: '🎖️ Your Rank', value: rank.toUpperCase(), inline: true },
+        { name: '? Your Points', value: points.toString(), inline: true },
+        { name: '??? Your Rank', value: rank.toUpperCase(), inline: true },
         ...fields
       )
       
       ;
 
-    await interaction.editReply({ embeds: [embed] });
+    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_zen_elite_rewards').setLabel('� Refresh Hyper-Apex Metrics').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
 
 
 

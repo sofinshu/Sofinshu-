@@ -1,4 +1,5 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { createZenithEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { createEnterpriseEmbed } = require('../../utils/embeds');
 const { User } = require('../../database/mongo');
 
@@ -10,18 +11,20 @@ module.exports = {
   async execute(interaction, client) {
     await interaction.deferReply();
     const users = await User.find({ 'staff.points': { $gt: 0 } }).sort({ 'staff.points': -1 }).limit(5).lean();
-    if (!users.length) return interaction.editReply('📊 No staff data yet.');
-    const medals = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣'];
-    const list = users.map((u, i) => `${medals[i]} **${u.username || '?'}** — ${u.staff?.points || 0} pts`).join('\n');
+    if (!users.length) return interaction.editReply('?? No staff data yet.');
+    const medals = ['??', '??', '??', '4??', '5??'];
+    const list = users.map((u, i) => `${medals[i]} **${u.username || '?'}** � ${u.staff?.points || 0} pts`).join('\n');
     const embed = createEnterpriseEmbed()
-      .setTitle('🏆 Leaderboard Summary')
+      .setTitle('?? Leaderboard Summary')
       
       .setDescription(list)
       
       ;
-    await interaction.editReply({ embeds: [embed] });
+    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_zen_leaderboard_summary').setLabel('� Refresh Hyper-Apex Metrics').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
 
 
 

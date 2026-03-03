@@ -1,4 +1,5 @@
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { createZenithEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { validatePremiumLicense } = require('../../utils/premium_guard');
 const { Guild } = require('../../database/mongo');
@@ -53,11 +54,14 @@ module.exports = {
                 color: 'premium'
             });
 
-            await interaction.editReply({ embeds: [embed] });
+            await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_zen_set_branding').setLabel('ðŸ„ Refresh Hyper-Apex Metrics').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
 
         } catch (error) {
             console.error('Zenith Set Branding Error:', error);
-            await interaction.editReply({ embeds: [createErrorEmbed('Visual Calibration failure: Unable to synchronize sector branding.')] });
+            await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_zen_set_branding').setLabel('ðŸ„ Refresh Hyper-Apex Metrics').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [createErrorEmbed('Visual Calibration failure: Unable to synchronize sector branding.')], components: [row] });
         }
     }
 };
+

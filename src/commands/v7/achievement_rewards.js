@@ -1,14 +1,14 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { createEnterpriseEmbed } = require('../../utils/embeds');
 const { User } = require('../../database/mongo');
 
 const AVAILABLE_ACHIEVEMENTS = [
-  { name: '🔥 First Shift', desc: 'Complete your first shift', req: 'Complete 1 shift' },
-  { name: '⭐ Point Collector', desc: 'Earn 100 points', req: '100 points' },
-  { name: '💎 Elite Member', desc: 'Earn 500 points', req: '500 points' },
-  { name: '🎯 Consistent', desc: 'Maintain 95%+ consistency for 30 days', req: '95% consistency' },
-  { name: '🏆 Top Performer', desc: 'Reach #1 on the leaderboard', req: 'Rank #1' },
-  { name: '⚡ Power User', desc: 'Use 500 commands', req: '500 commands' }
+  { name: '?? First Shift', desc: 'Complete your first shift', req: 'Complete 1 shift' },
+  { name: '? Point Collector', desc: 'Earn 100 points', req: '100 points' },
+  { name: '?? Elite Member', desc: 'Earn 500 points', req: '500 points' },
+  { name: '?? Consistent', desc: 'Maintain 95%+ consistency for 30 days', req: '95% consistency' },
+  { name: '?? Top Performer', desc: 'Reach #1 on the leaderboard', req: 'Rank #1' },
+  { name: '? Power User', desc: 'Use 500 commands', req: '500 commands' }
 ];
 
 module.exports = {
@@ -26,27 +26,29 @@ module.exports = {
     const consistency = user?.staff?.consistency || 100;
 
     const fields = AVAILABLE_ACHIEVEMENTS.map(a => ({
-      name: earned.includes(a.name) ? `✅ ${a.name}` : `🔒 ${a.name}`,
+      name: earned.includes(a.name) ? `? ${a.name}` : `?? ${a.name}`,
       value: `${a.desc}\n*Requirement: ${a.req}*`,
       inline: true
     }));
 
     const embed = createEnterpriseEmbed()
-      .setTitle(`🏅 Achievement Rewards — ${target.username}`)
+      .setTitle(`?? Achievement Rewards � ${target.username}`)
       
       .setThumbnail(target.displayAvatarURL())
       .addFields(
-        { name: '🎖️ Earned', value: `${earned.length}/${AVAILABLE_ACHIEVEMENTS.length}`, inline: true },
-        { name: '⭐ Points', value: points.toString(), inline: true },
-        { name: '📊 Consistency', value: `${consistency}%`, inline: true },
+        { name: '??? Earned', value: `${earned.length}/${AVAILABLE_ACHIEVEMENTS.length}`, inline: true },
+        { name: '? Points', value: points.toString(), inline: true },
+        { name: '?? Consistency', value: `${consistency}%`, inline: true },
         ...fields
       )
       
       ;
 
-    await interaction.editReply({ embeds: [embed] });
+    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_achievement_rewards').setLabel('� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
 
 
 

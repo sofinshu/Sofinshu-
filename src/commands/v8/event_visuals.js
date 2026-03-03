@@ -1,4 +1,5 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { createZenithEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { createEnterpriseEmbed } = require('../../utils/embeds');
 const { Activity } = require('../../database/mongo');
 
@@ -16,30 +17,32 @@ module.exports = {
 
     const promotions = events.filter(e => e.type === 'promotion');
     const warnings = events.filter(e => e.type === 'warning');
-    const typeEmojis = { promotion: '⬆️', warning: '⚠️' };
+    const typeEmojis = { promotion: '??', warning: '??' };
 
     const timeline = events.length
       ? events.map(e => {
         const ts = Math.floor(new Date(e.createdAt).getTime() / 1000);
-        return `${typeEmojis[e.type]} <@${e.userId}> — <t:${ts}:R>`;
+        return `${typeEmojis[e.type]} <@${e.userId}> � <t:${ts}:R>`;
       }).join('\n')
-      : '📭 No events this week.';
+      : '?? No events this week.';
 
     const embed = createEnterpriseEmbed()
-      .setTitle('🎭 Event Visuals — Last 7 Days')
+      .setTitle('?? Event Visuals � Last 7 Days')
       
       .addFields(
-        { name: '⬆️ Promotions', value: promotions.length.toString(), inline: true },
-        { name: '⚠️ Warnings', value: warnings.length.toString(), inline: true },
-        { name: '📋 Total Events', value: events.length.toString(), inline: true },
-        { name: '📅 Event Timeline', value: timeline }
+        { name: '?? Promotions', value: promotions.length.toString(), inline: true },
+        { name: '?? Warnings', value: warnings.length.toString(), inline: true },
+        { name: '?? Total Events', value: events.length.toString(), inline: true },
+        { name: '?? Event Timeline', value: timeline }
       )
       
       ;
 
-    await interaction.editReply({ embeds: [embed] });
+    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_zen_event_visuals').setLabel('� Refresh Hyper-Apex Metrics').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
 
 
 

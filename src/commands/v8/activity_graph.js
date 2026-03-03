@@ -1,4 +1,5 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { createZenithEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { createEnterpriseEmbed } = require('../../utils/embeds');
 const { Activity } = require('../../database/mongo');
 
@@ -19,26 +20,28 @@ module.exports = {
     const max = Math.max(...entries.map(e => e[1]), 1);
 
     const graph = entries.map(([date, count]) => {
-      const bar = '█'.repeat(Math.round((count / max) * 12)).padEnd(12, '░');
+      const bar = '�'.repeat(Math.round((count / max) * 12)).padEnd(12, '�');
       const d = new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
       return `${d}: ${bar} ${count}`;
     }).join('\n') || 'No activity data.';
 
     const embed = createEnterpriseEmbed()
-      .setTitle('📊 14-Day Activity Graph')
+      .setTitle('?? 14-Day Activity Graph')
       
       .setDescription(`\`\`\`${graph}\`\`\``)
       .addFields(
-        { name: '📊 Total Events', value: acts.length.toString(), inline: true },
-        { name: '🔝 Peak Day', value: entries.find(e => e[1] === Math.max(...entries.map(e => e[1])))?.[0] || 'N/A', inline: true },
-        { name: '📅 Daily Avg', value: entries.length > 0 ? (acts.length / entries.length).toFixed(1) : '0', inline: true }
+        { name: '?? Total Events', value: acts.length.toString(), inline: true },
+        { name: '?? Peak Day', value: entries.find(e => e[1] === Math.max(...entries.map(e => e[1])))?.[0] || 'N/A', inline: true },
+        { name: '?? Daily Avg', value: entries.length > 0 ? (acts.length / entries.length).toFixed(1) : '0', inline: true }
       )
       
       ;
 
-    await interaction.editReply({ embeds: [embed] });
+    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_zen_activity_graph').setLabel('� Refresh Hyper-Apex Metrics').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
 
 
 

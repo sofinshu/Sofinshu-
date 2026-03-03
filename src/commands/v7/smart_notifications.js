@@ -1,4 +1,4 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { createEnterpriseEmbed } = require('../../utils/embeds');
 const { Guild } = require('../../database/mongo');
 
@@ -14,14 +14,14 @@ module.exports = {
     const modules = guild?.settings?.modules || {};
 
     const notifConfig = [
-      { name: '📉 Activity Drop Alert', active: !!modules.analytics, desc: 'Fires when weekly activity drops >20%' },
-      { name: '⬆️ Promotion Ready', active: !!modules.automation, desc: 'Fires when staff hits rank threshold' },
-      { name: '⏰ Stuck Shift Alert', active: !!modules.moderation, desc: 'Fires when a shift is open 8+ hours' },
-      { name: '⚠️ Warning Spike', active: !!modules.moderation, desc: 'Fires when warnings spike vs last week' },
+      { name: '?? Activity Drop Alert', active: !!modules.analytics, desc: 'Fires when weekly activity drops >20%' },
+      { name: '?? Promotion Ready', active: !!modules.automation, desc: 'Fires when staff hits rank threshold' },
+      { name: '? Stuck Shift Alert', active: !!modules.moderation, desc: 'Fires when a shift is open 8+ hours' },
+      { name: '?? Warning Spike', active: !!modules.moderation, desc: 'Fires when warnings spike vs last week' },
     ];
 
     const fields = notifConfig.map(n => ({
-      name: `${n.active ? '✅' : '❌'} ${n.name}`,
+      name: `${n.active ? '?' : '?'} ${n.name}`,
       value: n.desc,
       inline: true
     }));
@@ -29,19 +29,21 @@ module.exports = {
     const logChannel = guild?.settings?.logChannel ? `<#${guild.settings.logChannel}>` : 'Not Set';
 
     const embed = createEnterpriseEmbed()
-      .setTitle('🔔 Smart Notification Config')
+      .setTitle('?? Smart Notification Config')
       
       .addFields(
-        { name: '📣 Log Channel', value: logChannel, inline: true },
-        { name: '✅ Active Notifications', value: notifConfig.filter(n => n.active).length.toString(), inline: true },
+        { name: '?? Log Channel', value: logChannel, inline: true },
+        { name: '? Active Notifications', value: notifConfig.filter(n => n.active).length.toString(), inline: true },
         ...fields
       )
       
       ;
 
-    await interaction.editReply({ embeds: [embed] });
+    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_smart_notifications').setLabel('� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
 
 
 

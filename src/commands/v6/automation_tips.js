@@ -1,4 +1,4 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { createEnterpriseEmbed } = require('../../utils/embeds');
 const { Guild } = require('../../database/mongo');
 
@@ -18,32 +18,32 @@ module.exports = {
     const tips = [
       {
         enabled: !!modules.moderation,
-        name: '🛡️ Moderation Module',
+        name: '??? Moderation Module',
         enabled_tip: 'Great! Use `/auto_warn` thresholds to auto-escalate repeat offenders.',
         disabled_tip: 'Enable moderation to get automatic warning escalation and anti-spam.'
       },
       {
         enabled: !!modules.analytics,
-        name: '📊 Analytics Module',
+        name: '?? Analytics Module',
         enabled_tip: 'Analytics active! Run `/analytics_trend` weekly to spot performance changes.',
         disabled_tip: 'Enable analytics to track member engagement and staff performance over time.'
       },
       {
         enabled: !!modules.automation,
-        name: '⚙️ Automation Module',
+        name: '?? Automation Module',
         enabled_tip: 'Automation on! Set up point thresholds for automatic rank promotions.',
         disabled_tip: 'Enable automation to handle promotions, reminders, and rewards automatically.'
       },
       {
         enabled: !!modules.tickets,
-        name: '🎫 Ticket System',
+        name: '?? Ticket System',
         enabled_tip: 'Ticket system active! Assign staff to tickets with `/task_assign` for faster resolution.',
         disabled_tip: 'Enable tickets to organize support requests and reduce noise in general channels.'
       }
     ];
 
     const fields = tips.map(t => ({
-      name: `${t.enabled ? '✅' : '❌'} ${t.name}`,
+      name: `${t.enabled ? '?' : '?'} ${t.name}`,
       value: t.enabled ? t.enabled_tip : t.disabled_tip,
       inline: false
     }));
@@ -51,20 +51,22 @@ module.exports = {
     const configured = tips.filter(t => t.enabled).length;
 
     const embed = createEnterpriseEmbed()
-      .setTitle('💡 Automation Tips')
+      .setTitle('?? Automation Tips')
       
       .setDescription(`Your server has **${configured}/4** automation modules enabled.`)
       .addFields(fields)
       .addFields({
-        name: '🔧 Quick Actions',
-        value: '• Use `/automation_settings` to toggle modules\n• Use `/automation_suggestions` for personalized advice\n• Use `/server_health` to check overall status'
+        name: '?? Quick Actions',
+        value: '� Use `/automation_settings` to toggle modules\n� Use `/automation_suggestions` for personalized advice\n� Use `/server_health` to check overall status'
       })
       
       ;
 
-    await interaction.editReply({ embeds: [embed] });
+    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_automation_tips').setLabel('� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
 
 
 

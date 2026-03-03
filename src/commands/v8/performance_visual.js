@@ -1,4 +1,5 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { createZenithEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { createEnterpriseEmbed } = require('../../utils/embeds');
 const { User } = require('../../database/mongo');
 
@@ -21,24 +22,26 @@ module.exports = {
     const grade = score >= 90 ? 'A+' : score >= 80 ? 'A' : score >= 70 ? 'B' : score >= 60 ? 'C' : score >= 50 ? 'D' : 'F';
     const color = score >= 80 ? 0x2ecc71 : score >= 60 ? 0xf39c12 : 0xe74c3c;
 
-    const bar = (v, max, len = 10) => '▓'.repeat(Math.round(Math.min(v, max) / max * len)) + '░'.repeat(len - Math.round(Math.min(v, max) / max * len));
+    const bar = (v, max, len = 10) => '�'.repeat(Math.round(Math.min(v, max) / max * len)) + '�'.repeat(len - Math.round(Math.min(v, max) / max * len));
 
     const embed = createEnterpriseEmbed()
-      .setTitle(`📊 Performance Visual — ${target.username}`)
+      .setTitle(`?? Performance Visual � ${target.username}`)
       
       .setThumbnail(target.displayAvatarURL())
       .addFields(
-        { name: '📊 Score', value: `**${score}/100** (${grade})`, inline: true },
-        { name: '🎖️ Rank', value: rank.toUpperCase(), inline: true },
-        { name: '⭐ Points', value: `\`${bar(pts, 500)}\` ${pts}` },
-        { name: '📈 Consistency', value: `\`${bar(consistency, 100)}\` ${consistency}%` },
-        { name: '🌟 Reputation', value: `\`${bar(reputation, 100)}\` ${reputation}` }
+        { name: '?? Score', value: `**${score}/100** (${grade})`, inline: true },
+        { name: '??? Rank', value: rank.toUpperCase(), inline: true },
+        { name: '? Points', value: `\`${bar(pts, 500)}\` ${pts}` },
+        { name: '?? Consistency', value: `\`${bar(consistency, 100)}\` ${consistency}%` },
+        { name: '?? Reputation', value: `\`${bar(reputation, 100)}\` ${reputation}` }
       )
       
       ;
-    await interaction.editReply({ embeds: [embed] });
+    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_zen_performance_visual').setLabel('� Refresh Hyper-Apex Metrics').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
 
 
 

@@ -1,4 +1,4 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { createEnterpriseEmbed } = require('../../utils/embeds');
 const { Activity } = require('../../database/mongo');
 
@@ -15,7 +15,7 @@ module.exports = {
     const todayActivity = await Activity.find({ guildId, createdAt: { $gte: todayStart } }).lean();
 
     if (!todayActivity.length) {
-      return interaction.editReply('📊 No activity recorded today yet. Be the first to earn points!');
+      return interaction.editReply('?? No activity recorded today yet. Be the first to earn points!');
     }
 
     const userCounts = {};
@@ -25,27 +25,29 @@ module.exports = {
 
     const sorted = Object.entries(userCounts).sort((a, b) => b[1] - a[1]).slice(0, 5);
     const topUser = sorted[0];
-    const medals = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣'];
+    const medals = ['??', '??', '??', '4??', '5??'];
 
     const leaderboard = sorted.map(([uid, count], i) =>
-      `${medals[i]} <@${uid}> — **${count}** actions today`
+      `${medals[i]} <@${uid}> � **${count}** actions today`
     ).join('\n');
 
     const embed = createEnterpriseEmbed()
-      .setTitle(`🌟 Daily Activity Standings — ${new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}`)
+      .setTitle(`?? Daily Activity Standings � ${new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}`)
       
       .addFields(
-        { name: '🌟 Today\'s Top Earner', value: `<@${topUser[0]}> with **${topUser[1]}** actions`, inline: false },
-        { name: '📊 Total Actions Today', value: todayActivity.length.toString(), inline: true },
-        { name: '👥 Active Users', value: sorted.length.toString(), inline: true },
-        { name: '🏆 Daily Standings', value: leaderboard }
+        { name: '?? Today\'s Top Earner', value: `<@${topUser[0]}> with **${topUser[1]}** actions`, inline: false },
+        { name: '?? Total Actions Today', value: todayActivity.length.toString(), inline: true },
+        { name: '?? Active Users', value: sorted.length.toString(), inline: true },
+        { name: '?? Daily Standings', value: leaderboard }
       )
       
       ;
 
-    await interaction.editReply({ embeds: [embed] });
+    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_daily_bonus').setLabel('� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
 
 
 

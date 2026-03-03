@@ -1,4 +1,5 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { createZenithEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { createEnterpriseEmbed } = require('../../utils/embeds');
 const { User, Shift, Activity } = require('../../database/mongo');
 
@@ -25,27 +26,29 @@ module.exports = {
     const consistency = user?.staff?.consistency || 100;
     const completedShifts = shifts.filter(s => s.endTime).length;
     const totalShiftHrs = shifts.filter(s => s.endTime).reduce((sum, s) => sum + (s.duration || (new Date(s.endTime) - new Date(s.startTime)) / 3600000), 0);
-    const consBar = '▓'.repeat(Math.round(consistency / 10)) + '░'.repeat(10 - Math.round(consistency / 10));
+    const consBar = '�'.repeat(Math.round(consistency / 10)) + '�'.repeat(10 - Math.round(consistency / 10));
 
     const embed = createEnterpriseEmbed()
-      .setTitle(`📱 Interactive Summary — ${target.username}`)
+      .setTitle(`?? Interactive Summary � ${target.username}`)
       
       .setThumbnail(target.displayAvatarURL())
       .addFields(
-        { name: '🎖️ Rank', value: rank.toUpperCase(), inline: true },
-        { name: '⭐ Points', value: pts.toString(), inline: true },
-        { name: '🏅 Achievements', value: (user?.staff?.achievements?.length || 0).toString(), inline: true },
-        { name: '📊 Consistency', value: `\`${consBar}\` ${consistency}%` },
-        { name: '🔄 Shifts (30d)', value: completedShifts.toString(), inline: true },
-        { name: '⏱️ Shift Hours (30d)', value: totalShiftHrs.toFixed(1), inline: true },
-        { name: '⚡ Actions (30d)', value: recentActs.toString(), inline: true }
+        { name: '??? Rank', value: rank.toUpperCase(), inline: true },
+        { name: '? Points', value: pts.toString(), inline: true },
+        { name: '?? Achievements', value: (user?.staff?.achievements?.length || 0).toString(), inline: true },
+        { name: '?? Consistency', value: `\`${consBar}\` ${consistency}%` },
+        { name: '?? Shifts (30d)', value: completedShifts.toString(), inline: true },
+        { name: '?? Shift Hours (30d)', value: totalShiftHrs.toFixed(1), inline: true },
+        { name: '? Actions (30d)', value: recentActs.toString(), inline: true }
       )
       
       ;
 
-    await interaction.editReply({ embeds: [embed] });
+    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_zen_interactive_summary').setLabel('� Refresh Hyper-Apex Metrics').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
 
 
 

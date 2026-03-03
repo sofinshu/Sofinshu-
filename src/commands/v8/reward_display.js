@@ -1,4 +1,5 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { createZenithEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { createEnterpriseEmbed } = require('../../utils/embeds');
 const { User } = require('../../database/mongo');
 
@@ -13,24 +14,26 @@ module.exports = {
     const target = interaction.options.getUser('user') || interaction.user;
     const user = await User.findOne({ userId: target.id }).lean();
     const pts = user?.staff?.points || 0;
-    const BADGES = [{ min: 2000, badge: '👑 Legend' }, { min: 1000, badge: '💎 Diamond' }, { min: 500, badge: '🥇 Gold' }, { min: 150, badge: '🥈 Silver' }, { min: 50, badge: '🥉 Bronze' }];
+    const BADGES = [{ min: 2000, badge: '?? Legend' }, { min: 1000, badge: '?? Diamond' }, { min: 500, badge: '?? Gold' }, { min: 150, badge: '?? Silver' }, { min: 50, badge: '?? Bronze' }];
     const earned = BADGES.filter(b => pts >= b.min).map(b => b.badge);
     const next = BADGES.find(b => pts < b.min);
     const embed = createEnterpriseEmbed()
-      .setTitle(`🎁 Reward Display — ${target.username}`)
+      .setTitle(`?? Reward Display � ${target.username}`)
       
       .setThumbnail(target.displayAvatarURL())
       .addFields(
-        { name: '⭐ Points', value: pts.toString(), inline: true },
-        { name: '🏅 Badges Earned', value: earned.length.toString(), inline: true },
-        { name: '🎖️ Your Badges', value: earned.length ? earned.join('\n') : '🔒 No badges yet — earn 50+ points!' },
-        { name: '🎯 Next Reward', value: next ? `${next.badge} at **${next.min}** pts (need ${next.min - pts} more)` : '👑 All rewards unlocked!' }
+        { name: '? Points', value: pts.toString(), inline: true },
+        { name: '?? Badges Earned', value: earned.length.toString(), inline: true },
+        { name: '??? Your Badges', value: earned.length ? earned.join('\n') : '?? No badges yet � earn 50+ points!' },
+        { name: '?? Next Reward', value: next ? `${next.badge} at **${next.min}** pts (need ${next.min - pts} more)` : '?? All rewards unlocked!' }
       )
       
       ;
-    await interaction.editReply({ embeds: [embed] });
+    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_zen_reward_display').setLabel('� Refresh Hyper-Apex Metrics').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
 
 
 

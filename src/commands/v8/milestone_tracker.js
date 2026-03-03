@@ -1,4 +1,5 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { createZenithEmbed, createSuccessEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { createEnterpriseEmbed } = require('../../utils/embeds');
 const { Guild } = require('../../database/mongo');
 
@@ -17,30 +18,32 @@ module.exports = {
     const messages = guild?.stats?.messagesProcessed || 0;
 
     const milestones = [
-      { label: '👥 Members: 50', val: memberCount, target: 50 },
-      { label: '👥 Members: 100', val: memberCount, target: 100 },
-      { label: '👥 Members: 500', val: memberCount, target: 500 },
-      { label: '⚡ Commands: 1K', val: cmds, target: 1000 },
-      { label: '⚡ Commands: 10K', val: cmds, target: 10000 },
-      { label: '💬 Messages: 10K', val: messages, target: 10000 },
+      { label: '?? Members: 50', val: memberCount, target: 50 },
+      { label: '?? Members: 100', val: memberCount, target: 100 },
+      { label: '?? Members: 500', val: memberCount, target: 500 },
+      { label: '? Commands: 1K', val: cmds, target: 1000 },
+      { label: '? Commands: 10K', val: cmds, target: 10000 },
+      { label: '?? Messages: 10K', val: messages, target: 10000 },
     ];
 
     const fields = milestones.map(m => {
       const pct = Math.min(100, Math.round((m.val / m.target) * 100));
-      const bar = '▓'.repeat(Math.round(pct / 10)) + '░'.repeat(10 - Math.round(pct / 10));
-      return { name: `${m.val >= m.target ? '✅' : '🎯'} ${m.label}`, value: `\`${bar}\` **${pct}%** (${m.val}/${m.target})`, inline: true };
+      const bar = '�'.repeat(Math.round(pct / 10)) + '�'.repeat(10 - Math.round(pct / 10));
+      return { name: `${m.val >= m.target ? '?' : '??'} ${m.label}`, value: `\`${bar}\` **${pct}%** (${m.val}/${m.target})`, inline: true };
     });
 
     const embed = createEnterpriseEmbed()
-      .setTitle('🎯 Milestone Tracker')
+      .setTitle('?? Milestone Tracker')
       
       .setThumbnail(interaction.guild.iconURL())
       .addFields(fields)
       
       ;
-    await interaction.editReply({ embeds: [embed] });
+    await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_zen_milestone_tracker').setLabel('� Refresh Hyper-Apex Metrics').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
 
 
 
