@@ -1,4 +1,4 @@
-ï»¿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
 
 module.exports = {
@@ -14,7 +14,8 @@ module.exports = {
       const staffSystem = client.systems.staff;
 
       if (!staffSystem) {
-        return interaction.editReply({ embeds: [createErrorEmbed('Staff system is currently offline.')] });
+        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_staff_score').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [createErrorEmbed('Staff system is currently offline.')], components: [row] });
       }
 
       // StaffSystem utility safely enforces guildId scoping out-of-the-box
@@ -27,31 +28,34 @@ module.exports = {
       const qualityScore = Math.max(0, 100 - (warnings.total * 5));
 
       const filledScore = Math.min(10, Math.floor(score / 10));
-      const progressBar = `\`${'â–ˆ'.repeat(filledScore)}${'â–‘'.repeat(10 - filledScore)}\``;
+      const progressBar = `\`${'¦'.repeat(filledScore)}${'¦'.repeat(10 - filledScore)}\``;
 
       const embed = await createCustomEmbed(interaction, {
-        title: `ðŸŽ¯ Staff Quality Algorithm: ${targetUser.username}`,
+        title: `?? Staff Quality Algorithm: ${targetUser.username}`,
         thumbnail: targetUser.displayAvatarURL(),
         description: `The internal grading mechanism evaluates users based on **Activity**, disciplinary **Quality**, and schedule **Consistency**.`,
         fields: [
-          { name: 'ðŸ’¯ Overlap Grade', value: `${progressBar} **${score}%**`, inline: false },
-          { name: 'ðŸ”¥ Activity Score', value: `\`${activityScore}/100\``, inline: true },
-          { name: 'âœ… Quality Score', value: `\`${qualityScore}/100\``, inline: true },
-          { name: 'ðŸ“ˆ Consistency', value: `\`${consistency}%\``, inline: true }
+          { name: '?? Overlap Grade', value: `${progressBar} **${score}%**`, inline: false },
+          { name: '?? Activity Score', value: `\`${activityScore}/100\``, inline: true },
+          { name: '? Quality Score', value: `\`${qualityScore}/100\``, inline: true },
+          { name: '?? Consistency', value: `\`${consistency}%\``, inline: true }
         ],
         footer: `Disciplinary Warnings Impact Quality: [${warnings.total} Strikes recorded]`
       });
 
-      await interaction.editReply({ embeds: [embed] });
+      await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_staff_score').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
 
     } catch (error) {
       console.error('Staff Score Error:', error);
       const errEmbed = createErrorEmbed('An error occurred while running the grading algorithm.');
       if (interaction.deferred || interaction.replied) {
-        await interaction.editReply({ embeds: [errEmbed] });
+        await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_staff_score').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {
         await interaction.reply({ embeds: [errEmbed], ephemeral: true });
       }
     }
   }
 };
+

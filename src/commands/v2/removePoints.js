@@ -1,4 +1,4 @@
-Ôªøconst { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { User } = require('../../database/mongo');
 
@@ -18,14 +18,16 @@ module.exports = {
       const reason = interaction.options.getString('reason') || 'No reason provided';
 
       if (!interaction.member.permissions.has('ModerateMembers') && !interaction.member.permissions.has('ManageGuild')) {
-        return interaction.editReply({ embeds: [createErrorEmbed('You do not have permission to remove points.')] });
+        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_removePoints').setLabel('üÑ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [createErrorEmbed('You do not have permission to remove points.')], components: [row] });
       }
 
       // STRICT SCOPING: Only find user data connected to this specific guild
       let user = await User.findOne({ userId: targetUser.id, guildId: interaction.guildId });
 
       if (!user) {
-        return interaction.editReply({ embeds: [createErrorEmbed(`No staff record found for <@${targetUser.id}> in this server.`)] });
+        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_removePoints').setLabel('üÑ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [createErrorEmbed(`No staff record found for <@${targetUser.id}> in this server.`)], components: [row] });
       }
 
       if (!user.staff) user.staff = { points: 0 };
@@ -33,28 +35,31 @@ module.exports = {
       await user.save();
 
       const embed = await createCustomEmbed(interaction, {
-        title: 'üìâ Administrative Point Deduction',
+        title: '?? Administrative Point Deduction',
         description: `Personnel record updated for **${targetUser.tag}**. Points have been successfully extracted from the local server profile.`,
         thumbnail: targetUser.displayAvatarURL({ dynamic: true }),
         fields: [
-          { name: 'üë§ Targeted Personnel', value: `<@${targetUser.id}>`, inline: true },
-          { name: '‚ûñ Points Extracted', value: `\`-${amount.toLocaleString()}\` **PTS**`, inline: true },
-          { name: 'üìù Protocol/Reason', value: `*${reason}*`, inline: false }
+          { name: '?? Targeted Personnel', value: `<@${targetUser.id}>`, inline: true },
+          { name: '? Points Extracted', value: `\`-${amount.toLocaleString()}\` **PTS**`, inline: true },
+          { name: '?? Protocol/Reason', value: `*${reason}*`, inline: false }
         ],
         footer: `Authorization: ${interaction.user.tag}`,
         color: 'error'
       });
 
-      await interaction.editReply({ embeds: [embed] });
+      await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_removePoints').setLabel('üÑ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
 
     } catch (error) {
       console.error('Remove Points Error:', error);
       const errEmbed = createErrorEmbed('An error occurred while removing user points.');
       if (interaction.deferred || interaction.replied) {
-        await interaction.editReply({ embeds: [errEmbed] });
+        await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_removePoints').setLabel('üÑ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {
         await interaction.reply({ embeds: [errEmbed], ephemeral: true });
       }
     }
   }
 };
+

@@ -1,4 +1,4 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { User } = require('../../database/mongo');
 
@@ -20,33 +20,36 @@ module.exports = {
 
       // Reputation Tiers for "Cool Feature"
       let tier = 'Neutral';
-      if (rep >= 1000) tier = '🌌 Legendary';
-      else if (rep >= 500) tier = '💎 Platinum';
-      else if (rep >= 250) tier = '🥇 Gold';
-      else if (rep >= 100) tier = '🥈 Silver';
-      else if (rep >= 50) tier = '🥉 Bronze';
+      if (rep >= 1000) tier = '?? Legendary';
+      else if (rep >= 500) tier = '?? Platinum';
+      else if (rep >= 250) tier = '?? Gold';
+      else if (rep >= 100) tier = '?? Silver';
+      else if (rep >= 50) tier = '?? Bronze';
 
       const embed = await createCustomEmbed(interaction, {
-        title: `💫 Personnel Reputation: ${targetUser.username}`,
+        title: `?? Personnel Reputation: ${targetUser.username}`,
         thumbnail: targetUser.displayAvatarURL({ dynamic: true }),
         description: `Official reputation standing for <@${targetUser.id}> in the **${interaction.guild.name}** network.`,
         fields: [
-          { name: '⭐ Reputation Points', value: `**${rep.toLocaleString()}**`, inline: true },
-          { name: '🏅 Reputation Tier', value: `\`${tier}\``, inline: true },
-          { name: '🏆 Official Rank', value: `\`${rank.toUpperCase()}\``, inline: true }
+          { name: '? Reputation Points', value: `**${rep.toLocaleString()}**`, inline: true },
+          { name: '?? Reputation Tier', value: `\`${tier}\``, inline: true },
+          { name: '?? Official Rank', value: `\`${rank.toUpperCase()}\``, inline: true }
         ],
         color: rep >= 100 ? 'enterprise' : 'primary'
       });
 
-      await interaction.editReply({ embeds: [embed] });
+      await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_reputation').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
     } catch (error) {
       console.error('Reputation Error:', error);
       const errEmbed = createErrorEmbed('An error occurred while fetching reputation points.');
       if (interaction.deferred || interaction.replied) {
-        await interaction.editReply({ embeds: [errEmbed] });
+        await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_reputation').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {
         await interaction.reply({ embeds: [errEmbed], ephemeral: true });
       }
     }
   }
 };
+

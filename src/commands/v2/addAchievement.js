@@ -1,4 +1,4 @@
-﻿const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
+const { SlashCommandBuilder, PermissionFlagsBits, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { createCustomEmbed, createErrorEmbed, createSuccessEmbed } = require('../../utils/embeds');
 const { User, Activity } = require('../../database/mongo');
 
@@ -54,7 +54,8 @@ module.exports = {
 
       // Check for duplicates
       if (userData.staff.achievements.includes(title)) {
-        return interaction.editReply({ embeds: [createErrorEmbed(`<@${targetUser.id}> already possesses the **${title}** achievement.`)] });
+        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_addAchievement').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [createErrorEmbed(`<@${targetUser.id}> already possesses the **${title}** achievement.`)], components: [row] });
       }
 
       userData.staff.achievements.push(title);
@@ -81,28 +82,31 @@ module.exports = {
       });
 
       const embed = await createCustomEmbed(interaction, {
-        title: `🏆 Strategic Merit Authenticated`,
-        description: `### 🛡️ Professional Achievement Awarded\nThe high-command has officially recognized <@${targetUser.id}> with the **${title}** classification for exemplary service.`,
+        title: `?? Strategic Merit Authenticated`,
+        description: `### ??? Professional Achievement Awarded\nThe high-command has officially recognized <@${targetUser.id}> with the **${title}** classification for exemplary service.`,
         thumbnail: targetUser.displayAvatarURL({ dynamic: true }),
         fields: [
-          { name: '📋 Merit Category', value: `\`${category}\``, inline: true },
-          { name: '🎖️ Registered By', value: `<@${interaction.user.id}>`, inline: true },
-          { name: '🔢 Medal Inventory', value: `\`${userData.staff.achievements.length}\` Distinct Merits`, inline: true }
+          { name: '?? Merit Category', value: `\`${category}\``, inline: true },
+          { name: '??? Registered By', value: `<@${interaction.user.id}>`, inline: true },
+          { name: '?? Medal Inventory', value: `\`${userData.staff.achievements.length}\` Distinct Merits`, inline: true }
         ],
         footer: 'Achievements boost advancement eligibility during autonomous promotion scans.',
         color: 'success'
       });
 
-      await interaction.editReply({ embeds: [embed] });
+      await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_addAchievement').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
 
     } catch (error) {
       console.error('Add Achievement Error:', error);
       const errEmbed = createErrorEmbed('An error occurred while attempting to grant the achievement in the database.');
       if (interaction.deferred || interaction.replied) {
-        await interaction.editReply({ embeds: [errEmbed] });
+        await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_addAchievement').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {
         await interaction.reply({ embeds: [errEmbed], ephemeral: true });
       }
     }
   }
 };
+

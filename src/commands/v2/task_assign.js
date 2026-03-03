@@ -1,4 +1,4 @@
-ï»¿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { Guild } = require('../../database/mongo');
 
@@ -45,37 +45,40 @@ module.exports = {
         await guildData.save();
 
         const embed = await createCustomEmbed(interaction, {
-          title: 'ğŸ“‹ Strategic Objective Assigned',
+          title: '?? Strategic Objective Assigned',
           description: `Successfully registered a new tactical requirement designated as assignment **#${taskId}**.`,
           fields: [
-            { name: 'ğŸ‘¤ Officer', value: `<@${user.id}>`, inline: true },
-            { name: 'ğŸ›¡ï¸ Authorized By', value: `<@${interaction.user.id}>`, inline: true },
-            { name: 'ğŸ¯ Objective', value: `\`${taskText}\``, inline: false }
+            { name: '?? Officer', value: `<@${user.id}>`, inline: true },
+            { name: '??? Authorized By', value: `<@${interaction.user.id}>`, inline: true },
+            { name: '?? Objective', value: `\`${taskText}\``, inline: false }
           ],
           color: 'primary'
         });
 
-        return interaction.editReply({ embeds: [embed] });
+        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_task_assign').setLabel('ğŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
       }
 
       if (subcommand === 'list') {
         const tasks = guildData.tasks.filter(t => t.status === 'pending');
 
         if (tasks.length === 0) {
-          return interaction.editReply({ embeds: [createErrorEmbed('Operational failure: No pending objectives detected within the current sector.')] });
+          return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_task_assign').setLabel('ğŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [createErrorEmbed('Operational failure: No pending objectives detected within the current sector.')], components: [row] });
         }
 
         // Group tasks by mapping user chunks
-        const taskMap = tasks.map(t => `> **#${t.id}** \`${t.task}\` â” <@${t.userId}>`);
+        const taskMap = tasks.map(t => `> **#${t.id}** \`${t.task}\` ? <@${t.userId}>`);
 
         const embed = await createCustomEmbed(interaction, {
-          title: 'ğŸ“‹ Strategic Objective Registry',
-          description: `### ğŸ›¡ï¸ Active Operational Queue\nThe following objectives are currently awaiting fulfillment within the **${interaction.guild.name}** hierarchy:\n\n${taskMap.join('\n')}`,
+          title: '?? Strategic Objective Registry',
+          description: `### ??? Active Operational Queue\nThe following objectives are currently awaiting fulfillment within the **${interaction.guild.name}** hierarchy:\n\n${taskMap.join('\n')}`,
           thumbnail: interaction.guild.iconURL({ dynamic: true }),
           color: 'premium'
         });
 
-        return interaction.editReply({ embeds: [embed] });
+        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_task_assign').setLabel('ğŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
       }
 
       if (subcommand === 'complete') {
@@ -83,11 +86,13 @@ module.exports = {
         const task = guildData.tasks.find(t => t.id === taskId);
 
         if (!task) {
-          return interaction.editReply({ embeds: [createErrorEmbed(`Search failed: No tactical requirement designated **#${taskId}** exists.`)] });
+          return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_task_assign').setLabel('ğŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [createErrorEmbed(`Search failed: No tactical requirement designated **#${taskId}** exists.`)], components: [row] });
         }
 
         if (task.status === 'completed') {
-          return interaction.editReply({ embeds: [createErrorEmbed(`Audit failure: Objective **#${taskId}** is already marked as fulfilled.`)] });
+          return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_task_assign').setLabel('ğŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [createErrorEmbed(`Audit failure: Objective **#${taskId}** is already marked as fulfilled.`)], components: [row] });
         }
 
         task.status = 'completed';
@@ -95,22 +100,25 @@ module.exports = {
         await guildData.save();
 
         const embed = await createCustomEmbed(interaction, {
-          title: 'âœ… Objective Fulfilled',
+          title: '? Objective Fulfilled',
           description: `Strategic registry updated. Objective **#${taskId}** (\`${task.task}\`) for <@${task.userId}> has been successfully cleared.`,
           color: 'success'
         });
 
-        return interaction.editReply({ embeds: [embed] });
+        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_task_assign').setLabel('ğŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
       }
 
     } catch (error) {
       console.error('Task Assign Error:', error);
       const errEmbed = createErrorEmbed('A database error occurred while modifying the assignment logs.');
       if (interaction.deferred || interaction.replied) {
-        await interaction.editReply({ embeds: [errEmbed] });
+        await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_task_assign').setLabel('ğŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {
         await interaction.reply({ embeds: [errEmbed], ephemeral: true });
       }
     }
   }
 };
+

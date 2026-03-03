@@ -1,4 +1,4 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder } = require('discord.js');
 const { createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { User } = require('../../database/mongo');
 
@@ -30,20 +30,20 @@ module.exports = {
       }
 
       const list = await Promise.all(users.map(async (u, i) => {
-        const medals = ['🥇', '🥈', '🥉'];
+        const medals = ['??', '??', '??'];
         const position = medals[i] || `\`#${i + 1}\``;
-        return `${position} **${u.username || 'Unknown'}** — \`${u.staff?.points?.toLocaleString() || 0}\` **PTS**`;
+        return `${position} **${u.username || 'Unknown'}** � \`${u.staff?.points?.toLocaleString() || 0}\` **PTS**`;
       }));
 
       const embed = await createCustomEmbed(interaction, {
-        title: '🏆 Macroscopic Economy Leaderboard',
+        title: '?? Macroscopic Economy Leaderboard',
         thumbnail: interaction.guild.iconURL({ dynamic: true }),
-        description: `### 🛡️ Sector Performance Ranking\nHigh-value personnel within the **${interaction.guild.name}** sector hierarchy.\n\n${list.join('\n')}`,
+        description: `### ??? Sector Performance Ranking\nHigh-value personnel within the **${interaction.guild.name}** sector hierarchy.\n\n${list.join('\n')}`,
         fields: [
-          { name: '👤 Staff Capacity', value: `\`${totalStaff.toLocaleString()}\` Members`, inline: true },
-          { name: '📊 Average Yield', value: `\`${Math.round(avgPoints).toLocaleString()}\` PTS`, inline: true }
+          { name: '?? Staff Capacity', value: `\`${totalStaff.toLocaleString()}\` Members`, inline: true },
+          { name: '?? Average Yield', value: `\`${Math.round(avgPoints).toLocaleString()}\` PTS`, inline: true }
         ],
-        footer: 'Paginated Interface • Use buttons below to navigate personnel registry.',
+        footer: 'Paginated Interface � Use buttons below to navigate personnel registry.',
         color: 'premium'
       });
 
@@ -67,3 +67,4 @@ module.exports = {
     }
   }
 };
+

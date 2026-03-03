@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, PermissionFlagsBits, ChannelType } = require('discord.js');
+const { SlashCommandBuilder, PermissionFlagsBits, ChannelType, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { ApplicationConfig } = require('../../database/mongo');
 
@@ -60,16 +60,19 @@ module.exports = {
                 color: 'success'
             });
 
-            await interaction.editReply({ embeds: [embed] });
+            await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_apply_setup').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
 
         } catch (error) {
             console.error('Apply Setup Error:', error);
             const errEmbed = createErrorEmbed('A database error occurred while trying to configure the application system.');
             if (interaction.deferred || interaction.replied) {
-                await interaction.editReply({ embeds: [errEmbed] });
+                await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_apply_setup').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [errEmbed], components: [row] });
             } else {
                 await interaction.reply({ embeds: [errEmbed], ephemeral: true });
             }
         }
     }
 };
+

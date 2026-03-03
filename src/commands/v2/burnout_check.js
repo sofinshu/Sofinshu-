@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { createCustomEmbed, createErrorEmbed, createProgressBar } = require('../../utils/embeds');
 const { Shift, User } = require('../../database/mongo');
 
@@ -65,7 +65,8 @@ module.exports = {
                     footer: 'uwu-chan â€¢ Burnout Analysis â€¢ Last 7 Days'
                 });
 
-                return interaction.editReply({ embeds: [embed] });
+                return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_burnout_check').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
             }
 
             // Server-wide burnout overview
@@ -106,12 +107,15 @@ module.exports = {
                 footer: 'uwu-chan â€¢ Server Burnout Analysis â€¢ Last 7 Days'
             });
 
-            await interaction.editReply({ embeds: [embed] });
+            await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_burnout_check').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
         } catch (error) {
             console.error('[burnout_check] Error:', error);
             const errEmbed = createErrorEmbed('Failed to run burnout analysis. Please try again.');
-            if (interaction.deferred || interaction.replied) await interaction.editReply({ embeds: [errEmbed] });
+            if (interaction.deferred || interaction.replied) await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_burnout_check').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [errEmbed], components: [row] });
             else await interaction.reply({ embeds: [errEmbed], ephemeral: true });
         }
     }
 };
+

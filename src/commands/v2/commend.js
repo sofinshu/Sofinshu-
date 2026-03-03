@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { User } = require('../../database/mongo');
 
@@ -17,7 +17,8 @@ module.exports = {
             const guildId = interaction.guildId;
 
             if (targetUser.id === interaction.user.id) {
-                return interaction.editReply({ embeds: [createErrorEmbed('Self-commendation protocol is prohibited for data integrity.')] });
+                return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_commend').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [createErrorEmbed('Self-commendation protocol is prohibited for data integrity.')], components: [row] });
             }
 
             const [sender, receiver] = await Promise.all([
@@ -26,7 +27,8 @@ module.exports = {
             ]);
 
             if (!sender || !sender.staff || !receiver || !receiver.staff) {
-                return interaction.editReply({ embeds: [createErrorEmbed('Personnel not found in the staff registry.')] });
+                return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_commend').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [createErrorEmbed('Personnel not found in the staff registry.')], components: [row] });
             }
 
             // Logic: Increase honor points and update honorific title
@@ -52,11 +54,14 @@ module.exports = {
                 color: 'premium'
             });
 
-            await interaction.editReply({ embeds: [embed] });
+            await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_commend').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
 
         } catch (error) {
             console.error('Commend Error:', error);
-            await interaction.editReply({ embeds: [createErrorEmbed('Cultural suite failure: Unable to record peer recognition.')] });
+            await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_commend').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [createErrorEmbed('Cultural suite failure: Unable to record peer recognition.')], components: [row] });
         }
     }
 };
+

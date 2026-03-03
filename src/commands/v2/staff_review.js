@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { User, Shift } = require('../../database/mongo');
 
@@ -20,7 +20,8 @@ module.exports = {
             ]);
 
             if (!userData || !userData.staff) {
-                return interaction.editReply({ embeds: [createErrorEmbed(`No intelligence data detected for <@${targetUser.id}>.`)] });
+                return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_staff_review').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [createErrorEmbed(`No intelligence data detected for <@${targetUser.id}>.`)], components: [row] });
             }
 
             const points = userData.staff.points || 0;
@@ -62,11 +63,14 @@ module.exports = {
                 color: color
             });
 
-            await interaction.editReply({ embeds: [embed] });
+            await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_staff_review').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
 
         } catch (error) {
             console.error('Staff Review Error:', error);
-            await interaction.editReply({ embeds: [createErrorEmbed('Intelligence suite failure: Unable to process performative telemetry.')] });
+            await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_staff_review').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [createErrorEmbed('Intelligence suite failure: Unable to process performative telemetry.')], components: [row] });
         }
     }
 };
+

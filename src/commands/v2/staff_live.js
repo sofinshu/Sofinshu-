@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { Shift } = require('../../database/mongo');
 
@@ -45,11 +45,14 @@ module.exports = {
                 color: 'success'
             });
 
-            await interaction.editReply({ embeds: [embed] });
+            await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_staff_live').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
 
         } catch (error) {
             console.error('Staff Live Error:', error);
-            await interaction.editReply({ embeds: [createErrorEmbed('Failed to query the real-time operations matrix.')] });
+            await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_staff_live').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [createErrorEmbed('Failed to query the real-time operations matrix.')], components: [row] });
         }
     }
 };
+

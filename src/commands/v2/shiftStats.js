@@ -1,4 +1,4 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { Shift } = require('../../database/mongo');
 
@@ -15,7 +15,8 @@ module.exports = {
       const shifts = await Shift.find({ userId: targetUser.id, guildId: interaction.guildId }).lean();
 
       if (shifts.length === 0) {
-        return interaction.editReply({ embeds: [createErrorEmbed(`No shift history records exist for <@${targetUser.id}> inside this server.`)] });
+        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_shiftStats').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [createErrorEmbed(`No shift history records exist for <@${targetUser.id}> inside this server.`)], components: [row] });
       }
 
       const totalShifts = shifts.length;
@@ -29,30 +30,33 @@ module.exports = {
       const activeShifts = shifts.filter(s => s.endTime == null && s.status !== 'ended').length;
 
       const embed = await createCustomEmbed(interaction, {
-        title: `⏱️ Patrol Analytics: ${targetUser.username}`,
-        description: `### 🛡️ Operational Record Breakdown\nA comprehensive statistical analysis of all service patrols recorded for <@${targetUser.id}> within the **${interaction.guild.name}** sector.`,
+        title: `?? Patrol Analytics: ${targetUser.username}`,
+        description: `### ??? Operational Record Breakdown\nA comprehensive statistical analysis of all service patrols recorded for <@${targetUser.id}> within the **${interaction.guild.name}** sector.`,
         thumbnail: targetUser.displayAvatarURL({ dynamic: true }),
         fields: [
-          { name: '📊 Patrols Executed', value: `\`${totalShifts.toLocaleString()}\` Logged`, inline: true },
-          { name: '⏱️ Total Service Time', value: `\`${hours}h ${minutes}m\``, inline: true },
-          { name: '📈 Avg. Deployment', value: `\`${Math.floor(avgDuration / 60)}m\``, inline: true },
-          { name: '✅ Validated Records', value: `\`${completedShifts.toLocaleString()}\` Completed`, inline: true },
-          { name: '🔴 Deployment Status', value: activeShifts > 0 ? '`ON ACTIVE PATROL`' : '`Standby`', inline: true }
+          { name: '?? Patrols Executed', value: `\`${totalShifts.toLocaleString()}\` Logged`, inline: true },
+          { name: '?? Total Service Time', value: `\`${hours}h ${minutes}m\``, inline: true },
+          { name: '?? Avg. Deployment', value: `\`${Math.floor(avgDuration / 60)}m\``, inline: true },
+          { name: '? Validated Records', value: `\`${completedShifts.toLocaleString()}\` Completed`, inline: true },
+          { name: '?? Deployment Status', value: activeShifts > 0 ? '`ON ACTIVE PATROL`' : '`Standby`', inline: true }
         ],
         footer: 'Statistics are localized to the current server environment.',
         color: 'premium'
       });
 
-      await interaction.editReply({ embeds: [embed] });
+      await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_shiftStats').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
 
     } catch (error) {
       console.error('Shift Stats Error:', error);
       const errEmbed = createErrorEmbed('An error occurred while attempting to aggregate shift metrics.');
       if (interaction.deferred || interaction.replied) {
-        await interaction.editReply({ embeds: [errEmbed] });
+        await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_shiftStats').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {
         await interaction.reply({ embeds: [errEmbed], ephemeral: true });
       }
     }
   }
 };
+

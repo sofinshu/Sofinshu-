@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
+const { SlashCommandBuilder, PermissionFlagsBits, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { Guild } = require('../../database/mongo');
 const { createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
 
@@ -28,11 +28,14 @@ module.exports = {
                 footer: enabled ? 'The bot will now auto-rank users who reach their threshold!' : 'Promotions must be granted manually.'
             });
 
-            await interaction.editReply({ embeds: [embed] });
+            await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_promo_toggle').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
 
         } catch (error) {
             console.error('Promo Toggle Error:', error);
-            await interaction.editReply({ embeds: [createErrorEmbed('An error occurred while toggling the promotion engine.')] });
+            await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_promo_toggle').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [createErrorEmbed('An error occurred while toggling the promotion engine.')], components: [row] });
         }
     }
 };
+

@@ -1,4 +1,4 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { User, Guild, Shift, Warning } = require('../../database/mongo');
 
@@ -14,7 +14,8 @@ module.exports = {
       const guild = await Guild.findOne({ guildId }).lean();
 
       if (!guild || !guild.promotionRequirements) {
-        return interaction.editReply({ embeds: [createErrorEmbed('This server has not configured any promotion requirements.')] });
+        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_nextPromotion').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [createErrorEmbed('This server has not configured any promotion requirements.')], components: [row] });
       }
 
       const users = await User.find({
@@ -78,33 +79,37 @@ module.exports = {
       eligible.sort((a, b) => b.progress - a.progress);
 
       if (!eligible.length) {
-        return interaction.editReply({ embeds: [createErrorEmbed('No staff members are currently eligible for promotion.')] });
+        return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_nextPromotion').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [createErrorEmbed('No staff members are currently eligible for promotion.')], components: [row] });
       }
 
       const top5 = eligible.slice(0, 5);
       const list = top5.map((e, i) => {
-        const positions = ['🥇 TOP PRIORITY', '🥈 HIGH PRIORITY', '🥉 TARGETED', '⚖️ MONITORING', '⚖️ MONITORING'];
+        const positions = ['?? TOP PRIORITY', '?? HIGH PRIORITY', '?? TARGETED', '?? MONITORING', '?? MONITORING'];
         const tag = positions[i] || `\`#${i + 1}\``;
-        return `> **${tag}**: **${e.username}**\n> ➔ **Target**: \`${e.nextRank.toUpperCase()}\`\n> 📊 **Metrics**: ⭐ \`${e.points.toLocaleString()}\` | 🔄 \`${e.shiftCount}\` | 📈 \`${e.consistency}%\` | 🎯 \`${e.progress}%\` Readied\n`;
+        return `> **${tag}**: **${e.username}**\n> ? **Target**: \`${e.nextRank.toUpperCase()}\`\n> ?? **Metrics**: ? \`${e.points.toLocaleString()}\` | ?? \`${e.shiftCount}\` | ?? \`${e.consistency}%\` | ?? \`${e.progress}%\` Readied\n`;
       }).join('\n');
 
       const embed = await createCustomEmbed(interaction, {
-        title: '📋 Enterprise Promotion Pipeline',
+        title: '?? Enterprise Promotion Pipeline',
         thumbnail: interaction.guild.iconURL({ dynamic: true }),
-        description: `### 🛡️ Authorized Personnel Queue\nCurrently **${eligible.length}** personnel meet or exceed the eligibility threshold for advancement in the **${interaction.guild.name}** sector.\n\n${list}\n\n*Queue is generated based on real-time performance telemetry.*`,
+        description: `### ??? Authorized Personnel Queue\nCurrently **${eligible.length}** personnel meet or exceed the eligibility threshold for advancement in the **${interaction.guild.name}** sector.\n\n${list}\n\n*Queue is generated based on real-time performance telemetry.*`,
         footer: 'Automated Advancement Algorithms'
       });
 
-      await interaction.editReply({ embeds: [embed] });
+      await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_nextPromotion').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
 
     } catch (error) {
       console.error('Next Promotion Error:', error);
       const errEmbed = createErrorEmbed('An error occurred while calculating the promotion queue.');
       if (interaction.deferred || interaction.replied) {
-        await interaction.editReply({ embeds: [errEmbed] });
+        await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_nextPromotion').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {
         await interaction.reply({ embeds: [errEmbed], ephemeral: true });
       }
     }
   }
 };
+

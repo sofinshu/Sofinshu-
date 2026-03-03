@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -65,7 +65,8 @@ module.exports = {
                 description: `Successfully synchronized the **${rank.toUpperCase()}** classification to the <@&${role.id}> role.`,
                 color: 'success'
             });
-            return interaction.editReply({ embeds: [embed] });
+            return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_setup_promo').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
         }
 
         if (sub === 'channel') {
@@ -78,7 +79,8 @@ module.exports = {
                 description: `Promotion advancement signals will now be broadcast to <#${channel.id}>.`,
                 color: 'success'
             });
-            return interaction.editReply({ embeds: [embed] });
+            return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_setup_promo').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
         }
 
         if (sub === 'requirements') {
@@ -103,7 +105,8 @@ module.exports = {
                 ],
                 color: 'enterprise'
             });
-            return interaction.editReply({ embeds: [embed] });
+            return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_setup_promo').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
         }
 
         if (sub === 'view') {
@@ -128,8 +131,10 @@ module.exports = {
                 ],
                 footer: 'Authorized Management Glance'
             });
-            return interaction.editReply({ embeds: [embed] });
+            return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_setup_promo').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
         }
     }
 };
+
 

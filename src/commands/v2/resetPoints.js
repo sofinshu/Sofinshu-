@@ -1,4 +1,4 @@
-﻿const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { User } = require('../../database/mongo');
 
@@ -11,13 +11,13 @@ module.exports = {
   async execute(interaction) {
     try {
       if (!interaction.member.permissions.has('Administrator')) {
-        return interaction.reply({ content: '❌ Administrator permission is strictly required.', ephemeral: true });
+        return interaction.reply({ content: '? Administrator permission is strictly required.', ephemeral: true });
       }
 
       const confirm = interaction.options.getBoolean('confirm');
 
       if (!confirm) {
-        return interaction.reply({ content: '❌ Operation aborted. You must use `/reset_points confirm:True` to execute this.', ephemeral: true });
+        return interaction.reply({ content: '? Operation aborted. You must use `/reset_points confirm:True` to execute this.', ephemeral: true });
       }
 
       await interaction.deferReply();
@@ -29,26 +29,29 @@ module.exports = {
       );
 
       const embed = await createCustomEmbed(interaction, {
-        title: '☢️ Enterprise Economy Wipeout',
+        title: '?? Enterprise Economy Wipeout',
         description: `**PROTOCOL EXECUTED:** The local staff economy for **${interaction.guild.name}** has been completely synchronized to zero state.`,
         fields: [
-          { name: '📊 Operational Impact', value: `\`${result.modifiedCount}\` Personnel Records Sanitized`, inline: true },
-          { name: '⚖️ Action Type', value: 'Full Economy Reset', inline: true }
+          { name: '?? Operational Impact', value: `\`${result.modifiedCount}\` Personnel Records Sanitized`, inline: true },
+          { name: '?? Action Type', value: 'Full Economy Reset', inline: true }
         ],
         footer: `System Wipe Activated By: ${interaction.user.tag}`,
         color: 'error'
       });
 
-      await interaction.editReply({ embeds: [embed] });
+      await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_resetPoints').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
 
     } catch (error) {
       console.error('Reset Points Error:', error);
       const errEmbed = createErrorEmbed('An error occurred while attempting to wipe server points.');
       if (interaction.deferred || interaction.replied) {
-        await interaction.editReply({ embeds: [errEmbed] });
+        await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_resetPoints').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {
         await interaction.reply({ embeds: [errEmbed], ephemeral: true });
       }
     }
   }
 };
+

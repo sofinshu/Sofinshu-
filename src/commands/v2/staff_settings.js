@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { User } = require('../../database/mongo');
 
@@ -18,7 +18,8 @@ module.exports = {
 
             let userData = await User.findOne({ userId: interaction.user.id, guildId });
             if (!userData || !userData.staff) {
-                return interaction.editReply({ embeds: [createErrorEmbed('No staff profile detected to customize.')] });
+                return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_staff_settings').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [createErrorEmbed('No staff profile detected to customize.')], components: [row] });
             }
 
             const updates = [];
@@ -32,7 +33,8 @@ module.exports = {
                     userData.staff.profileColor = color;
                     updates.push('Accent color updated');
                 } else {
-                    return interaction.editReply({ embeds: [createErrorEmbed('Invalid hex color format. Use e.g. `#FF0000`')] });
+                    return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_staff_settings').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [createErrorEmbed('Invalid hex color format. Use e.g. `#FF0000`')], components: [row] });
                 }
             }
 
@@ -48,11 +50,14 @@ module.exports = {
                 color: userData.staff.profileColor || 'success'
             });
 
-            await interaction.editReply({ embeds: [embed] });
+            await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_staff_settings').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
 
         } catch (error) {
             console.error('Staff Settings Error:', error);
-            await interaction.editReply({ embeds: [createErrorEmbed('Failed to synchronize personnel settings.')] });
+            await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_staff_settings').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [createErrorEmbed('Failed to synchronize personnel settings.')], components: [row] });
         }
     }
 };
+

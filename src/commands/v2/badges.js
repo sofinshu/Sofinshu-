@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { createCustomEmbed, createErrorEmbed } = require('../../utils/embeds');
 const { User } = require('../../database/mongo');
 
@@ -21,7 +21,8 @@ module.exports = {
                     description: `<@${targetUser.id}> currently holds no official badges in this sector.`,
                     footer: 'Achievements can be awarded by server administrators.'
                 });
-                return interaction.editReply({ embeds: [embed] });
+                return const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_badges').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
             }
 
             const badges = userData.staff.achievements.map(a => {
@@ -41,11 +42,14 @@ module.exports = {
                 color: 'premium'
             });
 
-            await interaction.editReply({ embeds: [embed] });
+            await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_badges').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
 
         } catch (error) {
             console.error('Badges Command Error:', error);
-            await interaction.editReply({ embeds: [createErrorEmbed('Failed to query the badge registry.')] });
+            await const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_badges').setLabel('ðŸ„ Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [createErrorEmbed('Failed to query the badge registry.')], components: [row] });
         }
     }
 };
+
