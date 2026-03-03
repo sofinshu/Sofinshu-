@@ -15,6 +15,7 @@ const AutomationSystem = require('./systems/automationSystem');
 const TicketSystem = require('./systems/ticketSystem');
 const commandHandler = require('./handlers/commandHandler');
 const { Guild } = require('./database/mongo');
+const dashboardSystems = require('./dashboardSystems');
 
 // Daily activity model (for message counting)
 const DailyActivity = require('./models/activity');
@@ -99,6 +100,9 @@ client.once('ready', async () => {
   logger.info(`Active Command Tiers: ${tierDisplay}`);
   await initializeSystems();
   await loadCommands();
+
+  // Register dashboard-driven auto-working systems
+  dashboardSystems.register(client, logger);
 
   const testGuildId = process.env.TEST_GUILD_ID;
   await commandHandler.deployCommands(client, testGuildId || null).catch(e => logger.error('Deploy error: ' + e.message));

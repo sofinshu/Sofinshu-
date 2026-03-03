@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { User, Guild, Shift, Warning, Activity } = require('../database/mongo');
+const { invalidateCache } = require('../dashboardSystems');
 
 const MANAGE_GUILD = 0x20; // Discord permission bit
 
@@ -131,6 +132,7 @@ router.patch('/guild/:guildId/settings', auth, guildAuth, async (req, res) => {
             if (req.body[key] !== undefined) update[`settings.${key}`] = req.body[key];
         }
         const result = await Guild.findOneAndUpdate({ guildId }, { $set: update }, { upsert: true, new: true });
+        invalidateCache(guildId);
         res.json({ success: true, settings: result.settings });
     } catch (e) { res.status(500).json({ error: e.message }); }
 });
@@ -313,6 +315,7 @@ router.patch('/guild/:guildId/systems/automod', auth, guildAuth, async (req, res
             { $set: { 'settings.modules.automod': req.body } },
             { upsert: true, new: true }
         );
+        invalidateCache(req.params.guildId);
         res.json({ success: true });
     } catch (e) { res.status(500).json({ error: e.message }); }
 });
