@@ -1,9 +1,14 @@
 const express = require('express');
 const router = express.Router();
-const { User, Guild, Shift, Warning, Activity } = require('../database/mongo');
+const { User, Guild, Shift, Warning, Activity, ApplicationConfig } = require('../database/mongo');
 const { invalidateCache } = require('../dashboardSystems');
+const { validateGuildId, validateUserId, validatePagination, validateNoSQLInjection, isValidHexColor } = require('../middleware/validation');
+const logger = require('../utils/logger');
 
 const MANAGE_GUILD = 0x20; // Discord permission bit
+
+// Apply NoSQL injection validation to all routes
+router.use(validateNoSQLInjection);
 
 /* ── Auth middleware: verify Discord Bearer token ── */
 async function auth(req, res, next) {

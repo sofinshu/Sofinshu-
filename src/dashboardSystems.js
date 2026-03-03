@@ -20,10 +20,31 @@ const { Guild } = require('./database/mongo');
 
 // ── In-memory spam tracker: { guildId:userId → [timestamps] }
 const spamTracker = new Map();
+const SPAM_WINDOW = 5000; // 5 seconds window for spam tracking
+const SPAM_CLEANUP_INTERVAL = 60000; // Cleanup old entries every minute
 
 // ── Settings cache (5-minute TTL to avoid DB hammering)
 const settingsCache = new Map();
 const CACHE_TTL = 5 * 60 * 1000;
+
+// ── Periodic cleanup of old spam tracker entries to prevent memory leaks
+setInterval(() => {
+    const now = Date.now();
+    let cleaned = 0;
+    for (const [key, timestamps] of spamTracker.entries()) {
+        // Remove entries with no recent activity
+        const recent = timestamps.filter(t => now - t < SPAM_WINDOW);
+        if (recent.length === 0) {
+            spamTracker.delete(key);
+            cleaned++;
+        } else if (recent.length !== timestamps.length) {
+            spamTracker.set(key, recent);
+        }
+    }
+    if (cleaned > 0 && process.env.NODE_ENV === 'development') {
+        console.log(`[DashboardSystems] Cleaned up ${cleaned} stale spam tracker entries`);
+    }
+}, SPAM_CLEANUP_INTERVAL);
 
 async function getModules(guildId) {
     const cached = settingsCache.get(guildId);
@@ -79,11 +100,10 @@ function register(client, logger) {
         if (spam.enabled) {
             const key = `${guildId}:${message.author.id}`;
             const now = Date.now();
-            const window = 5000; // 5 seconds
             const limit = spam.maxMessagesPerWindow || 5;
 
             if (!spamTracker.has(key)) spamTracker.set(key, []);
-            const times = spamTracker.get(key).filter(t => now - t < window);
+            const times = spamTracker.get(key).filter(t => now - t < SPAM_WINDOW);
             times.push(now);
             spamTracker.set(key, times);
 
