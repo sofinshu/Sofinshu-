@@ -276,6 +276,90 @@ router.get('/guild/:guildId/promotion-status', auth, guildAuth, async (req, res)
     } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
+// GET /api/dashboard/guild/:guildId/ticket-logs
+router.get('/guild/:guildId/ticket-logs', auth, guildAuth, async (req, res) => {
+    try {
+        const { Ticket } = require('../database/mongo');
+        const { status, type } = req.query;
+        const query = { guildId: req.params.guildId };
+        if (status && status !== 'all') query.status = status;
+        if (type) query.category = type;
+        const tickets = await Ticket.find(query).sort({ createdAt: -1 }).limit(50).lean();
+        res.json(tickets.map(t => ({
+            id: t._id.toString().slice(-6).toUpperCase(),
+            fullId: t._id,
+            username: t.username || 'Unknown',
+            userId: t.userId,
+            category: t.category || 'unknown',
+            status: t.status || 'open',
+            staffName: t.staffName || null,
+            reason: t.reason || null,
+            feedback: t.feedback || null,
+            claimedBy: t.claimedByName || null,
+            closedBy: t.closedByName || null,
+            createdAt: t.createdAt
+        })));
+    } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// GET /api/dashboard/guild/:guildId/activity-logs
+router.get('/guild/:guildId/activity-logs', auth, guildAuth, async (req, res) => {
+    try {
+        const activities = await Activity.find({ guildId: req.params.guildId })
+            .sort({ createdAt: -1 }).limit(60).lean();
+        res.json(activities.map(a => ({
+            id: a._id,
+            userId: a.userId,
+            type: a.type || 'activity',
+            meta: a.meta || (a.data?.action) || '',
+            createdAt: a.createdAt
+        })));
+    } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// GET /api/dashboard/guild/:guildId/promo-history — promotion/demotion records
+router.get('/guild/:guildId/promo-history', auth, guildAuth, async (req, res) => {
+    try {
+        const { guildId } = req.params;
+        // Read from Activity log where type includes 'promo' or 'admin_action' with rank changes
+        const promoActivities = await Activity.find({
+            guildId,
+            $or: [{ type: 'promotion' }, { type: 'demotion' }, { type: 'admin_action' }]
+        }).sort({ createdAt: -1 }).limit(40).lean();
+
+        // Also enumerate users with lastPromotionDate for that guild
+        const recentPromotees = await User.find({
+            'guilds': { $elemMatch: { guildId, 'staff.lastPromotionDate': { $exists: true } } }
+        }).sort({ 'staff.lastPromotionDate': -1 }).limit(20).lean();
+
+        const promoList = recentPromotees.map(u => {
+            const g = u.guilds?.find(x => x.guildId === guildId);
+            return {
+                userId: u.userId,
+                username: u.username || 'Unknown',
+                avatar: u.avatar,
+                currentRank: g?.staff?.rank || 'unknown',
+                lastPromotionDate: g?.staff?.lastPromotionDate || null,
+                points: g?.staff?.points || 0,
+                type: 'promotion'
+            };
+        });
+
+        // Merge activity log entries
+        const activityEntries = promoActivities
+            .filter(a => a.meta && (a.meta.includes('promote') || a.meta.includes('demote') || a.meta.includes('Updated staff')))
+            .map(a => ({
+                userId: a.userId,
+                username: null,
+                meta: a.meta,
+                type: a.type,
+                createdAt: a.createdAt
+            }));
+
+        res.json({ promotions: promoList, activityLog: activityEntries });
+    } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
 // GET /api/dashboard/guild/:guildId/leaderboard — staff sorted by points
 router.get('/guild/:guildId/leaderboard', auth, guildAuth, async (req, res) => {
     try {
