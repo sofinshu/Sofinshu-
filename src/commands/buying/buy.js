@@ -57,6 +57,7 @@ module.exports = {
 
     async execute(interaction) {
         try {
+            await interaction.deferReply({ ephemeral: false });
             const guildId = interaction.guildId;
             const guildData = await Guild.findOne({ guildId }).lean();
             const currentTier = guildData?.premium?.tier || 'free';

@@ -94,12 +94,49 @@ async function loadCommands() {
   logger.info(`Loaded ${client.commands.size} commands`);
 }
 
+/**
+ * Upserts a Guild document in MongoDB with default free-tier settings.
+ * This ensures versionGuard.checkAccess() can always find the guild.
+ */
+async function ensureGuildRegistered(guild) {
+  try {
+    await Guild.findOneAndUpdate(
+      { guildId: guild.id },
+      {
+        $setOnInsert: {
+          guildId: guild.id,
+          name: guild.name,
+          ownerId: guild.ownerId,
+          iconURL: guild.iconURL({ dynamic: true }) || null,
+          premium: { isActive: false, tier: 'free' }
+        }
+      },
+      { upsert: true, new: true }
+    );
+    logger.info(`[Guild] Registered/confirmed: ${guild.name} (${guild.id})`);
+  } catch (err) {
+    logger.error(`[Guild] Failed to register guild ${guild.id}:`, err);
+  }
+}
+
+// Auto-register server when bot is invited
+client.on('guildCreate', async (guild) => {
+  logger.info(`[Guild] Bot joined: ${guild.name} (${guild.id})`);
+  await ensureGuildRegistered(guild);
+});
+
 client.once('ready', async () => {
   const tierDisplay = process.env.ENABLED_TIERS ? process.env.ENABLED_TIERS : 'v1-v8';
   logger.info(`Bot logged in as ${client.user.tag}`);
   logger.info(`Active Command Tiers: ${tierDisplay}`);
   await initializeSystems();
   await loadCommands();
+
+  // Sync all guilds the bot is already in (ensures no server is stuck as "not registered")
+  logger.info(`[Guild] Running startup guild sync for ${client.guilds.cache.size} servers...`);
+  const syncPromises = client.guilds.cache.map(g => ensureGuildRegistered(g));
+  await Promise.allSettled(syncPromises);
+  logger.info('[Guild] Startup guild sync complete.');
 
   // Register dashboard-driven auto-working systems
   dashboardSystems.register(client, logger);

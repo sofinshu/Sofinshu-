@@ -5,6 +5,8 @@ const OWNER_IDS = process.env.OWNER_IDS ? process.env.OWNER_IDS.split(',') : ['1
 
 const VERSION_TIER_MAP = {
   v1: 'free',
+  v1_context: 'free',
+  buying: 'free',
   v2: 'free',
   v3: 'premium',
   v4: 'premium',

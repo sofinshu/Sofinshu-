@@ -8,7 +8,7 @@ function loadCommands() {
   const commands = new Collection();
   const commandsPath = path.join(__dirname, '../commands');
   // Including v1_context alongside the standard versions
-  const defaultVersions = ['v1', 'v1_context', 'v2', 'v3', 'v4', 'v5', 'v6', 'v7', 'v8', 'premium'];
+  const defaultVersions = ['v1', 'v1_context', 'buying', 'v2', 'v3', 'v4', 'v5', 'v6', 'v7', 'v8', 'premium'];
   const versions = process.env.ENABLED_TIERS ? process.env.ENABLED_TIERS.split(',') : defaultVersions;
 
   // Make sure v1_context is always injected if we are dynamically splitting ENABLED_TIERS

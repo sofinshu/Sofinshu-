@@ -36,7 +36,7 @@ module.exports = {
         : '';
 
       const embed = await createCustomEmbed(interaction, {
-        title: '? Shift Interface Initialized',
+        title: '✅ Shift Interface Initialized',
         description: `Your active duty shift has successfully commenced.${streakText}\n\n🕒 **Timestamp:** <t:${Math.floor(Date.now() / 1000)}:t> (<t:${Math.floor(Date.now() / 1000)}:R>)`,
         fields: [
           { name: 'Shift ID', value: `\`${result.shiftId.toString()}\``, inline: true }

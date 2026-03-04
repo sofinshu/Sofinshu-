@@ -5,7 +5,7 @@ require('dotenv').config();
 
 const commandsPath = path.join(__dirname, "src/commands");
 // Support all tiers, or restrict by environment variable
-const defaultVersions = ['v1', 'v2', 'v3', 'v4', 'v5', 'v6', 'v7', 'v8', 'premium'];
+const defaultVersions = ['v1', 'v1_context', 'buying', 'v2', 'v3', 'v4', 'v5', 'v6', 'v7', 'v8', 'premium'];
 const versions = process.env.ENABLED_TIERS ? process.env.ENABLED_TIERS.split(',') : defaultVersions;
 const commands = [];
 
