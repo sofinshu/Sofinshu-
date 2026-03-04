@@ -2,6 +2,7 @@
     SlashCommandBuilder,
     StringSelectMenuBuilder,
     StringSelectMenuOptionBuilder,
+    ActionRowBuilder,
     ComponentType,
     ActivityType,
     PermissionsBitField,
