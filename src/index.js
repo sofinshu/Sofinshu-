@@ -9,9 +9,13 @@ const logger = require('./utils/logger');
 const { versionGuard } = require('./guards/versionGuard');
 const LicenseSystem = require('./systems/licenseSystem');
 const StaffSystem = require('./systems/staffSystem');
+const StaffManagementSystem = require('./systems/staffManagementSystem');
 const ModerationSystem = require('./systems/moderationSystem');
+const EnhancedModerationSystem = require('./systems/enhancedModerationSystem');
 const AnalyticsSystem = require('./systems/analyticsSystem');
 const AutomationSystem = require('./systems/automationSystem');
+const AutoPromotionSystem = require('./systems/autoPromotionSystem');
+const LevelingSystem = require('./systems/levelingSystem');
 const TicketSystem = require('./systems/ticketSystem');
 const commandHandler = require('./handlers/commandHandler');
 const { Guild } = require('./database/mongo');
@@ -56,14 +60,26 @@ async function initializeSystems() {
   client.systems.staff = new StaffSystem(client);
   await client.systems.staff.initialize();
 
+  client.systems.staffManagement = new StaffManagementSystem(client);
+  await client.systems.staffManagement.initialize();
+
   client.systems.moderation = new ModerationSystem(client);
   await client.systems.moderation.initialize();
+
+  client.systems.enhancedModeration = new EnhancedModerationSystem(client);
+  await client.systems.enhancedModeration.initialize();
 
   client.systems.analytics = new AnalyticsSystem(client);
   await client.systems.analytics.initialize();
 
   client.systems.automation = new AutomationSystem(client);
   await client.systems.automation.initialize();
+
+  client.systems.autoPromotion = new AutoPromotionSystem(client);
+  await client.systems.autoPromotion.initialize();
+
+  client.systems.leveling = new LevelingSystem(client);
+  await client.systems.leveling.initialize();
 
   client.systems.tickets = new TicketSystem(client);
   await client.systems.tickets.initialize();
@@ -277,6 +293,11 @@ client.on('messageCreate', async (message) => {
       { $inc: { messageCount: 1 } },
       { upsert: true, new: true }
     );
+
+    // Handle leveling system XP
+    if (client.systems.leveling) {
+      await client.systems.leveling.handleMessage(message);
+    }
   } catch (error) {
     logger.error("Error tracking activity:", error);
   }
@@ -770,6 +791,7 @@ app.use('/api/guilds', require('./api/guilds'));
 app.use('/api/stats', require('./api/stats'));
 app.use('/api/commands', require('./api/commands'));
 app.use('/api/dashboard', require('./api/routes'));
+app.use('/api/v2', require('./api/dashboard'));
 
 // Mount webhook routes with specific middleware
 const paymentWebhook = require('./webhook/paymentWebhook');
