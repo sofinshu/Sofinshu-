@@ -114,6 +114,14 @@ const guildSchema = new mongoose.Schema({
       customNote: { type: String, default: '' }
     }
   },
+  customCommands: [{
+    trigger: { type: String, required: true },
+    response: { type: String, required: true },
+    type: { type: String, enum: ['exact', 'starts', 'contains'], default: 'exact' },
+    isEmbed: { type: Boolean, default: true },
+    enabled: { type: Boolean, default: true },
+    createdAt: { type: Date, default: Date.now }
+  }],
   stats: {
     commandsUsed: { type: Number, default: 0 },
     membersJoined: { type: Number, default: 0 },

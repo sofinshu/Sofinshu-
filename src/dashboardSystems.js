@@ -100,7 +100,37 @@ function register(client, loggerInstance) {
         if (message.author.bot || !message.guild) return;
 
         const guildId = message.guild.id;
-        const mods = await getModules(guildId);
+        const guildData = await Guild.findOne({ guildId }).select('settings.modules customCommands').lean();
+        const mods = guildData?.settings?.modules || {};
+
+        // ── CUSTOM COMMANDS / AUTO-RESPONDER ───────────────────────
+        const customCmds = (guildData?.customCommands || []).filter(c => c.enabled);
+        if (customCmds.length > 0) {
+            const content = message.content.trim();
+            const lowerContent = content.toLowerCase();
+
+            for (const cmd of customCmds) {
+                let triggered = false;
+                const trig = cmd.trigger.toLowerCase();
+
+                if (cmd.type === 'exact' && lowerContent === trig) triggered = true;
+                else if (cmd.type === 'starts' && lowerContent.startsWith(trig)) triggered = true;
+                else if (cmd.type === 'contains' && lowerContent.includes(trig)) triggered = true;
+
+                if (triggered) {
+                    if (cmd.isEmbed) {
+                        const embed = new EmbedBuilder()
+                            .setColor(message.guild.members.me?.displayHexColor || '#6c63ff')
+                            .setDescription(cmd.response)
+                            .setTimestamp();
+                        await message.channel.send({ embeds: [embed] });
+                    } else {
+                        await message.channel.send(cmd.response);
+                    }
+                    return; // Stop if a custom command was triggered
+                }
+            }
+        }
 
         // ── ANTI-SPAM ──────────────────────────────────────────────
         const spam = mods.antispam || {};

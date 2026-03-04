@@ -258,6 +258,28 @@ router.patch('/guild/:guildId/promotion-requirements', auth, guildAuth, async (r
     } catch (e) { res.status(400).json({ error: e.message || 'Invalid input' }); }
 });
 
+// GET /api/dashboard/guild/:guildId/custom-commands
+router.get('/guild/:guildId/custom-commands', auth, guildAuth, async (req, res) => {
+    try {
+        const g = await Guild.findOne({ guildId: req.params.guildId }).select('customCommands').lean();
+        res.json({ commands: g?.customCommands || [] });
+    } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// PATCH /api/dashboard/guild/:guildId/custom-commands
+router.patch('/guild/:guildId/custom-commands', auth, guildAuth, async (req, res) => {
+    try {
+        const { commands } = req.body;
+        if (!Array.isArray(commands)) return res.status(400).json({ error: 'Invalid commands data' });
+
+        await Guild.findOneAndUpdate(
+            { guildId: req.params.guildId },
+            { $set: { customCommands: commands } }
+        );
+        res.json({ success: true });
+    } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
 // GET /api/dashboard/guild/:guildId/alerts
 router.get('/guild/:guildId/alerts', auth, guildAuth, async (req, res) => {
     try {
