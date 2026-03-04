@@ -122,6 +122,21 @@ const guildSchema = new mongoose.Schema({
     enabled: { type: Boolean, default: true },
     createdAt: { type: Date, default: Date.now }
   }],
+  achievements: [{
+    id: { type: String, required: true },
+    name: { type: String, required: true },
+    description: String,
+    icon: String,
+    criteria: {
+      type: { type: String, enum: ['points', 'shifts', 'warnings', 'consistency'], default: 'points' },
+      value: { type: Number, default: 0 }
+    }
+  }],
+  roleRewards: [{
+    roleId: { type: String, required: true },
+    requiredPoints: { type: Number, default: 0 },
+    name: String
+  }],
   stats: {
     commandsUsed: { type: Number, default: 0 },
     membersJoined: { type: Number, default: 0 },

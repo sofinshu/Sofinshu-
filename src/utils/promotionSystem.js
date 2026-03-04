@@ -78,10 +78,77 @@ class PromotionSystem {
 
         if (meetsPoints && meetsShifts && meetsConsistency && meetsWarnings && meetsHours &&
             meetsAchievements && meetsReputation && meetsDays && meetsCleanRecord) {
-            return await this.executePromotion(userId, guildId, nextReq.rank, stats, guildData, client);
+            await this.executePromotion(userId, guildId, nextReq.rank, stats, guildData, client);
         }
 
+        // Always check for role rewards and achievement unlocks
+        await this.checkRewards(userId, guildId, stats, guildData, client);
+
         return null;
+    }
+
+    /**
+     * Checks and awards role rewards and achievements
+     */
+    static async checkRewards(userId, guildId, stats, guildData, client) {
+        const discordGuild = client.guilds.cache.get(guildId);
+        if (!discordGuild) return;
+
+        const member = await discordGuild.members.fetch(userId).catch(() => null);
+        if (!member) return;
+
+        // 1. Role Rewards (Point-based)
+        const rewards = guildData.roleRewards || [];
+        for (const reward of rewards) {
+            if (stats.points >= reward.requiredPoints && !member.roles.cache.has(reward.roleId)) {
+                await member.roles.add(reward.roleId).catch(e => logger.error(`Failed to award role reward ${reward.roleId}: ${e.message}`));
+                // Log achievement activity
+                await Activity.create({
+                    guildId,
+                    userId,
+                    type: 'message',
+                    data: { content: `Awarded role reward: ${reward.name || 'Staff Milestone'}` }
+                });
+            }
+        }
+
+        // 2. Custom Achievements
+        const guildAchievements = guildData.achievements || [];
+        const user = await User.findOne({ userId });
+        const guildProfile = user?.guilds?.find(g => g.guildId === guildId);
+        if (!guildProfile) return;
+
+        const currentUnlocked = guildProfile.staff.achievements || [];
+        const newlyUnlocked = [];
+
+        for (const ach of guildAchievements) {
+            if (currentUnlocked.includes(ach.id)) continue;
+
+            const criteria = ach.criteria;
+            let met = false;
+            if (criteria.type === 'points' && stats.points >= criteria.value) met = true;
+            else if (criteria.type === 'shifts' && stats.shifts >= criteria.value) met = true;
+            else if (criteria.type === 'warnings' && stats.warnings <= criteria.value) met = true; // Use sparingly
+            else if (criteria.type === 'consistency' && stats.consistency >= criteria.value) met = true;
+
+            if (met) {
+                newlyUnlocked.push(ach.id);
+                // Log activity
+                await Activity.create({
+                    guildId,
+                    userId,
+                    type: 'message',
+                    data: { content: `Unlocked achievement: ${ach.name}` }
+                });
+            }
+        }
+
+        if (newlyUnlocked.length > 0) {
+            await User.updateOne(
+                { userId, "guilds.guildId": guildId },
+                { $addToSet: { "guilds.$.staff.achievements": { $each: newlyUnlocked } } }
+            );
+        }
     }
 
     /**

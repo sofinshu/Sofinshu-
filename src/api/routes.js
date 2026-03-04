@@ -280,6 +280,26 @@ router.patch('/guild/:guildId/custom-commands', auth, guildAuth, async (req, res
     } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
+// GET /api/dashboard/guild/:guildId/staff-rewards
+router.get('/guild/:guildId/staff-rewards', auth, guildAuth, async (req, res) => {
+    try {
+        const g = await Guild.findOne({ guildId: req.params.guildId }).select('achievements roleRewards').lean();
+        res.json({ achievements: g?.achievements || [], roleRewards: g?.roleRewards || [] });
+    } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// PATCH /api/dashboard/guild/:guildId/staff-rewards
+router.patch('/guild/:guildId/staff-rewards', auth, guildAuth, async (req, res) => {
+    try {
+        const { achievements, roleRewards } = req.body;
+        await Guild.findOneAndUpdate(
+            { guildId: req.params.guildId },
+            { $set: { achievements: achievements || [], roleRewards: roleRewards || [] } }
+        );
+        res.json({ success: true });
+    } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
 // GET /api/dashboard/guild/:guildId/alerts
 router.get('/guild/:guildId/alerts', auth, guildAuth, async (req, res) => {
     try {
