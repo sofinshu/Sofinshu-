@@ -14,6 +14,8 @@ module.exports = {
             const targetUser = interaction.options.getUser('user');
             const guildId = interaction.guildId;
 
+            // Fetch user record from database
+            const userRecord = await User.findOne({ userId: targetUser.id });
             const staffSync = userRecord?.guilds?.find(g => g.guildId === guildId)?.staff || {};
             if (!userRecord || !userRecord.guilds?.some(g => g.guildId === guildId)) {
                 const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_case_file').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
