@@ -9,10 +9,19 @@ const logger = require('./utils/logger');
 const { versionGuard } = require('./guards/versionGuard');
 const LicenseSystem = require('./systems/licenseSystem');
 const StaffSystem = require('./systems/staffSystem');
+const StaffManagementSystem = require('./systems/staffManagementSystem');
 const ModerationSystem = require('./systems/moderationSystem');
+const EnhancedModerationSystem = require('./systems/enhancedModerationSystem');
 const AnalyticsSystem = require('./systems/analyticsSystem');
+const AnalyticsAggregator = require('./systems/analyticsAggregator');
 const AutomationSystem = require('./systems/automationSystem');
+const AutoPromotionSystem = require('./systems/autoPromotionSystem');
+const LevelingSystem = require('./systems/levelingSystem');
+const EconomySystem = require('./systems/economySystem');
 const TicketSystem = require('./systems/ticketSystem');
+const JobScheduler = require('./systems/jobScheduler');
+const WebhookManager = require('./systems/webhookManager');
+const cacheManager = require('./utils/cacheManager');
 const commandHandler = require('./handlers/commandHandler');
 const { Guild } = require('./database/mongo');
 const dashboardSystems = require('./dashboardSystems');
@@ -56,8 +65,14 @@ async function initializeSystems() {
   client.systems.staff = new StaffSystem(client);
   await client.systems.staff.initialize();
 
+  client.systems.staffManagement = new StaffManagementSystem(client);
+  await client.systems.staffManagement.initialize();
+
   client.systems.moderation = new ModerationSystem(client);
   await client.systems.moderation.initialize();
+
+  client.systems.enhancedModeration = new EnhancedModerationSystem(client);
+  await client.systems.enhancedModeration.initialize();
 
   client.systems.analytics = new AnalyticsSystem(client);
   await client.systems.analytics.initialize();
@@ -65,8 +80,28 @@ async function initializeSystems() {
   client.systems.automation = new AutomationSystem(client);
   await client.systems.automation.initialize();
 
+  client.systems.autoPromotion = new AutoPromotionSystem(client);
+  await client.systems.autoPromotion.initialize();
+
+  client.systems.leveling = new LevelingSystem(client);
+  await client.systems.leveling.initialize();
+
+  client.systems.economy = new EconomySystem(client);
+  await client.systems.economy.initialize();
+
   client.systems.tickets = new TicketSystem(client);
   await client.systems.tickets.initialize();
+
+  client.systems.scheduler = new JobScheduler(client);
+  await client.systems.scheduler.initialize();
+
+  client.systems.webhooks = new WebhookManager(client);
+
+  client.systems.analyticsAggregator = new AnalyticsAggregator(client);
+  await client.systems.analyticsAggregator.initialize();
+
+  // Initialize cache manager
+  await cacheManager.connect();
 }
 
 async function loadCommands() {
@@ -277,6 +312,11 @@ client.on('messageCreate', async (message) => {
       { $inc: { messageCount: 1 } },
       { upsert: true, new: true }
     );
+
+    // Handle leveling system XP
+    if (client.systems.leveling) {
+      await client.systems.leveling.handleMessage(message);
+    }
   } catch (error) {
     logger.error("Error tracking activity:", error);
   }
@@ -770,12 +810,21 @@ app.use('/api/guilds', require('./api/guilds'));
 app.use('/api/stats', require('./api/stats'));
 app.use('/api/commands', require('./api/commands'));
 app.use('/api/dashboard', require('./api/routes'));
+app.use('/api/v2', require('./api/dashboard'));
 
 // Mount webhook routes with specific middleware
 const paymentWebhook = require('./webhook/paymentWebhook');
 app.use('/webhooks/stripe', paymentWebhook);
 app.use('/webhooks/paypal', paymentWebhook);
 app.use('/webhooks/create-checkout-session', checkoutLimiter, paymentWebhook);
+
+// Mount new webhook manager routes (initialized in systems)
+app.use('/webhooks', (req, res, next) => {
+  if (client.systems.webhooks) {
+    return client.systems.webhooks.getRouter()(req, res, next);
+  }
+  next();
+});
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
