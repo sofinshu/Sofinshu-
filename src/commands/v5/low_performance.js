@@ -1,6 +1,4 @@
-const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { validatePremiumLicense } = require('../../utils/enhancedPremiumGuard');
-const { createPremiumEmbed } = require('../../utils/enhancedEmbeds');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const { User } = require('../../database/mongo');
 
 module.exports = {
@@ -22,13 +20,13 @@ module.exports = {
       .lean();
 
     if (users.length === 0) {
-      await interaction.editReply({ content: 'No staff data found.' });
+      await interaction.reply({ content: 'No staff data found.' });
       return;
     }
 
-    const embed = createPremiumEmbed()
-      .setTitle('?? Low Performance Staff')
-      
+    const embed = new EmbedBuilder()
+      .setTitle('📉 Low Performance Staff')
+      .setColor(0xe74c3c)
       .setDescription(
         users.map((u, i) => {
           const guildData = u.guilds?.find(g => g.guildId === guildId);
@@ -36,14 +34,8 @@ module.exports = {
           return `${i + 1}. ${name} - ${u.staff?.points || 0} points`;
         }).join('\n')
       )
-      ;
+      .setTimestamp();
 
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_low_performance').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [embed], components: [row] });
+    await interaction.reply({ embeds: [embed] });
   }
 };
-
-
-
-
-

@@ -1,46 +1,76 @@
-const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createCustomEmbed, createErrorEmbed, createPremiumEmbed, createSuccessEmbed } = require('../../utils/enhancedEmbeds');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const { User, Activity, Shift } = require('../../database/mongo');
 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('staff_efficiency')
-    .setDescription('Poll global efficiency matrices mapped strictly inside this server context.')
+    .setDescription('View staff efficiency metrics')
     .addUserOption(option =>
       option.setName('user')
         .setDescription('User to check efficiency for')
         .setRequired(false)),
 
   async execute(interaction) {
-    try {
-      await interaction.deferReply();
+    const guildId = interaction.guildId;
+    const targetUser = interaction.options.getUser('user');
 
-            const license = await validatePremiumLicense(interaction, 'premium');
-            if (!license.allowed) {
-                return await interaction.editReply({ embeds: [license.embed], components: [license.components] });
-            }
-      const guildId = interaction.guildId;
-      const targetUser = interaction.options.getUser('user');
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-      const thirtyDaysAgo = new Date();
-      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    if (targetUser) {
+      const user = await User.findOne({ userId: targetUser.id });
+      const activities = await Activity.find({
+        guildId,
+        userId: targetUser.id,
+        createdAt: { $gte: thirtyDaysAgo }
+      }).lean();
 
-      if (targetUser) {
-        const user = await User.findOne({ userId: targetUser.id, guildId }).lean();
-        if (!user || !user.staff) {
-          const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_staff_efficiency').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [createErrorEmbed(`No performance logs retrieved. <@${targetUser.id}> isn't mapped inside this server.`)], components: [row] });
-        }
+      const shifts = await Shift.find({
+        guildId,
+        userId: targetUser.id,
+        startTime: { $gte: thirtyDaysAgo }
+      }).lean();
 
+      const commands = activities.filter(a => a.type === 'command').length;
+      const warnings = activities.filter(a => a.type === 'warning').length;
+      const completedShifts = shifts.filter(s => s.endTime).length;
+
+      const staff = user?.staff || {};
+      const efficiency = calculateEfficiency(commands, warnings, completedShifts, staff.consistency || 100);
+
+      const embed = new EmbedBuilder()
+        .setTitle(`📊 Staff Efficiency - ${targetUser.username}`)
+        .setColor(0x2ecc71)
+        .setThumbnail(targetUser.displayAvatarURL());
+
+      embed.addFields(
+        { name: 'Efficiency Score', value: `${efficiency}%`, inline: true },
+        { name: 'Consistency', value: `${staff.consistency || 100}%`, inline: true }
+      );
+
+      embed.addFields(
+        { name: 'Commands', value: commands.toString(), inline: true },
+        { name: 'Warnings', value: warnings.toString(), inline: true },
+        { name: 'Shifts Completed', value: completedShifts.toString(), inline: true }
+      );
+
+      await interaction.reply({ embeds: [embed] });
+    } else {
+      const users = await User.find({
+        'guilds.guildId': guildId,
+        staff: { $exists: true }
+      }).lean();
+
+      const userEfficiencies = await Promise.all(users.map(async user => {
         const activities = await Activity.find({
           guildId,
-          userId: targetUser.id,
+          userId: user.userId,
           createdAt: { $gte: thirtyDaysAgo }
         }).lean();
 
         const shifts = await Shift.find({
           guildId,
-          userId: targetUser.id,
+          userId: user.userId,
           startTime: { $gte: thirtyDaysAgo }
         }).lean();
 
@@ -48,109 +78,39 @@ module.exports = {
         const warnings = activities.filter(a => a.type === 'warning').length;
         const completedShifts = shifts.filter(s => s.endTime).length;
 
-        const staff = user.staff || {};
-        const efficiency = calculateEfficiency(commands, warnings, completedShifts, staff.consistency || 100);
-        const bars = Math.round(efficiency / 10);
-        const barChar = '�';
-        const emptyChar = '�';
-        const visual = `\`${barChar.repeat(bars)}${emptyChar.repeat(10 - bars)}\` **${efficiency}%**`;
+        const efficiency = calculateEfficiency(commands, warnings, completedShifts, user.staff?.consistency || 100);
 
-        // Elite Grading System
-        let grade = 'C';
-        if (efficiency >= 95) grade = 'S (Elite)';
-        else if (efficiency >= 85) grade = 'A (Superior)';
-        else if (efficiency >= 70) grade = 'B (Reliable)';
+        return {
+          userId: user.userId,
+          username: user.username,
+          efficiency,
+          consistency: user.staff?.consistency || 100,
+          commands,
+          completedShifts
+        };
+      }));
 
-        const embed = await createCustomEmbed(interaction, {
-          title: `?? Tactical Efficiency: ${targetUser.username}`,
-          thumbnail: targetUser.displayAvatarURL({ dynamic: true }),
-          description: `### ??? Personnel Yield Audit\nReviewing 30-day authenticated activity tracked inside sector **${interaction.guild.name}**. Cross-referencing behavioral consistency with output yields.`,
-          fields: [
-            { name: '?? Efficiency Gradient', value: `${visual}\n> **Performance Grade:** \`Rank [${grade}]\``, inline: false },
-            { name: '?? Operational Integrity', value: `\`${staff.consistency || 100}%\``, inline: true },
-            { name: '? Network Commands', value: `\`${commands}\` Pings`, inline: true },
-            { name: '?? Moderation Disputes', value: `\`${warnings}\` Incidents`, inline: true },
-            { name: '?? Retention Yield', value: `\`${completedShifts}\` Patrols`, inline: true },
-            { name: '? Level Clearance', value: `\`LVL ${staff.level || 1}\``, inline: true }
-          ],
-          footer: 'Predictive Efficiency Modeling � V3 Strategic',
-          color: efficiency >= 80 ? 'success' : 'premium'
-        });
+      const sortedByEfficiency = userEfficiencies.sort((a, b) => b.efficiency - a.efficiency).slice(0, 10);
 
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_staff_efficiency').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [embed], components: [row] });
+      const embed = new EmbedBuilder()
+        .setTitle('📊 Staff Efficiency Rankings')
+        .setColor(0x3498db)
+        .setDescription('Top 10 most efficient staff members');
 
-      } else {
-        // Calculate Global Tier List limited by Guild bounds
-        const users = await User.find({
-          guildId,
-          staff: { $exists: true }
-        }).lean();
+      const rankings = sortedByEfficiency.map((u, i) => {
+        const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}.`;
+        return `${medal} **${u.username}** - ${u.efficiency}% (${u.commands} cmds, ${u.completedShifts} shifts)`;
+      });
 
-        if (!users.length) {
-          const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_staff_efficiency').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [createErrorEmbed('No staff database queries detected mapped securely to this operational bounds.')], components: [row] });
-        }
+      embed.addFields({ name: 'Rankings', value: rankings.join('\n'), inline: false });
 
-        const userEfficiencies = await Promise.all(users.map(async user => {
-          const activitiesBuffer = await Activity.find({
-            guildId,
-            userId: user.userId,
-            createdAt: { $gte: thirtyDaysAgo }
-          }).lean();
+      const avgEfficiency = userEfficiencies.length > 0 
+        ? Math.round(userEfficiencies.reduce((acc, u) => acc + u.efficiency, 0) / userEfficiencies.length)
+        : 0;
 
-          const shiftsBuffer = await Shift.find({
-            guildId,
-            userId: user.userId,
-            startTime: { $gte: thirtyDaysAgo }
-          }).lean();
+      embed.addFields({ name: 'Server Average', value: `${avgEfficiency}%`, inline: true });
 
-          const commands = activitiesBuffer.filter(a => a.type === 'command').length;
-          const warnings = activitiesBuffer.filter(a => a.type === 'warning').length;
-          const completedShifts = shiftsBuffer.filter(s => s.endTime).length;
-
-          const efficiency = calculateEfficiency(commands, warnings, completedShifts, user.staff?.consistency || 100);
-
-          return {
-            userId: user.userId,
-            username: user.username,
-            efficiency,
-            commands,
-            completedShifts
-          };
-        }));
-
-        const sortedByEfficiency = userEfficiencies.sort((a, b) => b.efficiency - a.efficiency).slice(0, 10);
-
-        let rankStrings = sortedByEfficiency.map((u, i) => {
-          const medal = i === 0 ? '??' : i === 1 ? '??' : i === 2 ? '??' : `\`${i + 1}\``;
-          return `${medal} <@${u.userId}> : **${u.efficiency}%** | \`${u.commands} Cmd | ${u.completedShifts} Pld\``;
-        });
-
-        const avgEfficiency = userEfficiencies.length > 0
-          ? Math.round(userEfficiencies.reduce((acc, u) => acc + u.efficiency, 0) / userEfficiencies.length)
-          : 0;
-
-        const embed = await createCustomEmbed(interaction, {
-          title: '?? Operational Server Efficiency Toplist',
-          thumbnail: interaction.guild.iconURL({ dynamic: true }),
-          description: `### ??? Authorized Personnel Ranking\nFiltering the top 10 most technically efficient tracked responders in the **${interaction.guild.name}** sector.`,
-          fields: [
-            { name: '?? Model Operatives', value: rankStrings.join('\n') || '*No authenticated entries resolved.*', inline: false },
-            { name: '?? Sector Baseline', value: `\`Relative Efficient Threshold: ${avgEfficiency}%\``, inline: false }
-          ],
-          footer: 'Rankings authenticated against 30-day tracking vector � V3 Strategic',
-          color: 'enterprise'
-        });
-
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_staff_efficiency').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [embed], components: [row] });
-      }
-
-    } catch (error) {
-      console.error('Staff Efficiency Error:', error);
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_staff_efficiency').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [createErrorEmbed('Efficiency Matrix failure: Unable to decode server-wide performance comparisons.')], components: [row] });
+      await interaction.reply({ embeds: [embed] });
     }
   }
 };
@@ -168,5 +128,3 @@ function calculateEfficiency(commands, warnings, completedShifts, consistency) {
   const score = positiveScore - penalty + consistencyBonus;
   return Math.min(100, Math.max(0, Math.round(score / 2)));
 }
-
-

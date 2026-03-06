@@ -1,5 +1,4 @@
-const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createEnterpriseEmbed } = require('../../utils/enhancedEmbeds');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const { Guild, Warning, Shift } = require('../../database/mongo');
 
 module.exports = {
@@ -9,11 +8,6 @@ module.exports = {
 
   async execute(interaction, client) {
     await interaction.deferReply();
-
-            const license = await validatePremiumLicense(interaction, 'enterprise');
-            if (!license.allowed) {
-                return await interaction.editReply({ embeds: [license.embed], components: [license.components] });
-            }
     const guildId = interaction.guildId;
     const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
 
@@ -28,35 +22,29 @@ module.exports = {
     const suggestions = [];
 
     if (!settings.moderation && warnings > 5)
-      suggestions.push({ name: '??? Enable Auto-Moderation', value: 'You have 5+ warnings this month. Auto-moderation can handle repeated offenders automatically.' });
+      suggestions.push({ name: '🛡️ Enable Auto-Moderation', value: 'You have 5+ warnings this month. Auto-moderation can handle repeated offenders automatically.' });
     if (!settings.automation)
-      suggestions.push({ name: '?? Enable Automation Module', value: 'Automation can handle shift reminders, rank-ups, and reward distributions without manual effort.' });
+      suggestions.push({ name: '⚙️ Enable Automation Module', value: 'Automation can handle shift reminders, rank-ups, and reward distributions without manual effort.' });
     if (stuckShifts > 0)
-      suggestions.push({ name: '? Set Shift Auto-End', value: `${stuckShifts} shift(s) are currently stuck. Consider auto-ending shifts after 8 hours of inactivity.` });
+      suggestions.push({ name: '⏰ Set Shift Auto-End', value: `${stuckShifts} shift(s) are currently stuck. Consider auto-ending shifts after 8 hours of inactivity.` });
     if (!settings.tickets && stats.commandsUsed > 100)
-      suggestions.push({ name: '?? Enable Ticket System', value: 'High command usage detected. A ticket system can reduce repetitive support interactions.' });
+      suggestions.push({ name: '🎫 Enable Ticket System', value: 'High command usage detected. A ticket system can reduce repetitive support interactions.' });
     if (suggestions.length === 0)
-      suggestions.push({ name: '? Everything Looks Good!', value: 'Your server automation is well-configured. Keep monitoring your trends.' });
+      suggestions.push({ name: '✅ Everything Looks Good!', value: 'Your server automation is well-configured. Keep monitoring your trends.' });
 
-    const embed = createEnterpriseEmbed()
-      .setTitle('?? Automation Suggestions')
-      
+    const embed = new EmbedBuilder()
+      .setTitle('🤖 Automation Suggestions')
+      .setColor(0x3498db)
       .setDescription('Based on your server\'s data, here are the top recommendations:')
       .addFields(suggestions)
       .addFields(
-        { name: '?? Warnings (30d)', value: warnings.toString(), inline: true },
-        { name: '?? Stuck Shifts', value: stuckShifts.toString(), inline: true },
-        { name: '? Commands Used', value: (stats.commandsUsed || 0).toString(), inline: true }
+        { name: '📊 Warnings (30d)', value: warnings.toString(), inline: true },
+        { name: '🕐 Stuck Shifts', value: stuckShifts.toString(), inline: true },
+        { name: '⚡ Commands Used', value: (stats.commandsUsed || 0).toString(), inline: true }
       )
-      
-      ;
+      .setFooter({ text: `${interaction.guild.name} • AI Suggestions` })
+      .setTimestamp();
 
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_automation_suggestions').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [embed], components: [row] });
+    await interaction.editReply({ embeds: [embed] });
   }
 };
-
-
-
-
-

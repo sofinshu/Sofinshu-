@@ -1,6 +1,4 @@
-const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { validatePremiumLicense } = require('../../utils/enhancedPremiumGuard');
-const { createEnterpriseEmbed, createErrorEmbed, createSuccessEmbed } = require('../../utils/enhancedEmbeds');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const { Activity } = require('../../database/mongo');
 
 module.exports = {
@@ -10,11 +8,6 @@ module.exports = {
 
   async execute(interaction, client) {
     await interaction.deferReply();
-
-            const license = await validatePremiumLicense(interaction, 'enterprise');
-            if (!license.allowed) {
-                return await interaction.editReply({ embeds: [license.embed], components: [license.components] });
-            }
     const guildId = interaction.guildId;
     const sevenDaysAgo = new Date(Date.now() - 7 * 86400000);
     const events = await Activity.find({ guildId, type: { $in: ['promotion', 'warning'] }, createdAt: { $gte: sevenDaysAgo } })
@@ -22,35 +15,27 @@ module.exports = {
 
     const promotions = events.filter(e => e.type === 'promotion');
     const warnings = events.filter(e => e.type === 'warning');
-    const typeEmojis = { promotion: '??', warning: '??' };
+    const typeEmojis = { promotion: '⬆️', warning: '⚠️' };
 
     const timeline = events.length
       ? events.map(e => {
         const ts = Math.floor(new Date(e.createdAt).getTime() / 1000);
-        return `${typeEmojis[e.type]} <@${e.userId}> � <t:${ts}:R>`;
+        return `${typeEmojis[e.type]} <@${e.userId}> — <t:${ts}:R>`;
       }).join('\n')
-      : '?? No events this week.';
+      : '📭 No events this week.';
 
-    const embed = createEnterpriseEmbed()
-      .setTitle('?? Event Visuals � Last 7 Days')
-      
+    const embed = new EmbedBuilder()
+      .setTitle('🎭 Event Visuals — Last 7 Days')
+      .setColor(0x9b59b6)
       .addFields(
-        { name: '?? Promotions', value: promotions.length.toString(), inline: true },
-        { name: '?? Warnings', value: warnings.length.toString(), inline: true },
-        { name: '?? Total Events', value: events.length.toString(), inline: true },
-        { name: '?? Event Timeline', value: timeline }
+        { name: '⬆️ Promotions', value: promotions.length.toString(), inline: true },
+        { name: '⚠️ Warnings', value: warnings.length.toString(), inline: true },
+        { name: '📋 Total Events', value: events.length.toString(), inline: true },
+        { name: '📅 Event Timeline', value: timeline }
       )
-      
-      ;
+      .setFooter({ text: `${interaction.guild.name} • Event Visual Log` })
+      .setTimestamp();
 
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_event_visuals').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [embed], components: [row] });
+    await interaction.editReply({ embeds: [embed] });
   }
 };
-
-
-
-
-
-
-

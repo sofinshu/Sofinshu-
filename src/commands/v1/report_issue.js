@@ -1,46 +1,25 @@
-﻿const { ActionRowBuilder, ButtonBuilder, ButtonStyle, SlashCommandBuilder } = require('discord.js');
-const { createCustomEmbed, createErrorEmbed, createSuccessEmbed } = require('../../utils/enhancedEmbeds');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const { Guild } = require('../../database/mongo');
 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('report_issue')
-    .setDescription('Report an issue with the bot or server')
+    .setDescription('Report an issue with the bot')
     .addStringOption(opt => opt.setName('issue').setDescription('Describe the issue').setRequired(true)),
 
   async execute(interaction) {
-    try {
-      await interaction.deferReply({ ephemeral: true });
-      const issue = interaction.options.getString('issue');
-
-      const guildData = await Guild.findOne({ guildId: interaction.guildId }) || new Guild({ guildId: interaction.guildId });
-      if (!guildData.reportedIssues) guildData.reportedIssues = [];
-      guildData.reportedIssues.push({
-        userId: interaction.user.id,
-        issue,
-        timestamp: new Date(),
-        status: 'open'
-      });
-      await guildData.save();
-
-      const embed = await createCustomEmbed(interaction, {
-        title: '✅ Issue Reported',
-        description: `Your feedback has been successfully logged. Our development team will review this shortly.\n\n**Log Entry:**\n*"${issue}"*`,
-        color: 'success'
-      });
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_report_issue').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
-      await interaction.editReply({ embeds: [embed], components: [row] });
-    } catch (error) {
-      console.error(error);
-      const errEmbed = createErrorEmbed('An error occurred while reporting the issue. Please try again later.');
-      if (interaction.deferred || interaction.replied) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_report_issue').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
-        return await interaction.editReply({ embeds: [errEmbed], components: [row] });
-      } else {
-        await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
-      }
-    }
+    const issue = interaction.options.getString('issue');
+    
+    const guildData = await Guild.findOne({ guildId: interaction.guildId }) || new Guild({ guildId: interaction.guildId });
+    if (!guildData.reportedIssues) guildData.reportedIssues = [];
+    guildData.reportedIssues.push({
+      userId: interaction.user.id,
+      issue,
+      timestamp: new Date(),
+      status: 'open'
+    });
+    await guildData.save();
+    
+    await interaction.reply({ content: `✅ Issue reported: "${issue}". Thank you for your feedback!`, ephemeral: true });
   }
 };
-
-

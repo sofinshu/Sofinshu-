@@ -1,5 +1,4 @@
-const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createPremiumEmbed } = require('../../utils/enhancedEmbeds');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const { Guild } = require('../../database/mongo');
 
 module.exports = {
@@ -42,22 +41,16 @@ module.exports = {
     };
     await guild.save();
 
-    const embed = createPremiumEmbed()
-      .setTitle('?? Auto-Warn Settings')
-      
+    const embed = new EmbedBuilder()
+      .setTitle('⚠️ Auto-Warn Settings')
+      .setColor(enabled ? 0x2ecc71 : 0xe74c3c)
       .addFields(
         { name: 'Status', value: enabled ? 'Enabled' : 'Disabled', inline: true },
         { name: 'Points', value: points.toString(), inline: true },
         { name: 'Default Reason', value: reason, inline: false }
       )
-      ;
+      .setTimestamp();
 
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v4_auto_warn').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [embed], components: [row] });
+    await interaction.reply({ embeds: [embed] });
   }
 };
-
-
-
-
-

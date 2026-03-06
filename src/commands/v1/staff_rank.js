@@ -1,5 +1,4 @@
-﻿const { ActionRowBuilder, ButtonBuilder, ButtonStyle, SlashCommandBuilder } = require('discord.js');
-const { createCoolEmbed, createCustomEmbed, createErrorEmbed } = require('../../utils/enhancedEmbeds');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -8,48 +7,28 @@ module.exports = {
     .addUserOption(opt => opt.setName('user').setDescription('Staff member').setRequired(false)),
 
   async execute(interaction, client) {
-    try {
-      await interaction.deferReply();
-      const user = interaction.options.getUser('user') || interaction.user;
-      const staffSystem = client.systems.staff;
+    const user = interaction.options.getUser('user') || interaction.user;
+    const staffSystem = client.systems.staff;
+    
+    const points = await staffSystem.getPoints(user.id, interaction.guildId);
+    const rank = await staffSystem.getRank(user.id, interaction.guildId);
+    const requirements = await staffSystem.getPromotionRequirements(rank);
+    
+    const rankOrder = ['member', 'trial', 'staff', 'moderator', 'admin', 'owner'];
+    const rankNames = { member: 'Newcomer', trial: 'Trial', staff: 'Staff', moderator: 'Moderator', admin: 'Admin', owner: 'Owner' };
+    
+    let displayRank = rankNames[rank] || rank;
+    
+    const embed = new EmbedBuilder()
+      .setTitle(`🏆 ${user.username}'s Rank`)
+      .addFields(
+        { name: 'Rank', value: displayRank, inline: true },
+        { name: 'Points', value: `${points}`, inline: true },
+        { name: 'Next Rank', value: requirements.next, inline: true }
+      )
+      .setColor('#f1c40f')
+      .setThumbnail(user.displayAvatarURL());
 
-      if (!staffSystem) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_staff_rank').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
-        return await interaction.editReply({ embeds: [createErrorEmbed('Staff system is currently offline.')], components: [row] });
-      }
-
-      const points = await staffSystem.getPoints(user.id, interaction.guildId);
-      const rank = await staffSystem.getRank(user.id, interaction.guildId);
-      const requirements = await staffSystem.getPromotionRequirements(rank);
-
-      const rankNames = { member: 'Newcomer', trial: 'Trial', staff: 'Staff', moderator: 'Moderator', admin: 'Admin', owner: 'Owner' };
-      let displayRank = rankNames[rank] || rank;
-
-      const embed = await createCustomEmbed(interaction, {
-        title: `📈 ${user.username}'s Rank Progression`,
-        description: `Current standing within the administrative hierarchy of **${interaction.guild.name}**.`,
-        thumbnail: user.displayAvatarURL({ dynamic: true }),
-        fields: [
-          { name: '🎖️ Current Rank', value: `\`${displayRank.toUpperCase()}\``, inline: true },
-          { name: '📊 Lifetime Points', value: `\`${points.toLocaleString()}\``, inline: true },
-          { name: '📈 Next Tier', value: requirements?.next ? `\`${requirements.next}\` pts` : 'Max Rank Reached', inline: true }
-        ],
-        footer: 'Automated ranking engine active'
-      });
-
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_staff_rank').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
-      await interaction.editReply({ embeds: [embed], components: [row] });
-    } catch (error) {
-      console.error(error);
-      const errEmbed = createErrorEmbed('An error occurred while fetching the staff rank.');
-      if (interaction.deferred || interaction.replied) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_staff_rank').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
-        return await interaction.editReply({ embeds: [errEmbed], components: [row] });
-      } else {
-        await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
-      }
-    }
+    await interaction.reply({ embeds: [embed] });
   }
 };
-
-

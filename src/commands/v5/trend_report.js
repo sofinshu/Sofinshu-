@@ -1,5 +1,4 @@
-const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createPremiumEmbed } = require('../../utils/enhancedEmbeds');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const { Activity } = require('../../database/mongo');
 
 module.exports = {
@@ -39,9 +38,9 @@ module.exports = {
       ? ((currentMonth.length - lastMonth.length) / lastMonth.length * 100).toFixed(1)
       : 0;
 
-    const embed = createPremiumEmbed()
-      .setTitle('?? Trend Report')
-      
+    const embed = new EmbedBuilder()
+      .setTitle('📈 Trend Report')
+      .setColor(0x3498db)
       .addFields(
         { name: 'This Week', value: `${currentWeek.length} activities`, inline: true },
         { name: 'Last Week', value: `${lastWeek.length} activities`, inline: true },
@@ -50,14 +49,8 @@ module.exports = {
         { name: 'Last Month', value: `${lastMonth.length} activities`, inline: true },
         { name: 'Monthly Change', value: `${monthChange > 0 ? '+' : ''}${monthChange}%`, inline: true }
       )
-      ;
+      .setTimestamp();
 
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_trend_report').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [embed], components: [row] });
+    await interaction.reply({ embeds: [embed] });
   }
 };
-
-
-
-
-

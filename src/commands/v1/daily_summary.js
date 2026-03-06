@@ -1,61 +1,45 @@
-﻿const { ActionRowBuilder, ButtonBuilder, ButtonStyle, SlashCommandBuilder } = require('discord.js');
-const { createCoolEmbed, createCustomEmbed, createErrorEmbed } = require('../../utils/enhancedEmbeds');
-const { Guild, Shift, Warning } = require('../../database/mongo');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { Guild } = require('../../database/mongo');
 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('daily_summary')
     .setDescription('Get daily activity summary report'),
-
+  
   async execute(interaction) {
-    try {
-      await interaction.deferReply();
-      const guildData = await Guild.findOne({ guildId: interaction.guild.id });
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-
-      let activeStaff = 0;
-      let totalMinutes = 0;
-      let warningsToday = 0;
-
-      const todayShifts = await Shift.find({ guildId: interaction.guild.id, startTime: { $gte: today } }).lean();
-      const todayWarnings = await Warning.find({ guildId: interaction.guild.id, createdAt: { $gte: today } }).lean();
-
-      if (todayShifts.length > 0) {
-        const activeUserIds = new Set(todayShifts.map(s => s.userId));
-        activeStaff = activeUserIds.size;
-        totalMinutes = todayShifts.reduce((acc, s) => {
-          const end = s.endTime ? new Date(s.endTime) : new Date();
-          return acc + (end - new Date(s.startTime)) / 60000;
-        }, 0);
-      }
-
-      warningsToday = todayWarnings.length;
-
-      const embed = await createCustomEmbed(interaction, {
-        title: '📊 Terminal Operational Summary (Daily)',
-        description: `High-fidelity activity report for **${interaction.guild.name}** over the last 24-hour cycle.`,
-        thumbnail: interaction.guild.iconURL({ dynamic: true }),
-        fields: [
-          { name: '👥 Active Personnel', value: `\`${activeStaff}\` members`, inline: true },
-          { name: '⏱️ Total Active Time', value: `\`${Math.round(totalMinutes / 60)}h ${Math.round(totalMinutes % 60)}m\``, inline: true },
-          { name: '⚠️ Recorded Incidents', value: `\`${warningsToday}\``, inline: true }
-        ]
-      });
-
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_daily_summary').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
-      await interaction.editReply({ embeds: [embed], components: [row] });
-    } catch (error) {
-      console.error(error);
-      const errEmbed = createErrorEmbed('An error occurred while fetching the daily summary.');
-      if (interaction.deferred || interaction.replied) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_daily_summary').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
-        return await interaction.editReply({ embeds: [errEmbed], components: [row] });
-      } else {
-        await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
-      }
+    const guildData = await Guild.findOne({ guildId: interaction.guild.id });
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    let activeStaff = 0;
+    let totalMinutes = 0;
+    let warningsToday = 0;
+    
+    if (guildData?.shifts) {
+      const todayShifts = guildData.shifts.filter(s => s.startTime >= today);
+      const activeUserIds = new Set(todayShifts.map(s => s.userId));
+      activeStaff = activeUserIds.size;
+      totalMinutes = todayShifts.reduce((acc, s) => {
+        const end = s.endTime || new Date();
+        return acc + (end - s.startTime) / 60000;
+      }, 0);
     }
+    
+    if (guildData?.warnings) {
+      warningsToday = guildData.warnings.filter(w => w.timestamp >= today).length;
+    }
+    
+    const embed = new EmbedBuilder()
+      .setTitle('📊 Daily Summary')
+      .setThumbnail(interaction.guild.iconURL())
+      .addFields(
+        { name: '👥 Active Staff', value: `${activeStaff}`, inline: true },
+        { name: '⏱️ Total Hours', value: `${Math.round(totalMinutes / 60)}h`, inline: true },
+        { name: '⚠️ Warnings Today', value: `${warningsToday}`, inline: true }
+      )
+      .setColor('#3498db')
+      .setTimestamp();
+    
+    await interaction.reply({ embeds: [embed] });
   }
 };
-
-

@@ -1,12 +1,10 @@
-const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { validatePremiumLicense } = require('../../utils/enhancedPremiumGuard');
-const { createCustomEmbed, createErrorEmbed, createPremiumEmbed, createSuccessEmbed } = require('../../utils/enhancedEmbeds');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const { User, Activity } = require('../../database/mongo');
 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('efficiency_chart')
-    .setDescription('Enterprise Apex: High-Fidelity Spectral Performance Analysis')
+    .setDescription('View efficiency chart')
     .addUserOption(option =>
       option.setName('user')
         .setDescription('User to view efficiency for')
@@ -17,95 +15,83 @@ module.exports = {
         .setRequired(false)
         .addChoices(
           { name: '7 Days', value: '7' },
-          { name: '30 Days', value: '30' }
+          { name: '30 Days', value: '30' },
+          { name: '90 Days', value: '90' }
         )),
 
   async execute(interaction) {
-    try {
-      await interaction.deferReply();
+    const targetUser = interaction.options.getUser('user') || interaction.user;
+    const guildId = interaction.guildId;
+    const period = parseInt(interaction.options.getString('period') || '30');
 
-      // Enterprise License Guard
-      const license = await validatePremiumLicense(interaction, 'premium');
-      if (!license.allowed) {
-        return await interaction.editReply({ embeds: [license.embed], components: license.components });
-      }
+    const daysAgo = new Date();
+    daysAgo.setDate(daysAgo.getDate() - period);
 
-      const targetUser = interaction.options.getUser('user') || interaction.user;
-      const guildId = interaction.guildId;
-      const period = parseInt(interaction.options.getString('period') || '30');
+    const activities = await Activity.find({
+      guildId,
+      userId: targetUser.id,
+      createdAt: { $gte: daysAgo }
+    }).lean();
 
-      const daysAgo = new Date();
-      daysAgo.setDate(daysAgo.getDate() - period);
+    const user = await User.findOne({ userId: targetUser.id });
+    const staff = user?.staff || {};
 
-      const [activities, user] = await Promise.all([
-        Activity.find({ guildId, userId: targetUser.id, createdAt: { $gte: daysAgo } }).lean(),
-        User.findOne({ userId: targetUser.id, guildId }).lean()
-      ]);
+    const commands = activities.filter(a => a.type === 'command').length;
+    const warnings = activities.filter(a => a.type === 'warning').length;
+    const messages = activities.filter(a => a.type === 'message').length;
 
-      if (!user || !user.staff) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_efficiency_chart').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [createErrorEmbed(`No analytics found. <@${targetUser.id}> is unmapped in this sector.`)], components: [row] });
-      }
+    const efficiencyScore = calculateEfficiency(commands, warnings, messages, staff.consistency || 100);
 
-      const staff = user.staff;
-      const commands = activities.filter(a => a.type === 'command').length;
-      const warnings = activities.filter(a => a.type === 'warning').length;
-      const messages = activities.filter(a => a.type === 'message').length;
+    const embed = new EmbedBuilder()
+      .setTitle(`📈 Efficiency Chart - ${targetUser.username}`)
+      .setColor(0x2ecc71)
+      .setThumbnail(targetUser.displayAvatarURL());
 
-      const efficiencyScore = calculateEfficiency(commands, warnings, messages, staff.consistency || 100);
-      const spectralGauge = generateSpectralGauge(efficiencyScore);
+    embed.addFields(
+      { name: 'Period', value: `${period} Days`, inline: true },
+      { name: 'Efficiency Score', value: `${efficiencyScore}%`, inline: true }
+    );
 
-      const embed = await createCustomEmbed(interaction, {
-        title: `?? Enterprise Spectral Yield: ${targetUser.username}`,
-        thumbnail: targetUser.displayAvatarURL({ dynamic: true }),
-        description: `### ??? Apex Performance Audit\nMacroscopic trace of personnel execution gathered over a **${period}-day** trajectory. High-fidelity spectral visualization of behavioral metabolism.\n\n**?? Enterprise APEX EXCLUSIVE**`,
-        fields: [
-          { name: '? Spectral Efficiency Ribbon', value: spectralGauge, inline: false },
-          { name: '? Command Module', value: `\`${commands}\` Pings`, inline: true },
-          { name: '?? Chat Intelligence', value: `\`${messages}\` Logs`, inline: true },
-          { name: '?? Security Warnings', value: `\`${warnings}\` Flags`, inline: true },
-          { name: '?? Reliability Factor', value: `\`${staff.consistency || 100}%\``, inline: true },
-          { name: '?? Honorific Rating', value: `\`Rank [${getGrade(efficiencyScore)}]\``, inline: true },
-          { name: '?? Intelligence Tier', value: '`PLATINUM (APEX)`', inline: true }
-        ],
-        footer: 'Spectral Yield Visualization � V3 Strategic Apex Suite',
-        color: efficiencyScore >= 80 ? 'success' : 'premium'
-      });
+    embed.addFields(
+      { name: 'Commands', value: commands.toString(), inline: true },
+      { name: 'Warnings', value: warnings.toString(), inline: true },
+      { name: 'Messages', value: messages.toString(), inline: true }
+    );
 
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_efficiency_chart').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [embed], components: [row] });
+    embed.addFields(
+      { name: 'Consistency', value: `${staff.consistency || 100}%`, inline: true },
+      { name: 'Reputation', value: (staff.reputation || 0).toString(), inline: true },
+      { name: 'Total Points', value: (staff.points || 0).toString(), inline: true }
+    );
 
-    } catch (error) {
-      console.error('Enterprise Efficiency Chart Error:', error);
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_efficiency_chart').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [createErrorEmbed('Efficiency Analytics failure: Unable to synchronize spectral ribbons.')], components: [row] });
-    }
+    const chart = generateEfficiencyChart(efficiencyScore);
+    embed.addFields({ name: 'Efficiency', value: chart, inline: false });
+
+    await interaction.reply({ embeds: [embed] });
   }
 };
 
 function calculateEfficiency(commands, warnings, messages, consistency) {
   const positiveActions = commands + messages;
-  const totalActions = positiveActions + (warnings * 5); // Warnings have higher negative weight in Apex
+  const totalActions = positiveActions + warnings;
+  
   if (totalActions === 0) return 50;
+  
   const actionScore = (positiveActions / Math.max(totalActions, 1)) * 70;
   const consistencyScore = (consistency / 100) * 30;
+  
   return Math.min(100, Math.max(0, Math.round(actionScore + consistencyScore)));
 }
 
-function generateSpectralGauge(score) {
-  const length = 15;
-  const filledLength = Math.round((score / 100) * length);
-  const filled = '�'.repeat(filledLength);
-  const pattern = '�'.repeat(Math.max(0, length - filledLength));
-  return `\`[${filled}${pattern}]\` **${score}% VELOCITY**`;
+function generateEfficiencyChart(score) {
+  const bars = Math.round(score / 10);
+  let chart = '';
+  for (let i = 0; i < 10; i++) {
+    if (i < bars) {
+      chart += i < 6 ? '🟢' : i < 8 ? '🟡' : '🔴';
+    } else {
+      chart += '⬜';
+    }
+  }
+  return chart + ` ${score}%`;
 }
-
-function getGrade(score) {
-  if (score >= 95) return 'S+ OVERLORD';
-  if (score >= 85) return 'A+ ELITE';
-  if (score >= 70) return 'B STABLE';
-  if (score >= 50) return 'C NOMINAL';
-  return 'F CRITICAL';
-}
-
-

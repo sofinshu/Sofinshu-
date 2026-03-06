@@ -1,5 +1,4 @@
-const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createEnterpriseEmbed } = require('../../utils/enhancedEmbeds');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const { Guild, Activity } = require('../../database/mongo');
 
 module.exports = {
@@ -9,11 +8,6 @@ module.exports = {
 
   async execute(interaction, client) {
     await interaction.deferReply();
-
-            const license = await validatePremiumLicense(interaction, 'enterprise');
-            if (!license.allowed) {
-                return await interaction.editReply({ embeds: [license.embed], components: [license.components] });
-            }
     const guildId = interaction.guildId;
     const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 
@@ -33,30 +27,24 @@ module.exports = {
       return d >= today && a.type === 'command';
     }).length;
 
-    const bar = '�'.repeat(Math.round(parseFloat(engagementRate) / 10)) + '�'.repeat(10 - Math.round(parseFloat(engagementRate) / 10));
+    const bar = '▓'.repeat(Math.round(parseFloat(engagementRate) / 10)) + '░'.repeat(10 - Math.round(parseFloat(engagementRate) / 10));
 
-    const embed = createEnterpriseEmbed()
-      .setTitle('?? Engagement Summary')
-      
+    const embed = new EmbedBuilder()
+      .setTitle('💬 Engagement Summary')
+      .setColor(0x1abc9c)
       .setThumbnail(interaction.guild.iconURL())
       .addFields(
-        { name: '?? Total Members', value: memberCount.toString(), inline: true },
-        { name: '? Active This Week', value: activeUsers.toString(), inline: true },
-        { name: '?? Engagement Rate', value: `${engagementRate}%`, inline: true },
-        { name: '? Commands Today', value: cmdToday.toString(), inline: true },
-        { name: '?? Messages Processed', value: (stats.messagesProcessed || 0).toString(), inline: true },
-        { name: '?? Total Commands Used', value: (stats.commandsUsed || 0).toString(), inline: true },
-        { name: '?? Engagement Bar', value: `\`${bar}\` ${engagementRate}%` }
+        { name: '👥 Total Members', value: memberCount.toString(), inline: true },
+        { name: '✅ Active This Week', value: activeUsers.toString(), inline: true },
+        { name: '📊 Engagement Rate', value: `${engagementRate}%`, inline: true },
+        { name: '⚡ Commands Today', value: cmdToday.toString(), inline: true },
+        { name: '💬 Messages Processed', value: (stats.messagesProcessed || 0).toString(), inline: true },
+        { name: '🏅 Total Commands Used', value: (stats.commandsUsed || 0).toString(), inline: true },
+        { name: '📈 Engagement Bar', value: `\`${bar}\` ${engagementRate}%` }
       )
-      
-      ;
+      .setFooter({ text: `${interaction.guild.name} • Engagement Summary` })
+      .setTimestamp();
 
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_engagement_summary').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [embed], components: [row] });
+    await interaction.editReply({ embeds: [embed] });
   }
 };
-
-
-
-
-

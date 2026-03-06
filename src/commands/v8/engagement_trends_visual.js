@@ -1,5 +1,4 @@
-const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createEnterpriseEmbed, createErrorEmbed, createSuccessEmbed } = require('../../utils/enhancedEmbeds');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const { Activity } = require('../../database/mongo');
 
 module.exports = {
@@ -9,11 +8,6 @@ module.exports = {
 
   async execute(interaction, client) {
     await interaction.deferReply();
-
-            const license = await validatePremiumLicense(interaction, 'enterprise');
-            if (!license.allowed) {
-                return await interaction.editReply({ embeds: [license.embed], components: [license.components] });
-            }
     const guildId = interaction.guildId;
     const now = new Date();
     const w1 = new Date(now - 7 * 86400000);
@@ -33,25 +27,17 @@ module.exports = {
 
     const rows = metrics.map(([name, cur, prev]) => {
       const change = prev > 0 ? Math.round(((cur - prev) / prev) * 100) : 0;
-      const arrow = change > 5 ? '??' : change < -5 ? '??' : '??';
+      const arrow = change > 5 ? '📈' : change < -5 ? '📉' : '➡️';
       return `${arrow} **${name}**: ${cur} vs ${prev} (${change > 0 ? '+' : ''}${change}%)`;
     }).join('\n');
 
-    const embed = createEnterpriseEmbed()
-      .setTitle('?? Engagement Trends Visual')
-      
+    const embed = new EmbedBuilder()
+      .setTitle('📈 Engagement Trends Visual')
+      .setColor(thisWeek.length >= lastWeek.length ? 0x2ecc71 : 0xe74c3c)
       .setDescription(rows)
-      
-      ;
+      .setFooter({ text: `${interaction.guild.name} • Week-over-Week Trends` })
+      .setTimestamp();
 
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_engagement_trends_visual').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [embed], components: [row] });
+    await interaction.editReply({ embeds: [embed] });
   }
 };
-
-
-
-
-
-
-

@@ -1,95 +1,42 @@
-const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { validatePremiumLicense } = require('../../utils/enhancedPremiumGuard');
-const { createCustomEmbed, createErrorEmbed, createPremiumEmbed, createProgressBar, createSuccessEmbed } = require('../../utils/enhancedEmbeds');
-const { Activity } = require('../../database/mongo');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { Activity, User } = require('../../database/mongo');
 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('growth_tracking')
-    .setDescription('?? Track real member and activity growth trends over time'),
+    .setDescription('Track server growth metrics'),
 
   async execute(interaction) {
-    try {
-      await interaction.deferReply();
+    const guildId = interaction.guildId;
+    const guild = interaction.guild;
 
-      const license = await validatePremiumLicense(interaction, 'premium');
-      if (!license.allowed) {
-        return interaction.editReply({ embeds: [license.embed], components: license.components });
-      }
+    const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    const twoWeeksAgo = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000);
 
-      const guildId = interaction.guildId;
-      const now = new Date();
-      const thirtyDaysAgo = new Date(now - 30 * 86400000);
+    const thisWeek = await Activity.find({ guildId, createdAt: { $gte: weekAgo } });
+    const lastWeek = await Activity.find({ guildId, createdAt: { $gte: twoWeeksAgo, $lt: weekAgo } });
 
-      // Fetch 30 days of activity
-      const activities = await Activity.find({ guildId, createdAt: { $gte: thirtyDaysAgo } })
-        .sort({ createdAt: 1 }).lean();
+    const thisWeekMessages = thisWeek.filter(a => a.type === 'message').length;
+    const lastWeekMessages = lastWeek.filter(a => a.type === 'message').length;
 
-      if (activities.length === 0) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_growth_tracking').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [createErrorEmbed('Not enough activity data for growth tracking. Start using commands!')], components: [row] });
-      }
+    const newMembers = guild.members.cache.filter(m => m.joinedAt && m.joinedAt >= weekAgo).size;
+    const activeUsers = new Set(thisWeek.map(a => a.userId)).size;
 
-      // Group by week (4 weeks)
-      const weekCounts = [0, 0, 0, 0];
-      activities.forEach(a => {
-        const daysAgo = Math.floor((now - new Date(a.createdAt)) / 86400000);
-        const weekIdx = Math.min(3, Math.floor(daysAgo / 7));
-        weekCounts[3 - weekIdx]++;
-      });
+    const growth = lastWeekMessages > 0 
+      ? ((thisWeekMessages - lastWeekMessages) / lastWeekMessages * 100).toFixed(1)
+      : 0;
 
-      // Growth rates
-      const weekLabels = ['Week 4 ago', 'Week 3 ago', 'Week 2 ago', 'This Week'];
-      const maxWeek = Math.max(...weekCounts, 1);
-      const weekDisplay = weekCounts.map((c, i) => {
-        const bar = createProgressBar(Math.round((c / maxWeek) * 100), 10);
-        const delta = i > 0 && weekCounts[i - 1] > 0
-          ? ((c - weekCounts[i - 1]) / weekCounts[i - 1] * 100).toFixed(0)
-          : null;
-        const arrow = delta !== null ? (parseFloat(delta) > 0 ? `?? +${delta}%` : `?? ${delta}%`) : '';
-        return `**${weekLabels[i]}**: \`${bar}\` \`${c}\` ${arrow}`;
-      }).join('\n');
+    const embed = new EmbedBuilder()
+      .setTitle('📊 Growth Tracking')
+      .setColor(0x3498db)
+      .addFields(
+        { name: 'New Members (7d)', value: `+${newMembers}`, inline: true },
+        { name: 'Messages (7d)', value: thisWeekMessages.toLocaleString(), inline: true },
+        { name: 'Active Users', value: activeUsers.toString(), inline: true },
+        { name: 'Growth', value: `${growth > 0 ? '+' : ''}${growth}%`, inline: true }
+      )
+      .setTimestamp();
 
-      // Week-over-week overall
-      const thisWeek = weekCounts[3];
-      const lastWeek = weekCounts[2];
-      const overallGrowth = lastWeek > 0 ? ((thisWeek - lastWeek) / lastWeek * 100).toFixed(1) : '8';
-      const growthColor = parseFloat(overallGrowth) >= 0 ? '#43b581' : '#f04747';
-
-      // Member count from Discord
-      const memberCount = interaction.guild.memberCount;
-
-      // Active users this week
-      const oneWeekAgo = new Date(now - 7 * 86400000);
-      const recentActs = activities.filter(a => new Date(a.createdAt) >= oneWeekAgo);
-      const activeUsers = new Set(recentActs.map(a => a.userId)).size;
-      const retentionPct = Math.min(100, Math.round((activeUsers / Math.max(memberCount, 1)) * 100));
-
-      const embed = await createCustomEmbed(interaction, {
-        title: `?? Growth Tracking � ${interaction.guild.name}`,
-        thumbnail: interaction.guild.iconURL({ dynamic: true }),
-        description: `Real activity growth over the last **30 days** across **4 weeks**.`,
-        fields: [
-          { name: '?? Weekly Activity Trend', value: weekDisplay, inline: false },
-          { name: '?? Week-over-Week Growth', value: `\`${overallGrowth}%\``, inline: true },
-          { name: '?? Members', value: `\`${memberCount.toLocaleString()}\``, inline: true },
-          { name: '?? Weekly Retention', value: `\`${createProgressBar(retentionPct)}\` **${retentionPct}%**`, inline: false },
-          { name: '? Total Events (30d)', value: `\`${activities.length.toLocaleString()}\``, inline: true },
-          { name: '?? Active This Week', value: `\`${activeUsers}\` users`, inline: true }
-        ],
-        color: growthColor,
-        footer: 'uwu-chan � Premium Growth Tracking � 30-Day View'
-      });
-
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_growth_tracking').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [embed], components: [row] });
-    } catch (error) {
-      console.error('[growth_tracking] Error:', error);
-      const errEmbed = createErrorEmbed('Failed to load growth tracking data.');
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_growth_tracking').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary)); if (interaction.deferred || interaction.replied) {
-            return await interaction.editReply({ embeds: [errEmbed], components: [row] }); } else await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
-    }
+    await interaction.reply({ embeds: [embed] });
   }
 };
-
-

@@ -1,65 +1,25 @@
 const { Guild } = require('../database/mongo');
 const logger = require('../utils/logger');
 
+// Bot 3 (Strata3) — Enterprise tier only. Requires guild.premium.tier = 'enterprise'
+
 const OWNER_IDS = process.env.OWNER_IDS ? process.env.OWNER_IDS.split(',') : ['1357317173470564433'];
-
-const VERSION_TIER_MAP = {
-  v1: 'free',
-  v1_context: 'free',
-  buying: 'free',
-  v2: 'free',
-  v3: 'premium',
-  v4: 'premium',
-  v5: 'premium',
-  v6: 'enterprise',
-  v7: 'enterprise',
-  v8: 'enterprise'
-};
-
-const VERSION_NAMES = {
-  v1: 'Base Commands',
-  v2: 'Staff Tools',
-  v3: 'Premium Analytics',
-  v4: 'Premium Moderation',
-  v5: 'Premium Staff',
-  v6: 'Advanced Insights',
-  v7: 'Automation Ecosystem',
-  v8: 'Ultimate Experience'
-};
 
 class VersionGuard {
   async checkAccess(guildId, userId, requiredVersion) {
     const userIdStr = String(userId);
     const ownerIdsStr = OWNER_IDS.map(id => String(id));
 
-    logger.info(`[VERSION] checkAccess: guildId=${guildId}, userId=${userIdStr}, requiredVersion=${requiredVersion}`);
+    logger.info(`[VERSION] checkAccess: userId=${userIdStr}, requiredVersion=${requiredVersion}`);
 
+    // Bot owner always has access
     if (ownerIdsStr.includes(userIdStr)) {
       logger.info(`[VERSION] Owner access granted for ${userIdStr}`);
       return { allowed: true };
     }
 
-    if (!guildId) {
-      logger.error('[VERSION] checkAccess called without guildId - this may be a DM or internal error');
-      return {
-        allowed: false,
-        message: '❌ **Server Error**\nUnable to verify server context. Please try again in a server.'
-      };
-    }
-
-    let guild;
-    try {
-      guild = await Guild.findOne({ guildId });
-    } catch (dbError) {
-      logger.error(`[VERSION] Database error when looking up guild ${guildId}:`, dbError);
-      return {
-        allowed: false,
-        message: '❌ **Database Error**\nUnable to verify server status. Please try again later.'
-      };
-    }
-
+    const guild = await Guild.findOne({ guildId });
     if (!guild) {
-      logger.warn(`[VERSION] Guild ${guildId} not found in database - server may need registration`);
       return {
         allowed: false,
         message: '❌ **Server Not Registered**\nThis server isn\'t in our system yet. Please have a server admin use the `/buy` command in **Strata1 Bot** to get started.'
@@ -68,6 +28,7 @@ class VersionGuard {
 
     const currentTier = guild.premium?.tier || 'free';
 
+    // Check enterprise expired
     if (guild.premium?.expiresAt && new Date() > guild.premium.expiresAt) {
       guild.premium.isActive = false;
       guild.premium.tier = 'free';
@@ -76,25 +37,20 @@ class VersionGuard {
       const renewText = renewUrl ? `Renew at: ${renewUrl}` : 'Use `/enterprise` in the **Strata1 Bot** to renew.';
       return {
         allowed: false,
-        message: `⏰ **Subscription Expired**\nYour subscription has expired.\n${renewText}`
+        message: `⏰ **Enterprise Expired**\nYour enterprise subscription has expired.\n${renewText}`
       };
     }
 
-    const requiredTier = VERSION_TIER_MAP[requiredVersion] || 'enterprise';
-    const tierOrder = ['free', 'premium', 'enterprise'];
-    const currentTierIndex = tierOrder.indexOf(currentTier);
-    const requiredTierIndex = tierOrder.indexOf(requiredTier);
+    // This bot requires ENTERPRISE tier only — free and premium are both blocked
+    if (currentTier !== 'enterprise') {
+      const enterpriseUrl = process.env.ENTERPRISE_CHECKOUT_URL || process.env.STRIPE_CHECKOUT_URL || process.env.PAYPAL_CHECKOUT_URL || null;
+      const upgradeText = enterpriseUrl
+        ? `Upgrade at: ${enterpriseUrl}`
+        : 'Use `/buy` or `/enterprise` in the **Strata1 Bot** to upgrade.';
 
-    if (currentTierIndex < requiredTierIndex) {
-      const upgradeUrl = currentTier === 'free'
-        ? (process.env.PREMIUM_CHECKOUT_URL || process.env.STRIPE_CHECKOUT_URL || null)
-        : (process.env.ENTERPRISE_CHECKOUT_URL || process.env.STRIPE_CHECKOUT_URL || null);
-
-      const upgradeText = upgradeUrl ? `Upgrade at: ${upgradeUrl}` : 'Use `/buy` or `/premium` in the **Strata1 Bot** to upgrade.';
-
-      const tierMsg = requiredTier === 'premium'
-        ? `💎 **Premium Required**\n\n${VERSION_NAMES[requiredVersion]} requires **Premium** or **Enterprise**.\n\n✅ **Premium unlocks:** v1-v5 commands\n🌟 **Enterprise unlocks:** v1-v8 commands (all)\n\n${upgradeText}`
-        : `🌟 **Enterprise Required**\n\n${VERSION_NAMES[requiredVersion]} requires **Enterprise**.\n\n✅ **Free unlocks:** v1-v2 commands\n💎 **Premium unlocks:** v1-v5 commands\n🌟 **Enterprise unlocks:** v1-v8 commands (all)\n\n${upgradeText}`;
+      const tierMsg = currentTier === 'premium'
+        ? `💎 You have **Premium** but this bot requires **Enterprise**.\n\nEnterprise unlocks v6, v7, v8 commands (100 commands).\n\n${upgradeText}`
+        : `🌟 **Enterprise Required**\nThis bot (Strata3) requires an **Enterprise** subscription.\n\nEnterprise unlocks v6, v7, v8 commands (100 commands).\n\n${upgradeText}`;
 
       return {
         allowed: false,
@@ -106,11 +62,13 @@ class VersionGuard {
   }
 
   getVersionInfo(version) {
-    return {
-      tier: VERSION_TIER_MAP[version] || 'enterprise',
-      name: VERSION_NAMES[version] || 'Unknown'
+    const VERSIONS = {
+      v6: { tier: 'enterprise', name: 'Advanced Insights' },
+      v7: { tier: 'enterprise', name: 'Automation Ecosystem' },
+      v8: { tier: 'enterprise', name: 'Ultimate Experience' }
     };
+    return VERSIONS[version] || { tier: 'enterprise', name: 'Enterprise' };
   }
 }
 
-module.exports = { versionGuard: new VersionGuard(), VERSIONS: VERSION_TIER_MAP };
+module.exports = { versionGuard: new VersionGuard(), VERSIONS: {} };

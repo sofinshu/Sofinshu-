@@ -1,5 +1,4 @@
-const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createEnterpriseEmbed, createErrorEmbed, createSuccessEmbed } = require('../../utils/enhancedEmbeds');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -8,11 +7,6 @@ module.exports = {
 
   async execute(interaction, client) {
     await interaction.deferReply();
-
-            const license = await validatePremiumLicense(interaction, 'enterprise');
-            if (!license.allowed) {
-                return await interaction.editReply({ embeds: [license.embed], components: [license.components] });
-            }
     const guildId = interaction.guildId;
     const { Guild, Activity } = require('../../database/mongo');
     const [guild, acts] = await Promise.all([
@@ -27,32 +21,24 @@ module.exports = {
 
     const growth = joined > 0 ? Math.round((joined / Math.max(memberCount, 1)) * 100) : 0;
     const engRate = Math.round(([...new Set(acts.map(a => a.userId))].length / Math.max(memberCount, 1)) * 100);
-    const gBar = '�'.repeat(Math.round(growth / 10)) + '�'.repeat(10 - Math.round(growth / 10));
-    const eBar = '�'.repeat(Math.round(engRate / 10)) + '�'.repeat(10 - Math.round(engRate / 10));
+    const gBar = '▓'.repeat(Math.round(growth / 10)) + '░'.repeat(10 - Math.round(growth / 10));
+    const eBar = '▓'.repeat(Math.round(engRate / 10)) + '░'.repeat(10 - Math.round(engRate / 10));
 
-    const embed = createEnterpriseEmbed()
-      .setTitle('?? Growth Visuals')
-      
+    const embed = new EmbedBuilder()
+      .setTitle('🌱 Growth Visuals')
+      .setColor(0x27ae60)
       .setThumbnail(interaction.guild.iconURL())
       .addFields(
-        { name: '?? Total Members', value: memberCount.toString(), inline: true },
-        { name: '?? Members Joined (Tracked)', value: joined.toString(), inline: true },
-        { name: '?? Messages Processed', value: messages.toString(), inline: true },
-        { name: '? Commands Used', value: commands.toString(), inline: true },
-        { name: '?? Growth Rate', value: `\`${gBar}\` ${growth}%` },
-        { name: '?? Engagement Rate (30d)', value: `\`${eBar}\` ${engRate}%` }
+        { name: '👥 Total Members', value: memberCount.toString(), inline: true },
+        { name: '📈 Members Joined (Tracked)', value: joined.toString(), inline: true },
+        { name: '💬 Messages Processed', value: messages.toString(), inline: true },
+        { name: '⚡ Commands Used', value: commands.toString(), inline: true },
+        { name: '🌱 Growth Rate', value: `\`${gBar}\` ${growth}%` },
+        { name: '📊 Engagement Rate (30d)', value: `\`${eBar}\` ${engRate}%` }
       )
-      
-      ;
+      .setFooter({ text: `${interaction.guild.name} • Growth Visuals` })
+      .setTimestamp();
 
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_growth_visuals').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [embed], components: [row] });
+    await interaction.editReply({ embeds: [embed] });
   }
 };
-
-
-
-
-
-
-

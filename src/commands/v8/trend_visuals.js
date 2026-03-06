@@ -1,5 +1,4 @@
-const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createEnterpriseEmbed, createErrorEmbed, createSuccessEmbed } = require('../../utils/enhancedEmbeds');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const { Activity } = require('../../database/mongo');
 
 module.exports = {
@@ -9,11 +8,6 @@ module.exports = {
 
   async execute(interaction, client) {
     await interaction.deferReply();
-
-            const license = await validatePremiumLicense(interaction, 'enterprise');
-            if (!license.allowed) {
-                return await interaction.editReply({ embeds: [license.embed], components: [license.components] });
-            }
     const guildId = interaction.guildId;
     const now = new Date();
     const w1 = new Date(now - 7 * 86400000);
@@ -23,7 +17,7 @@ module.exports = {
       Activity.find({ guildId, createdAt: { $gte: w2, $lt: w1 } }).lean()
     ]);
 
-    const arrow = (a, b) => a > b ? '??' : a < b ? '??' : '??';
+    const arrow = (a, b) => a > b ? '📈' : a < b ? '📉' : '➡️';
     const pct = (a, b) => b > 0 ? `${((a - b) / b * 100).toFixed(1)}%` : 'N/A';
 
     const rows = [
@@ -35,20 +29,12 @@ module.exports = {
 
     const display = rows.map(([name, cur, prev]) => `${arrow(cur, prev)} **${name}**: ${cur} vs ${prev} (${pct(cur, prev)})`).join('\n');
 
-    const embed = createEnterpriseEmbed()
-      .setTitle('?? Trend Visuals')
-      
+    const embed = new EmbedBuilder()
+      .setTitle('📊 Trend Visuals')
+      .setColor(thisWeek.length >= lastWeek.length ? 0x2ecc71 : 0xe74c3c)
       .setDescription(display)
-      
-      ;
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_trend_visuals').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [embed], components: [row] });
+      .setFooter({ text: `${interaction.guild.name} • This Week vs Last Week` })
+      .setTimestamp();
+    await interaction.editReply({ embeds: [embed] });
   }
 };
-
-
-
-
-
-
-
