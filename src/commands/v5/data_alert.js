@@ -1,4 +1,6 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { validatePremiumLicense } = require('../../utils/enhancedPremiumGuard');
+const { createPremiumEmbed } = require('../../utils/enhancedEmbeds');
 const { Guild } = require('../../database/mongo');
 
 module.exports = {
@@ -45,21 +47,27 @@ module.exports = {
       }
       await guild.save();
 
-      await interaction.reply({ content: `Alert **${alertType}** has been ${enabled ? 'enabled' : 'disabled'}.` });
+      await interaction.editReply({ content: `Alert **${alertType}** has been ${enabled ? 'enabled' : 'disabled'}.` });
     } else {
       const alerts = guild.settings.alerts;
-      const embed = new EmbedBuilder()
-        .setTitle('🔔 Data Alerts Configuration')
-        .setColor(0xf39c12)
+      const embed = createPremiumEmbed()
+        .setTitle('?? Data Alerts Configuration')
+        
         .addFields(
-          { name: 'Low Activity', value: alerts.lowActivity?.enabled ? '✅ Enabled' : '❌ Disabled', inline: true },
-          { name: 'High Warnings', value: alerts.highWarnings?.enabled ? '✅ Enabled' : '❌ Disabled', inline: true },
-          { name: 'New Members', value: alerts.newMembers?.enabled ? '✅ Enabled' : '❌ Disabled', inline: true }
+          { name: 'Low Activity', value: alerts.lowActivity?.enabled ? '? Enabled' : '? Disabled', inline: true },
+          { name: 'High Warnings', value: alerts.highWarnings?.enabled ? '? Enabled' : '? Disabled', inline: true },
+          { name: 'New Members', value: alerts.newMembers?.enabled ? '? Enabled' : '? Disabled', inline: true }
         )
         .setDescription('Use `/data_alert alert_type:... enabled:...` to configure alerts.')
-        .setTimestamp();
+        ;
 
-      await interaction.reply({ embeds: [embed] });
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_data_alert').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
     }
   }
 };
+
+
+
+
+

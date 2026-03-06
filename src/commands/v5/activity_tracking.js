@@ -1,4 +1,5 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { createPremiumEmbed } = require('../../utils/enhancedEmbeds');
 const { Activity, User } = require('../../database/mongo');
 
 module.exports = {
@@ -22,9 +23,9 @@ module.exports = {
     const user = await User.findOne({ userId });
     const staffData = user?.staff || { points: 0, warnings: 0, shiftTime: 0 };
 
-    const embed = new EmbedBuilder()
-      .setTitle(`📈 Activity Tracking: ${targetUser.username}`)
-      .setColor(0x2ecc71)
+    const embed = createPremiumEmbed()
+      .setTitle(`?? Activity Tracking: ${targetUser.username}`)
+      
       .addFields(
         { name: 'Messages (30d)', value: messages.toString(), inline: true },
         { name: 'Commands (30d)', value: commands.toString(), inline: true },
@@ -33,8 +34,14 @@ module.exports = {
         { name: 'Warnings', value: staffData.warnings.toString(), inline: true },
         { name: 'Total Shift Time', value: `${Math.round(staffData.shiftTime / 60)}h`, inline: true }
       )
-      .setTimestamp();
+      ;
 
-    await interaction.reply({ embeds: [embed] });
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_activity_tracking').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
+
+
+
+

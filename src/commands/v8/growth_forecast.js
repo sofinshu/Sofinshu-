@@ -1,5 +1,7 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
-const { Activity } = require('../../database/mongo');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { validatePremiumLicense } = require('../../utils/enhancedPremiumGuard');
+const { createEnterpriseEmbed, createErrorEmbed, createSuccessEmbed } = require('../../utils/enhancedEmbeds');
+const { Activity, Guild } = require('../../database/mongo');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -8,9 +10,15 @@ module.exports = {
 
   async execute(interaction, client) {
     await interaction.deferReply();
+
+    const license = await validatePremiumLicense(interaction, 'enterprise');
+    if (!license.allowed) {
+      return await interaction.editReply({ embeds: [license.embed], components: [license.components] });
+    }
+
     const guildId = interaction.guildId;
     const thirtyDaysAgo = new Date(Date.now() - 30 * 86400000);
-    const guild = await require('../../database/mongo').Guild.findOne({ guildId }).lean();
+    const guild = await Guild.findOne({ guildId }).lean();
 
     const acts = await Activity.find({ guildId, createdAt: { $gte: thirtyDaysAgo } }).lean();
     const memberCount = interaction.guild.memberCount;
@@ -23,22 +31,29 @@ module.exports = {
       projected: Math.round(memberCount + parseFloat(dailyGrowth) * days)
     }));
 
-    const embed = new EmbedBuilder()
-      .setTitle('📈 Growth Forecast')
-      .setColor(0x2ecc71)
+    const { createLineChart } = require('../../utils/charts');
+
+    const chartUrl = createLineChart(
+      ['Now', '+30 Days', '+60 Days', '+90 Days'],
+      [memberCount, forecasts[0].projected, forecasts[1].projected, forecasts[2].projected],
+      'Projected Member Growth'
+    );
+
+    const embed = createEnterpriseEmbed()
+      .setTitle('Growth Forecast')
+      .setImage(chartUrl)
       .setThumbnail(interaction.guild.iconURL())
       .addFields(
-        { name: '👥 Current Members', value: memberCount.toString(), inline: true },
-        { name: '📈 Avg Daily Growth', value: dailyGrowth, inline: true },
-        { name: '📅 Projected Monthly', value: projectedMonthly.toString(), inline: true },
-        { name: '🔮 30-Day Projection', value: forecasts[0].projected.toString(), inline: true },
-        { name: '🔮 60-Day Projection', value: forecasts[1].projected.toString(), inline: true },
-        { name: '🔮 90-Day Projection', value: forecasts[2].projected.toString(), inline: true },
-        { name: '⚡ Activity (30d)', value: acts.length.toString(), inline: true }
-      )
-      .setFooter({ text: `${interaction.guild.name} • Growth Forecast` })
-      .setTimestamp();
+        { name: 'Current Members', value: memberCount.toString(), inline: true },
+        { name: 'Avg Daily Growth', value: dailyGrowth, inline: true },
+        { name: 'Projected Monthly', value: projectedMonthly.toString(), inline: true },
+        { name: '30-Day Projection', value: forecasts[0].projected.toString(), inline: true },
+        { name: '60-Day Projection', value: forecasts[1].projected.toString(), inline: true },
+        { name: '90-Day Projection', value: forecasts[2].projected.toString(), inline: true },
+        { name: 'Activity (30d)', value: acts.length.toString(), inline: true }
+      );
 
-    await interaction.editReply({ embeds: [embed] });
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_growth_forecast').setLabel('Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+    await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };

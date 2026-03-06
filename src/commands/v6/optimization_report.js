@@ -1,4 +1,6 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { validatePremiumLicense } = require('../../utils/enhancedPremiumGuard');
+const { createEnterpriseEmbed } = require('../../utils/enhancedEmbeds');
 const { User, Warning } = require('../../database/mongo');
 
 module.exports = {
@@ -8,6 +10,11 @@ module.exports = {
 
   async execute(interaction, client) {
     await interaction.deferReply();
+
+            const license = await validatePremiumLicense(interaction, 'enterprise');
+            if (!license.allowed) {
+                return await interaction.editReply({ embeds: [license.embed], components: [license.components] });
+            }
     const guildId = interaction.guildId;
     const thirtyDaysAgo = new Date(Date.now() - 30 * 86400000);
 
@@ -17,7 +24,7 @@ module.exports = {
     ]);
 
     if (!users.length) {
-      return interaction.editReply('📊 No staff data found yet.');
+      return interaction.editReply('?? No staff data found yet.');
     }
 
     const warnMap = {};
@@ -37,24 +44,30 @@ module.exports = {
       : '0';
 
     const lowText = lowPerformers.length
-      ? lowPerformers.map(u => `• **${u.username || 'Unknown'}** — ${u.staff?.points || 0} pts, ${warnMap[u.userId] || 0} warns`).join('\n')
-      : '✅ No underperforming staff found!';
+      ? lowPerformers.map(u => `� **${u.username || 'Unknown'}** � ${u.staff?.points || 0} pts, ${warnMap[u.userId] || 0} warns`).join('\n')
+      : '? No underperforming staff found!';
 
-    const topText = topPerformers.map(u => `• **${u.username || 'Unknown'}** — ${u.staff?.points || 0} pts`).join('\n');
+    const topText = topPerformers.map(u => `� **${u.username || 'Unknown'}** � ${u.staff?.points || 0} pts`).join('\n');
 
-    const embed = new EmbedBuilder()
-      .setTitle('🔧 Optimization Report')
-      .setColor(0xe67e22)
+    const embed = createEnterpriseEmbed()
+      .setTitle('?? Optimization Report')
+      
       .addFields(
-        { name: '👥 Staff Tracked', value: users.length.toString(), inline: true },
-        { name: '📊 Average Points', value: avgPoints, inline: true },
-        { name: '⚠️ Warnings (30d)', value: recentWarnings.length.toString(), inline: true },
-        { name: '⬇️ Needs Attention', value: lowText },
-        { name: '🏆 Top Performers', value: topText }
+        { name: '?? Staff Tracked', value: users.length.toString(), inline: true },
+        { name: '?? Average Points', value: avgPoints, inline: true },
+        { name: '?? Warnings (30d)', value: recentWarnings.length.toString(), inline: true },
+        { name: '?? Needs Attention', value: lowText },
+        { name: '?? Top Performers', value: topText }
       )
-      .setFooter({ text: `${interaction.guild.name} • Optimization Report` })
-      .setTimestamp();
+      
+      ;
 
-    await interaction.editReply({ embeds: [embed] });
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_optimization_report').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
+
+
+
+

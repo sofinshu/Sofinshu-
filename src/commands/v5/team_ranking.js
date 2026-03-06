@@ -1,4 +1,5 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { createPremiumEmbed } = require('../../utils/enhancedEmbeds');
 const { User } = require('../../database/mongo');
 
 module.exports = {
@@ -33,9 +34,9 @@ module.exports = {
       .limit(limit)
       .lean();
 
-    const embed = new EmbedBuilder()
-      .setTitle(`🏆 Team Ranking (by ${sortBy})`)
-      .setColor(0xf1c40f)
+    const embed = createPremiumEmbed()
+      .setTitle(`?? Team Ranking (by ${sortBy})`)
+      
       .setDescription(
         users.map((u, i) => {
           const guildData = u.guilds?.find(g => g.guildId === guildId);
@@ -46,8 +47,14 @@ module.exports = {
           return `${i + 1}. ${name} - ${value}`;
         }).join('\n') || 'No ranking data found'
       )
-      .setTimestamp();
+      ;
 
-    await interaction.reply({ embeds: [embed] });
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_team_ranking').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
+
+
+
+

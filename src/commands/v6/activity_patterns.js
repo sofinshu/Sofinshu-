@@ -1,4 +1,5 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { createEnterpriseEmbed } = require('../../utils/enhancedEmbeds');
 const { Activity } = require('../../database/mongo');
 
 module.exports = {
@@ -8,13 +9,18 @@ module.exports = {
 
   async execute(interaction, client) {
     await interaction.deferReply();
+
+            const license = await validatePremiumLicense(interaction, 'enterprise');
+            if (!license.allowed) {
+                return await interaction.editReply({ embeds: [license.embed], components: [license.components] });
+            }
     const guildId = interaction.guildId;
     const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
 
     const activities = await Activity.find({ guildId, createdAt: { $gte: thirtyDaysAgo } }).lean();
 
     if (!activities.length) {
-      return interaction.editReply('📊 No activity data found for the past 30 days.');
+      return interaction.editReply('?? No activity data found for the past 30 days.');
     }
 
     const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -28,28 +34,34 @@ module.exports = {
 
     const maxDay = Math.max(...dayCounts);
     const dayBars = dayNames.map((d, i) => {
-      const bar = '▓'.repeat(Math.round((dayCounts[i] / Math.max(maxDay, 1)) * 8)) + '░'.repeat(8 - Math.round((dayCounts[i] / Math.max(maxDay, 1)) * 8));
+      const bar = '�'.repeat(Math.round((dayCounts[i] / Math.max(maxDay, 1)) * 8)) + '�'.repeat(8 - Math.round((dayCounts[i] / Math.max(maxDay, 1)) * 8));
       return `${d}: ${bar} ${dayCounts[i]}`;
     }).join('\n');
 
     const weekdays = dayCounts.slice(1, 6).reduce((a, b) => a + b, 0);
     const weekends = dayCounts[0] + dayCounts[6];
 
-    const embed = new EmbedBuilder()
-      .setTitle('📅 Activity Patterns — Last 30 Days')
-      .setColor(0x9b59b6)
+    const embed = createEnterpriseEmbed()
+      .setTitle('?? Activity Patterns � Last 30 Days')
+      
       .addFields(
-        { name: '📊 Total Events', value: activities.length.toString(), inline: true },
-        { name: '📅 Weekday Activity', value: weekdays.toString(), inline: true },
-        { name: '🏖️ Weekend Activity', value: weekends.toString(), inline: true },
-        { name: '⚡ Commands', value: typeCounts.command.toString(), inline: true },
-        { name: '🔔 Warnings', value: typeCounts.warning.toString(), inline: true },
-        { name: '🏆 Promotions', value: typeCounts.promotion.toString(), inline: true },
-        { name: '📆 Weekly Pattern', value: `\`\`\`${dayBars}\`\`\`` }
+        { name: '?? Total Events', value: activities.length.toString(), inline: true },
+        { name: '?? Weekday Activity', value: weekdays.toString(), inline: true },
+        { name: '??? Weekend Activity', value: weekends.toString(), inline: true },
+        { name: '? Commands', value: typeCounts.command.toString(), inline: true },
+        { name: '?? Warnings', value: typeCounts.warning.toString(), inline: true },
+        { name: '?? Promotions', value: typeCounts.promotion.toString(), inline: true },
+        { name: '?? Weekly Pattern', value: `\`\`\`${dayBars}\`\`\`` }
       )
-      .setFooter({ text: `${interaction.guild.name} • 30-Day Analysis` })
-      .setTimestamp();
+      
+      ;
 
-    await interaction.editReply({ embeds: [embed] });
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_activity_patterns').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
+
+
+
+

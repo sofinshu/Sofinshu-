@@ -1,4 +1,5 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { createPremiumEmbed } = require('../../utils/enhancedEmbeds');
 const { Guild } = require('../../database/mongo');
 
 module.exports = {
@@ -31,15 +32,21 @@ module.exports = {
     };
     await guild.save();
 
-    const embed = new EmbedBuilder()
-      .setTitle('😀 Emoji Control Settings')
-      .setColor(enabled ? 0x2ecc71 : 0xe74c3c)
+    const embed = createPremiumEmbed()
+      .setTitle('?? Emoji Control Settings')
+      
       .addFields(
         { name: 'Status', value: enabled ? 'Enabled' : 'Disabled', inline: true },
         { name: 'Include Stickers', value: stickers ? 'Yes' : 'No', inline: true }
       )
-      .setTimestamp();
+      ;
 
-    await interaction.reply({ embeds: [embed] });
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v4_emoji_control').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
+
+
+
+

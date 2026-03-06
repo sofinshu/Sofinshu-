@@ -1,4 +1,6 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { validatePremiumLicense } = require('../../utils/enhancedPremiumGuard');
+const { createEnterpriseEmbed, createErrorEmbed, createSuccessEmbed } = require('../../utils/enhancedEmbeds');
 const { User } = require('../../database/mongo');
 
 module.exports = {
@@ -8,22 +10,35 @@ module.exports = {
 
   async execute(interaction, client) {
     await interaction.deferReply();
+
+            const license = await validatePremiumLicense(interaction, 'enterprise');
+            if (!license.allowed) {
+                return await interaction.editReply({ embeds: [license.embed], components: [license.components] });
+            }
     const users = await User.find({ 'staff.points': { $gt: 0 } }).sort({ 'staff.points': -1 }).limit(10).lean();
-    if (!users.length) return interaction.editReply('📊 No staff data yet.');
+    if (!users.length) return interaction.editReply('?? No staff data yet.');
     const maxPts = users[0]?.staff?.points || 1;
-    const medals = ['🥇', '🥈', '🥉'];
+    const medals = ['??', '??', '??'];
     const rows = users.map((u, i) => {
       const pts = u.staff?.points || 0;
-      const bar = '█'.repeat(Math.round(pts / maxPts * 10)).padEnd(10, '░');
+      const bar = '�'.repeat(Math.round(pts / maxPts * 10)).padEnd(10, '�');
       const medal = medals[i] || `\`${String(i + 1).padStart(2)}\``;
       return `${medal} **${u.username || '?'}** [${u.staff?.rank || '?'}] \`${bar}\` **${pts}**`;
     }).join('\n');
-    const embed = new EmbedBuilder()
-      .setTitle('🏆 Visual Leaderboard')
-      .setColor(0xf1c40f)
+    const embed = createEnterpriseEmbed()
+      .setTitle('?? Visual Leaderboard')
+      
       .setDescription(rows)
-      .setFooter({ text: `${interaction.guild.name} • Top ${users.length} Staff by Points` })
-      .setTimestamp();
-    await interaction.editReply({ embeds: [embed] });
+      
+      ;
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_visual_leaderboard').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
+
+
+
+
+
+

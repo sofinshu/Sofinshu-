@@ -1,7 +1,8 @@
-const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { createEnterpriseEmbed } = require('../../utils/enhancedEmbeds');
 const { Guild } = require('../../database/mongo');
 
-// v6 (ENTERPRISE) — All 10 requirements
+// v6 (ENTERPRISE) � All 10 requirements
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('set_requirements_enterprise')
@@ -53,24 +54,30 @@ module.exports = {
 
         const off = (v) => v > 0 ? v.toString() : 'Disabled';
 
-        const embed = new EmbedBuilder()
-            .setTitle(`👑 Enterprise Full Requirements Set — ${rank.toUpperCase()}`)
-            .setColor(0xf1c40f)
+        const embed = createEnterpriseEmbed()
+            .setTitle(`?? Enterprise Full Requirements Set � ${rank.toUpperCase()}`)
+            
             .setDescription('**Enterprise tier: All 10 requirements configured.**\nThis is the maximum customization level.')
             .addFields(
-                { name: '1️⃣ ⭐ Min Points', value: points.toString(), inline: true },
-                { name: '2️⃣ 🔄 Min Shifts', value: shifts.toString(), inline: true },
-                { name: '3️⃣ 📈 Min Consistency %', value: `${consistency}%`, inline: true },
-                { name: '4️⃣ ⚠️ Max Warnings', value: maxWarnings.toString(), inline: true },
-                { name: '5️⃣ ⏱️ Min Shift Hours', value: off(shiftHours), inline: true },
-                { name: '6️⃣ 🏅 Min Achievements', value: off(achievements), inline: true },
-                { name: '7️⃣ 🌟 Min Reputation', value: off(reputation), inline: true },
-                { name: '8️⃣ 📅 Min Days In Server', value: off(daysInServer), inline: true },
-                { name: '9️⃣ 🔒 Clean Record Days', value: off(cleanRecordDays), inline: true },
-                { name: '🔟 📝 Custom Note (in DM)', value: customNote || 'None set', inline: false }
+                { name: '1?? ? Min Points', value: points.toString(), inline: true },
+                { name: '2?? ?? Min Shifts', value: shifts.toString(), inline: true },
+                { name: '3?? ?? Min Consistency %', value: `${consistency}%`, inline: true },
+                { name: '4?? ?? Max Warnings', value: maxWarnings.toString(), inline: true },
+                { name: '5?? ?? Min Shift Hours', value: off(shiftHours), inline: true },
+                { name: '6?? ?? Min Achievements', value: off(achievements), inline: true },
+                { name: '7?? ?? Min Reputation', value: off(reputation), inline: true },
+                { name: '8?? ?? Min Days In Server', value: off(daysInServer), inline: true },
+                { name: '9?? ?? Clean Record Days', value: off(cleanRecordDays), inline: true },
+                { name: '?? ?? Custom Note (in DM)', value: customNote || 'None set', inline: false }
             )
-            .setFooter({ text: 'Enterprise — Full custom auto-promotion active every 15 min' });
+            ;
 
-        await interaction.editReply({ embeds: [embed] });
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_set_requirements_enterprise').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
     }
 };
+
+
+
+
+

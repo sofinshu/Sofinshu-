@@ -1,4 +1,5 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { createEnterpriseEmbed } = require('../../utils/enhancedEmbeds');
 const { User, Activity } = require('../../database/mongo');
 
 module.exports = {
@@ -21,8 +22,13 @@ module.exports = {
   async execute(interaction, client) {
     await interaction.deferReply();
 
+            const license = await validatePremiumLicense(interaction, 'enterprise');
+            if (!license.allowed) {
+                return await interaction.editReply({ embeds: [license.embed], components: [license.components] });
+            }
+
     if (!interaction.member.permissions.has('ManageRoles')) {
-      return interaction.editReply('❌ You need **Manage Roles** permission to announce promotions.');
+      return interaction.editReply('? You need **Manage Roles** permission to announce promotions.');
     }
 
     const target = interaction.options.getUser('user');
@@ -41,21 +47,27 @@ module.exports = {
       data: { newRank, promotedBy: interaction.user.id }
     });
 
-    const rankEmojis = { trial: '🔰', staff: '⭐', senior: '🌟', manager: '💎', admin: '👑' };
+    const rankEmojis = { trial: '??', staff: '?', senior: '??', manager: '??', admin: '??' };
 
-    const embed = new EmbedBuilder()
-      .setTitle('🎉 Rank Promotion Announcement!')
-      .setColor(0xf1c40f)
+    const embed = createEnterpriseEmbed()
+      .setTitle('?? Rank Promotion Announcement!')
+      
       .setThumbnail(target.displayAvatarURL())
       .setDescription(`Congratulations to <@${target.id}> on their promotion!`)
       .addFields(
-        { name: '👤 Staff Member', value: `<@${target.id}>`, inline: true },
-        { name: `${rankEmojis[newRank] || '⭐'} New Rank`, value: newRank.toUpperCase(), inline: true },
-        { name: '👮 Promoted By', value: `<@${interaction.user.id}>`, inline: true }
+        { name: '?? Staff Member', value: `<@${target.id}>`, inline: true },
+        { name: `${rankEmojis[newRank] || '?'} New Rank`, value: newRank.toUpperCase(), inline: true },
+        { name: '?? Promoted By', value: `<@${interaction.user.id}>`, inline: true }
       )
-      .setFooter({ text: `${interaction.guild.name} • Staff Promotion` })
-      .setTimestamp();
+      
+      ;
 
-    await interaction.editReply({ embeds: [embed] });
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_rank_announce').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
+
+
+
+

@@ -1,4 +1,6 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { validatePremiumLicense } = require('../../utils/enhancedPremiumGuard');
+const { createPremiumEmbed } = require('../../utils/enhancedEmbeds');
 const { User } = require('../../database/mongo');
 
 module.exports = {
@@ -30,9 +32,9 @@ module.exports = {
       return { id: roleId, name: role?.name || 'Unknown', count: roleCounts[roleId] };
     }));
 
-    const embed = new EmbedBuilder()
-      .setTitle('🎭 Role Distribution')
-      .setColor(0x9b59b6)
+    const embed = createPremiumEmbed()
+      .setTitle('?? Role Distribution')
+      
       .setDescription(
         roleDescriptions.map(r => `${r.name}: ${r.count}`).join('\n') || 'No role data found'
       )
@@ -40,8 +42,14 @@ module.exports = {
         { name: 'Total Tracked Users', value: users.length.toString(), inline: true },
         { name: 'Unique Roles', value: sortedRoles.length.toString(), inline: true }
       )
-      .setTimestamp();
+      ;
 
-    await interaction.reply({ embeds: [embed] });
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_role_distribution').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
+
+
+
+

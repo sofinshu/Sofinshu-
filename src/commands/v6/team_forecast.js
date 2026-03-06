@@ -1,4 +1,5 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { createEnterpriseEmbed } = require('../../utils/enhancedEmbeds');
 const { Activity } = require('../../database/mongo');
 
 module.exports = {
@@ -8,13 +9,18 @@ module.exports = {
 
   async execute(interaction, client) {
     await interaction.deferReply();
+
+            const license = await validatePremiumLicense(interaction, 'enterprise');
+            if (!license.allowed) {
+                return await interaction.editReply({ embeds: [license.embed], components: [license.components] });
+            }
     const guildId = interaction.guildId;
     const fourteenDaysAgo = new Date(Date.now() - 14 * 86400000);
 
     const activities = await Activity.find({ guildId, createdAt: { $gte: fourteenDaysAgo } }).lean();
 
     if (!activities.length) {
-      return interaction.editReply('📊 Not enough team activity data for a forecast.');
+      return interaction.editReply('?? Not enough team activity data for a forecast.');
     }
 
     const userActivity = {};
@@ -42,22 +48,28 @@ module.exports = {
       // Weekends slightly lower
       const multiplier = (dayOfWeek === 0 || dayOfWeek === 6) ? 0.7 : 1.15;
       const predicted = Math.max(0, Math.round((weekly + trend * 0.05 * i) * multiplier));
-      const bar = '█'.repeat(Math.min(10, Math.round(predicted / Math.max(weekly * 2, 1) * 10)));
+      const bar = '�'.repeat(Math.min(10, Math.round(predicted / Math.max(weekly * 2, 1) * 10)));
       lines.push(`${dayNames[dayOfWeek]} ${day.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}: ${bar.padEnd(10)} ~${predicted} events`);
     }
 
-    const embed = new EmbedBuilder()
-      .setTitle('👥 Team Activity Forecast — Next 7 Days')
-      .setColor(0x2980b9)
+    const embed = createEnterpriseEmbed()
+      .setTitle('?? Team Activity Forecast � Next 7 Days')
+      
       .setDescription(`\`\`\`${lines.join('\n')}\`\`\``)
       .addFields(
-        { name: '👥 Active Team Members (14d)', value: activeCount.toString(), inline: true },
-        { name: '📊 Avg Events/Member', value: avgPerUser, inline: true },
-        { name: '📈 Trend', value: trend > 0 ? `+${trend} from last week` : `${trend} from last week`, inline: true }
+        { name: '?? Active Team Members (14d)', value: activeCount.toString(), inline: true },
+        { name: '?? Avg Events/Member', value: avgPerUser, inline: true },
+        { name: '?? Trend', value: trend > 0 ? `+${trend} from last week` : `${trend} from last week`, inline: true }
       )
-      .setFooter({ text: `${interaction.guild.name} • Team Forecast` })
-      .setTimestamp();
+      
+      ;
 
-    await interaction.editReply({ embeds: [embed] });
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_team_forecast').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
+
+
+
+

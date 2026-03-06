@@ -1,9 +1,10 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { createEnterpriseEmbed } = require('../../utils/enhancedEmbeds');
 const { Activity } = require('../../database/mongo');
 
 function progressBar(value, max, len = 10) {
   const filled = Math.round((value / Math.max(max, 1)) * len);
-  return '▓'.repeat(filled) + '░'.repeat(len - filled);
+  return '�'.repeat(filled) + '�'.repeat(len - filled);
 }
 
 module.exports = {
@@ -13,13 +14,18 @@ module.exports = {
 
   async execute(interaction, client) {
     await interaction.deferReply();
+
+            const license = await validatePremiumLicense(interaction, 'enterprise');
+            if (!license.allowed) {
+                return await interaction.editReply({ embeds: [license.embed], components: [license.components] });
+            }
     const guildId = interaction.guildId;
     const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 
     const activities = await Activity.find({ guildId, createdAt: { $gte: sevenDaysAgo } }).lean();
 
     if (!activities.length) {
-      return interaction.editReply('📊 No activity data found for the past 7 days.');
+      return interaction.editReply('?? No activity data found for the past 7 days.');
     }
 
     // Group by hour
@@ -45,7 +51,7 @@ module.exports = {
       .sort((a, b) => b.count - a.count)
       .slice(0, 3);
 
-    const topHoursText = topHours.map(h => `\`${String(h.hour).padStart(2,'0')}:00\` — ${h.count} actions`).join('\n');
+    const topHoursText = topHours.map(h => `\`${String(h.hour).padStart(2,'0')}:00\` � ${h.count} actions`).join('\n');
 
     // Day breakdown
     const dayBreakdown = dayNames.map((name, i) => {
@@ -53,23 +59,29 @@ module.exports = {
       return `${name.slice(0,3)}: ${bar} ${dayCounts[i]}`;
     }).join('\n');
 
-    const embed = new EmbedBuilder()
-      .setTitle('🔍 Activity Insights — Last 7 Days')
-      .setColor(0x3498db)
+    const embed = createEnterpriseEmbed()
+      .setTitle('?? Activity Insights � Last 7 Days')
+      
       .setThumbnail(interaction.guild.iconURL())
       .addFields(
-        { name: '📊 Total Activity', value: totalActivity.toString(), inline: true },
-        { name: '📅 Daily Average', value: avgPerDay, inline: true },
-        { name: '⏰ Peak Hour', value: `${String(peakHour).padStart(2,'0')}:00`, inline: true },
-        { name: '📆 Most Active Day', value: dayNames[peakDay], inline: true },
-        { name: '🔝 Unique Users', value: [...new Set(activities.map(a => a.userId))].length.toString(), inline: true },
-        { name: '⚡ Commands Run', value: activities.filter(a => a.type === 'command').length.toString(), inline: true },
-        { name: '🕐 Top 3 Peak Hours', value: topHoursText, inline: false },
-        { name: '📈 Day Breakdown', value: `\`\`\`${dayBreakdown}\`\`\``, inline: false }
+        { name: '?? Total Activity', value: totalActivity.toString(), inline: true },
+        { name: '?? Daily Average', value: avgPerDay, inline: true },
+        { name: '? Peak Hour', value: `${String(peakHour).padStart(2,'0')}:00`, inline: true },
+        { name: '?? Most Active Day', value: dayNames[peakDay], inline: true },
+        { name: '?? Unique Users', value: [...new Set(activities.map(a => a.userId))].length.toString(), inline: true },
+        { name: '? Commands Run', value: activities.filter(a => a.type === 'command').length.toString(), inline: true },
+        { name: '?? Top 3 Peak Hours', value: topHoursText, inline: false },
+        { name: '?? Day Breakdown', value: `\`\`\`${dayBreakdown}\`\`\``, inline: false }
       )
-      .setFooter({ text: `${interaction.guild.name} • Enterprise Insights` })
-      .setTimestamp();
+      
+      ;
 
-    await interaction.editReply({ embeds: [embed] });
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_activity_insights').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
+
+
+
+

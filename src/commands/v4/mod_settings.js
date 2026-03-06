@@ -1,4 +1,6 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { validatePremiumLicense } = require('../../utils/enhancedPremiumGuard');
+const { createPremiumEmbed } = require('../../utils/enhancedEmbeds');
 const { Guild } = require('../../database/mongo');
 
 module.exports = {
@@ -24,11 +26,17 @@ module.exports = {
     guild.settings.modules.moderation = enabled;
     await guild.save();
 
-    const embed = new EmbedBuilder()
-      .setTitle('⚙️ Moderation Settings')
-      .setColor(enabled ? 0x2ecc71 : 0xe74c3c)
+    const embed = createPremiumEmbed()
+      .setTitle('?? Moderation Settings')
+      
       .setDescription(`Moderation is now ${enabled ? 'enabled' : 'disabled'}`);
 
-    await interaction.reply({ embeds: [embed] });
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v4_mod_settings').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
+
+
+
+

@@ -1,4 +1,5 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { createEnterpriseEmbed, createErrorEmbed, createSuccessEmbed } = require('../../utils/enhancedEmbeds');
 const { Activity } = require('../../database/mongo');
 
 module.exports = {
@@ -8,6 +9,11 @@ module.exports = {
 
   async execute(interaction, client) {
     await interaction.deferReply();
+
+            const license = await validatePremiumLicense(interaction, 'enterprise');
+            if (!license.allowed) {
+                return await interaction.editReply({ embeds: [license.embed], components: [license.components] });
+            }
     const guildId = interaction.guildId;
     const twoWeeksAgo = new Date(Date.now() - 14 * 86400000);
     const oneWeekAgo = new Date(Date.now() - 7 * 86400000);
@@ -28,17 +34,25 @@ module.exports = {
       lastWeek.filter(a => a.type === 'command').length
     );
 
-    const embed = new EmbedBuilder()
-      .setTitle('🔮 Prediction Summary')
-      .setColor(0x9b59b6)
+    const embed = createEnterpriseEmbed()
+      .setTitle('?? Prediction Summary')
+      
       .addFields(
-        { name: '📊 This Week Total', value: thisWeek.length.toString(), inline: true },
-        { name: '📅 Last Week Total', value: lastWeek.length.toString(), inline: true },
-        { name: '🔮 Next Week Predicted', value: `~${totalPred.val} (${totalPred.change > 0 ? '+' : ''}${totalPred.change}%)`, inline: true },
-        { name: '⚡ Commands Predicted', value: `~${cmdPred.val} next week`, inline: true }
+        { name: '?? This Week Total', value: thisWeek.length.toString(), inline: true },
+        { name: '?? Last Week Total', value: lastWeek.length.toString(), inline: true },
+        { name: '?? Next Week Predicted', value: `~${totalPred.val} (${totalPred.change > 0 ? '+' : ''}${totalPred.change}%)`, inline: true },
+        { name: '? Commands Predicted', value: `~${cmdPred.val} next week`, inline: true }
       )
-      .setFooter({ text: `${interaction.guild.name} • Prediction Summary` })
-      .setTimestamp();
-    await interaction.editReply({ embeds: [embed] });
+      
+      ;
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_prediction_summary').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
+
+
+
+
+
+

@@ -1,4 +1,5 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { createPremiumEmbed } = require('../../utils/enhancedEmbeds');
 const { Guild, User, Activity } = require('../../database/mongo');
 
 module.exports = {
@@ -16,9 +17,9 @@ module.exports = {
     const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
     const recentActivity = await Activity.countDocuments({ guildId, createdAt: { $gte: weekAgo } });
 
-    const embed = new EmbedBuilder()
-      .setTitle(`📊 Server Overview: ${guild.name}`)
-      .setColor(0x3498db)
+    const embed = createPremiumEmbed()
+      .setTitle(`?? Server Overview: ${guild.name}`)
+      
       .setThumbnail(guild.iconURL())
       .addFields(
         { name: 'Members', value: guild.memberCount.toString(), inline: true },
@@ -26,14 +27,20 @@ module.exports = {
         { name: 'Roles', value: guild.roles.cache.size.toString(), inline: true },
         { name: 'Channels', value: guild.channels.cache.size.toString(), inline: true },
         { name: 'Active (7d)', value: recentActivity.toString(), inline: true },
-        { name: 'Premium', value: guildDoc?.premium?.isActive ? '✅ Active' : '❌ Inactive', inline: true }
+        { name: 'Premium', value: guildDoc?.premium?.isActive ? '? Active' : '? Inactive', inline: true }
       )
       .addFields(
         { name: 'Created', value: guild.createdAt.toLocaleDateString(), inline: true },
         { name: 'Owner', value: `<@${guild.ownerId}>`, inline: true }
       )
-      .setTimestamp();
+      ;
 
-    await interaction.reply({ embeds: [embed] });
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_server_overview').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
+
+
+
+

@@ -1,4 +1,5 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { createPremiumEmbed } = require('../../utils/enhancedEmbeds');
 const { Activity } = require('../../database/mongo');
 
 module.exports = {
@@ -12,19 +13,20 @@ module.exports = {
         .setMaxValue(50)
         .setRequired(false)),
 
-  async execute(interaction) {
+  async execute(interaction, client) {
+    if (!interaction.deferred && !interaction.replied) await interaction.deferReply();
     const guildId = interaction.guildId;
     const limit = interaction.options.getInteger('limit') || 10;
 
-    const logs = await Activity.find({ 
-      guildId, 
-      type: 'warning' 
+    const logs = await Activity.find({
+      guildId,
+      type: 'warning'
     })
-    .sort({ createdAt: -1 })
-    .limit(limit);
+      .sort({ createdAt: -1 })
+      .limit(limit);
 
     if (logs.length === 0) {
-      return interaction.reply({ content: 'No moderation logs found.', ephemeral: true });
+      return interaction.editReply({ content: 'No moderation logs found.', ephemeral: true });
     }
 
     const formatLog = (log) => {
@@ -36,13 +38,19 @@ module.exports = {
       return `**${action.toUpperCase()}** | ${user} | ${mod} | ${reason} | ${time}`;
     };
 
-    const embed = new EmbedBuilder()
-      .setTitle('📋 Moderation Logs')
-      .setColor(0xe74c3c)
-      .setDescription(logs.map(formatLog).join('\n'))
-      .setFooter({ text: `Showing ${logs.length} entries` })
-      .setTimestamp();
+    const embed = createPremiumEmbed()
+      .setTitle('?? Moderation Logs')
 
-    await interaction.reply({ embeds: [embed] });
+      .setDescription(logs.map(formatLog).join('\n'))
+
+      ;
+
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v4_moderation_logs').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+    await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
+
+
+
+

@@ -1,88 +1,85 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { validatePremiumLicense } = require('../../utils/enhancedPremiumGuard');
+const { createCustomEmbed, createErrorEmbed, createPremiumEmbed, createSuccessEmbed } = require('../../utils/enhancedEmbeds');
 const { User, Activity, Shift } = require('../../database/mongo');
 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('detailed_profile')
-    .setDescription('View detailed profile of a user')
+    .setDescription('Enterprise Personnel Dossier: High-Fidelity identity verification')
     .addUserOption(option =>
       option.setName('user')
         .setDescription('User to view profile for')
         .setRequired(false)),
 
   async execute(interaction) {
-    const targetUser = interaction.options.getUser('user') || interaction.user;
-    const guildId = interaction.guildId;
+    try {
+      await interaction.deferReply();
 
-    let user = await User.findOne({ userId: targetUser.id });
-    if (!user) {
-      user = new User({
-        userId: targetUser.id,
-        username: targetUser.username,
-        globalName: targetUser.globalName,
-        guilds: [{ guildId, joinedAt: new Date() }]
+      // Strict Enterprise License Guard
+      const license = await validatePremiumLicense(interaction, 'premium');
+      if (!license.allowed) {
+        return await interaction.editReply({ embeds: [license.embed], components: license.components });
+      }
+
+      const targetUser = interaction.options.getUser('user') || interaction.user;
+      const guildId = interaction.guildId;
+
+      const user = await User.findOne({ userId: targetUser.id, guildId }).lean();
+
+      if (!user || !user.staff) {
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_detailed_profile').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [createErrorEmbed(`No high-fidelity personnel records found for <@${targetUser.id}>.`)], components: [row] });
+      }
+
+      const staff = user.staff;
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+      const [activities, shifts] = await Promise.all([
+        Activity.find({ guildId, userId: targetUser.id }).sort({ createdAt: -1 }).limit(5).lean(),
+        Shift.find({ guildId, userId: targetUser.id, startTime: { $gte: thirtyDaysAgo } }).lean()
+      ]);
+
+      const totalHours = shifts.reduce((acc, s) => acc + (s.duration || 0), 0) / 3600;
+
+      // Enterprise Aesthetic: Custom Watermarked Profile
+      const embed = await createCustomEmbed(interaction, {
+        title: `??? Enterprise Personnel Dossier: ${targetUser.username}`,
+        thumbnail: targetUser.displayAvatarURL({ dynamic: true }),
+        description: `### ?? Enterprise Identity Authentication\nAuthenticated high-fidelity trace for **${targetUser.tag}**. Integrating V2 Ultra metrics and behavioral consistency mapping.\n\n**Verified Premium Operative**`,
+        fields: [
+          { name: '?? Operational Rank', value: `\`${staff.rank?.toUpperCase() || 'MEMBER'}\``, inline: true },
+          { name: '? Mastery Level', value: `\`LVL ${staff.level || 1}\``, inline: true },
+          { name: '?? Merit Gained', value: `\`${(staff.points || 0).toLocaleString()}\``, inline: true },
+          { name: '?? 30D Time Delta', value: `\`${totalHours.toFixed(1)}h\``, inline: true },
+          { name: '?? Reliability', value: `\`${staff.consistency || 100}%\``, inline: true },
+          { name: '?? Peer Honorific', value: `\`${staff.honorific || 'COMMENDABLE'}\``, inline: true },
+          { name: '??? Tactical Tagline', value: `*"${staff.tagline || 'Operational Personnel'}"*`, inline: false }
+        ],
+        footer: 'Enterprise Identity Matrix � V3 Strategic Executive Suite',
+        color: 'enterprise'
       });
-      await user.save();
+
+      // Integrating RPG Perks if equipped
+      if (staff.equippedPerk) {
+        embed.addFields({ name: '?? Equipped Tactical Perk', value: `\`[ ${staff.equippedPerk.toUpperCase()} ]\``, inline: true });
+      }
+
+      if (activities.length > 0) {
+        const activityList = activities.map(a => `\`[${new Date(a.createdAt).toLocaleDateString()}]\` **${a.type.toUpperCase()}** - Verified Tracer`).join('\n');
+        embed.addFields({ name: '?? Recent Ledger Footprints', value: activityList, inline: false });
+      }
+
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_detailed_profile').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
+
+    } catch (error) {
+      console.error('Enterprise Detailed Profile Error:', error);
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_detailed_profile').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [createErrorEmbed('Enterprise Identity failure: Unable to decode high-fidelity dossiers.')], components: [row] });
     }
-
-    const activities = await Activity.find({
-      guildId,
-      userId: targetUser.id
-    }).sort({ createdAt: -1 }).limit(10).lean();
-
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-
-    const recentShifts = await Shift.find({
-      guildId,
-      userId: targetUser.id,
-      startTime: { $gte: thirtyDaysAgo }
-    }).lean();
-
-    const totalShifts = recentShifts.length;
-    const completedShifts = recentShifts.filter(s => s.endTime).length;
-    const totalHours = recentShifts.reduce((acc, s) => acc + (s.duration || 0), 0) / 60;
-
-    const embed = new EmbedBuilder()
-      .setTitle(`👤 ${targetUser.username}'s Detailed Profile`)
-      .setColor(0x9b59b6)
-      .setThumbnail(targetUser.displayAvatarURL());
-
-    const rank = user.staff?.rank || 'member';
-    const points = user.staff?.points || 0;
-    const warnings = user.staff?.warnings || 0;
-    const consistency = user.staff?.consistency || 100;
-    const reputation = user.staff?.reputation || 0;
-    const achievements = user.staff?.achievements || [];
-
-    embed.addFields(
-      { name: 'User ID', value: targetUser.id, inline: true },
-      { name: 'Joined Discord', value: targetUser.createdAt.toDateString(), inline: true }
-    );
-
-    embed.addFields(
-      { name: 'Rank', value: rank.charAt(0).toUpperCase() + rank.slice(1), inline: true },
-      { name: 'Points', value: points.toString(), inline: true },
-      { name: 'Warnings', value: warnings.toString(), inline: true },
-      { name: 'Consistency', value: `${consistency}%`, inline: true },
-      { name: 'Reputation', value: reputation.toString(), inline: true },
-      { name: 'Achievements', value: achievements.length.toString(), inline: true }
-    );
-
-    embed.addFields(
-      { name: 'Shifts (30d)', value: totalShifts.toString(), inline: true },
-      { name: 'Completed', value: completedShifts.toString(), inline: true },
-      { name: 'Hours', value: totalHours.toFixed(1), inline: true }
-    );
-
-    if (activities.length > 0) {
-      const recentActivity = activities.map(a => {
-        const date = new Date(a.createdAt).toLocaleDateString();
-        return `**${a.type}** - ${date}`;
-      });
-      embed.addFields({ name: 'Recent Activity', value: recentActivity.join('\n'), inline: false });
-    }
-
-    await interaction.reply({ embeds: [embed] });
   }
 };
+
+

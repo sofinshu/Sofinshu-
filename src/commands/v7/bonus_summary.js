@@ -1,4 +1,6 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { validatePremiumLicense } = require('../../utils/enhancedPremiumGuard');
+const { createEnterpriseEmbed } = require('../../utils/enhancedEmbeds');
 const { Activity } = require('../../database/mongo');
 
 module.exports = {
@@ -8,6 +10,11 @@ module.exports = {
 
   async execute(interaction, client) {
     await interaction.deferReply();
+
+            const license = await validatePremiumLicense(interaction, 'enterprise');
+            if (!license.allowed) {
+                return await interaction.editReply({ embeds: [license.embed], components: [license.components] });
+            }
     const guildId = interaction.guildId;
     const thirtyDaysAgo = new Date(Date.now() - 30 * 86400000);
 
@@ -18,7 +25,7 @@ module.exports = {
     }).lean();
 
     if (!bonusActivities.length) {
-      return interaction.editReply('📊 No bonus events recorded this month.');
+      return interaction.editReply('?? No bonus events recorded this month.');
     }
 
     const bonusByUser = {};
@@ -30,21 +37,27 @@ module.exports = {
     const totalBonus = Object.values(bonusByUser).reduce((s, v) => s + v, 0);
 
     const leaderboard = sorted.map(([uid, pts], i) =>
-      `\`${String(i + 1).padStart(2)}\` <@${uid}> — **+${pts}** bonus pts`
+      `\`${String(i + 1).padStart(2)}\` <@${uid}> � **+${pts}** bonus pts`
     ).join('\n');
 
-    const embed = new EmbedBuilder()
-      .setTitle('🎁 Bonus Point Summary — This Month')
-      .setColor(0x27ae60)
+    const embed = createEnterpriseEmbed()
+      .setTitle('?? Bonus Point Summary � This Month')
+      
       .addFields(
-        { name: '🎁 Total Bonus Events', value: bonusActivities.length.toString(), inline: true },
-        { name: '⭐ Total Bonus Points', value: totalBonus.toString(), inline: true },
-        { name: '👥 Recipients', value: sorted.length.toString(), inline: true },
-        { name: '🏆 Bonus Leaderboard', value: leaderboard }
+        { name: '?? Total Bonus Events', value: bonusActivities.length.toString(), inline: true },
+        { name: '? Total Bonus Points', value: totalBonus.toString(), inline: true },
+        { name: '?? Recipients', value: sorted.length.toString(), inline: true },
+        { name: '?? Bonus Leaderboard', value: leaderboard }
       )
-      .setFooter({ text: `${interaction.guild.name} • Monthly Bonus Summary` })
-      .setTimestamp();
+      
+      ;
 
-    await interaction.editReply({ embeds: [embed] });
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_bonus_summary').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
+
+
+
+

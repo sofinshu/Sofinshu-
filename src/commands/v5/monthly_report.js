@@ -1,4 +1,6 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { validatePremiumLicense } = require('../../utils/enhancedPremiumGuard');
+const { createPremiumEmbed } = require('../../utils/enhancedEmbeds');
 const { Activity } = require('../../database/mongo');
 
 module.exports = {
@@ -28,9 +30,9 @@ module.exports = {
 
     const sortedMonths = Object.entries(monthlyData).sort((a, b) => b[0].localeCompare(a[0]));
 
-    const embed = new EmbedBuilder()
-      .setTitle('📅 Monthly Report')
-      .setColor(0x3498db)
+    const embed = createPremiumEmbed()
+      .setTitle('?? Monthly Report')
+      
       .addFields(
         { name: 'Messages', value: messages.toLocaleString(), inline: true },
         { name: 'Commands', value: commands.toLocaleString(), inline: true },
@@ -40,8 +42,14 @@ module.exports = {
         { name: 'Period', value: `${months} month(s)`, inline: true }
       )
       .setDescription(sortedMonths.map(([month, count]) => `${month}: ${count} activities`).join('\n'))
-      .setTimestamp();
+      ;
 
-    await interaction.reply({ embeds: [embed] });
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_monthly_report').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
+
+
+
+

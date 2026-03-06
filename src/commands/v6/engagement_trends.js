@@ -1,4 +1,5 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { createEnterpriseEmbed } = require('../../utils/enhancedEmbeds');
 const { Activity } = require('../../database/mongo');
 
 module.exports = {
@@ -8,6 +9,11 @@ module.exports = {
 
   async execute(interaction, client) {
     await interaction.deferReply();
+
+            const license = await validatePremiumLicense(interaction, 'enterprise');
+            if (!license.allowed) {
+                return await interaction.editReply({ embeds: [license.embed], components: [license.components] });
+            }
     const guildId = interaction.guildId;
     const now = new Date();
     const w1Start = new Date(now - 7 * 86400000);
@@ -28,23 +34,29 @@ module.exports = {
     const warnNow = thisWeek.filter(a => a.type === 'warning').length;
     const warnLast = lastWeek.filter(a => a.type === 'warning').length;
 
-    const trend = (tw, lw) => lw === 0 ? '➡️' : tw > lw ? '📈' : tw < lw ? '📉' : '➡️';
+    const trend = (tw, lw) => lw === 0 ? '??' : tw > lw ? '??' : tw < lw ? '??' : '??';
 
-    const embed = new EmbedBuilder()
-      .setTitle('📈 Engagement Trends')
-      .setColor(0x3498db)
+    const embed = createEnterpriseEmbed()
+      .setTitle('?? Engagement Trends')
+      
       .addFields(
-        { name: '📊 Activity This Week', value: thisWeek.length.toString(), inline: true },
-        { name: '📅 Activity Last Week', value: lastWeek.length.toString(), inline: true },
+        { name: '?? Activity This Week', value: thisWeek.length.toString(), inline: true },
+        { name: '?? Activity Last Week', value: lastWeek.length.toString(), inline: true },
         { name: `${trend(thisWeek.length, lastWeek.length)} Change`, value: actChange === 'N/A' ? 'N/A' : `${actChange}%`, inline: true },
         { name: `${trend(activeNow, activeLast)} Active Users`, value: `${activeNow} vs ${activeLast}`, inline: true },
         { name: `${trend(cmdNow, cmdLast)} Commands`, value: `${cmdNow} vs ${cmdLast}`, inline: true },
         { name: `${trend(warnLast, warnNow)} Warnings`, value: `${warnNow} vs ${warnLast}`, inline: true },
-        { name: '👥 User Change', value: userChange === 'N/A' ? 'N/A' : `${userChange}%`, inline: true }
+        { name: '?? User Change', value: userChange === 'N/A' ? 'N/A' : `${userChange}%`, inline: true }
       )
-      .setFooter({ text: `${interaction.guild.name} • Engagement Trends` })
-      .setTimestamp();
+      
+      ;
 
-    await interaction.editReply({ embeds: [embed] });
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_engagement_trends').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
+
+
+
+

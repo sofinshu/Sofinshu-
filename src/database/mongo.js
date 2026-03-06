@@ -29,7 +29,16 @@ const guildSchema = new mongoose.Schema({
     logChannel: String,
     welcomeChannel: String,
     modChannel: String,
-    promotionChannel: String  // channel to announce promotions
+    promotionChannel: String,
+    // [Phase 3] Dynamic Role assigning for shifted staff
+    onDutyRole: { type: String, default: null },
+    // New: activity alert settings
+    alerts: {
+      enabled: { type: Boolean, default: false },
+      channelId: { type: String, default: null },
+      roleId: { type: String, default: null },
+      threshold: { type: Number, default: 50 }
+    }
   },
   // rank → Discord role ID mapping (set via /setup_promo)
   rankRoles: {
@@ -39,23 +48,34 @@ const guildSchema = new mongoose.Schema({
     manager: { type: String, default: null },
     admin: { type: String, default: null }
   },
+  // Helper application system configuration
+  helperConfig: {
+    enabled: { type: Boolean, default: false },
+    staffRole: { type: String, default: null },
+    logChannel: { type: String, default: null },
+    acceptedRole: { type: String, default: null }
+  },
+  // Enterprise custom branding configuration
+  customBranding: {
+    color: { type: String, default: null },
+    footer: { type: String, default: null },
+    iconURL: { type: String, default: null }
+  },
+  // Dynamic application system config
+  applicationConfig: { type: mongoose.Schema.Types.Mixed, default: {} },
   // Full 10-field promotion requirements (customizable by tier)
-  // v1 (free): points, shifts, consistency
-  // v2 (free): + maxWarnings, shiftHours
-  // v3 (premium): + achievements, reputation
-  // v6 (enterprise): + daysInServer, cleanRecordDays, customNote
   promotionRequirements: {
     staff: {
-      points: { type: Number, default: 100 },   // req 1 (v1)
-      shifts: { type: Number, default: 5 },   // req 2 (v1)
-      consistency: { type: Number, default: 70 },   // req 3 (v1)
-      maxWarnings: { type: Number, default: 3 },   // req 4 (v2)
-      shiftHours: { type: Number, default: 0 },   // req 5 (v2) — 0 = disabled
-      achievements: { type: Number, default: 0 },   // req 6 (v3)
-      reputation: { type: Number, default: 0 },   // req 7 (v3)
-      daysInServer: { type: Number, default: 0 },   // req 8 (enterprise)
-      cleanRecordDays: { type: Number, default: 0 },   // req 9 (enterprise)
-      customNote: { type: String, default: '' }    // req 10 (enterprise) — text shown in DM
+      points: { type: Number, default: 100 },
+      shifts: { type: Number, default: 5 },
+      consistency: { type: Number, default: 70 },
+      maxWarnings: { type: Number, default: 3 },
+      shiftHours: { type: Number, default: 0 },
+      achievements: { type: Number, default: 0 },
+      reputation: { type: Number, default: 0 },
+      daysInServer: { type: Number, default: 0 },
+      cleanRecordDays: { type: Number, default: 0 },
+      customNote: { type: String, default: '' }
     },
     senior: {
       points: { type: Number, default: 300 },
@@ -94,12 +114,55 @@ const guildSchema = new mongoose.Schema({
       customNote: { type: String, default: '' }
     }
   },
+  customCommands: [{
+    trigger: { type: String, required: true },
+    response: { type: String, required: true },
+    type: { type: String, enum: ['exact', 'starts', 'contains'], default: 'exact' },
+    isEmbed: { type: Boolean, default: true },
+    enabled: { type: Boolean, default: true },
+    createdAt: { type: Date, default: Date.now }
+  }],
+  achievements: [{
+    id: { type: String, required: true },
+    name: { type: String, required: true },
+    description: String,
+    icon: String,
+    criteria: {
+      type: { type: String, enum: ['points', 'shifts', 'warnings', 'consistency'], default: 'points' },
+      value: { type: Number, default: 0 }
+    }
+  }],
+  roleRewards: [{
+    roleId: { type: String, required: true },
+    requiredPoints: { type: Number, default: 0 },
+    name: String
+  }],
   stats: {
     commandsUsed: { type: Number, default: 0 },
     membersJoined: { type: Number, default: 0 },
     messagesProcessed: { type: Number, default: 0 },
     warnings: { type: Number, default: 0 },
     lastActivity: Date
+  },
+  welcomeConfig: {
+    enabled: { type: Boolean, default: false },
+    channelId: String,
+    title: { type: String, default: 'Welcome to the Server!' },
+    message: { type: String, default: 'We are glad to have you here!' },
+    imageURL: String,
+    buttons: {
+      rules: { enabled: { type: Boolean, default: false }, label: { type: String, default: 'Read Rules' } },
+      roles: { enabled: { type: Boolean, default: false }, label: { type: String, default: 'Get Roles' } },
+      apply: { enabled: { type: Boolean, default: false }, label: { type: String, default: 'Apply Now' } }
+    }
+  },
+  autoChatConfig: {
+    enabled: { type: Boolean, default: false },
+    channelId: String,
+    interval: { type: Number, default: 60 }, // Frequency in minutes
+    messages: { type: [String], default: ["How is everyone doing today?", "Don't forget to check out our rules!", "Welcome to the community!"] },
+    lastSent: Date,
+    nextSent: Date
   },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
@@ -113,7 +176,23 @@ const userSchema = new mongoose.Schema({
     guildId: String,
     joinedAt: Date,
     roles: [String],
-    nickname: String
+    nickname: String,
+    // Multi-Server Isolated Staff Stats
+    staff: {
+      rank: { type: String, default: 'trial' },
+      points: { type: Number, default: 0 },
+      warnings: { type: Number, default: 0 },
+      shiftTime: { type: Number, default: 0 },
+      lastShift: Date,
+      consistency: { type: Number, default: 100 },
+      reputation: { type: Number, default: 0 },
+      achievements: [String],
+      streak: { type: Number, default: 0 },
+      trophies: { type: [String], default: [] },
+      promotionPending: { type: Boolean, default: false },
+      lastPromotionCheck: Date,
+      lastPromotionDate: Date
+    }
   }],
   licenses: [{
     licenseKey: String,
@@ -123,22 +202,41 @@ const userSchema = new mongoose.Schema({
     expiresAt: Date,
     isActive: Boolean
   }],
+  // Global staff profile (Cross-Server identity)
   staff: {
-    rank: { type: String, default: 'member' },
-    points: { type: Number, default: 0 },
-    warnings: { type: Number, default: 0 },
-    shiftTime: { type: Number, default: 0 },
-    lastShift: Date,
-    consistency: { type: Number, default: 100 },
-    reputation: { type: Number, default: 0 },
-    achievements: [String],
-    promotionPending: { type: Boolean, default: false }, // true = owner DM already sent, awaiting decision
-    lastPromotionCheck: Date // last time this user was checked for promotion
+    tagline: { type: String, default: 'Operational Personnel' },
+    profileColor: { type: String, default: null },
+    xp: { type: Number, default: 0 }, // Global XP
+    level: { type: Number, default: 1 }, // Global Level
+    commandUsage: { type: mongoose.Schema.Types.Mixed, default: {} },
+    perks: { type: [String], default: [] },
+    equippedPerk: { type: String, default: null },
+    honorPoints: { type: Number, default: 0 },
+    honorific: { type: String, default: 'Unranked' }
   },
   stats: {
     commandsUsed: { type: Number, default: 0 },
-    totalSpent: { type: Number, default: 0 }
+    totalSpent: { type: Number, default: 0 },
+    xp: { type: Number, default: 0 },
+    level: { type: Number, default: 1 }
   },
+  helperApplications: [{
+    id: String,
+    guildId: String,
+    username: String,
+    userId: String,
+    whyHelper: String,
+    howAssist: String,
+    experience: String,
+    activity: String,
+    other: String,
+    status: { type: String, enum: ['pending', 'accepted', 'denied'], default: 'pending' },
+    messageId: String,
+    channelId: String,
+    reviewedBy: String,
+    reviewedAt: Date,
+    createdAt: { type: Date, default: Date.now }
+  }],
   createdAt: { type: Date, default: Date.now }
 });
 
@@ -172,7 +270,13 @@ const shiftSchema = new mongoose.Schema({
   startTime: { type: Date, default: Date.now },
   endTime: Date,
   duration: Number,
-  notes: String
+  notes: String,
+  status: { type: String, enum: ['active', 'paused', 'ended'], default: 'active' },
+  pauses: [{
+    startedAt: Date,
+    endedAt: Date,
+    duration: { type: Number, default: 0 }
+  }]
 });
 
 const activitySchema = new mongoose.Schema({
@@ -198,6 +302,39 @@ const ticketSchema = new mongoose.Schema({
   closedAt: Date
 });
 
+const applicationConfigSchema = new mongoose.Schema({
+  guildId: { type: String, required: true, unique: true },
+  enabled: { type: Boolean, default: false },
+  applyChannelId: { type: String, default: null },
+  reviewChannelId: { type: String, default: null },
+  reviewerRoleId: { type: String, default: null },
+  panelTitle: { type: String, default: 'Server Application' },
+  questions: {
+    type: [String],
+    default: [
+      "Why do you want to join our team?",
+      "What experience do you have?",
+      "How active can you be?"
+    ]
+  },
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now }
+});
+
+const applicationRequestSchema = new mongoose.Schema({
+  guildId: { type: String, required: true },
+  userId: { type: String, required: true },
+  username: String,
+  globalName: String,
+  answers: mongoose.Schema.Types.Mixed,
+  status: { type: String, enum: ['pending', 'accepted', 'denied'], default: 'pending' },
+  messageId: String,
+  channelId: String,
+  reviewedBy: String,
+  reviewedAt: Date,
+  createdAt: { type: Date, default: Date.now }
+});
+
 const Guild = mongoose.model('Guild', guildSchema);
 const User = mongoose.model('User', userSchema);
 const License = mongoose.model('License', licenseSchema);
@@ -205,5 +342,17 @@ const Warning = mongoose.model('Warning', warningSchema);
 const Shift = mongoose.model('Shift', shiftSchema);
 const Activity = mongoose.model('Activity', activitySchema);
 const Ticket = mongoose.model('Ticket', ticketSchema);
+const ApplicationConfig = mongoose.model('ApplicationConfig', applicationConfigSchema);
+const ApplicationRequest = mongoose.model('ApplicationRequest', applicationRequestSchema);
 
-module.exports = { Guild, User, License, Warning, Shift, Activity, Ticket };
+module.exports = {
+  Guild,
+  User,
+  License,
+  Warning,
+  Shift,
+  Activity,
+  Ticket,
+  ApplicationConfig,
+  ApplicationRequest
+};

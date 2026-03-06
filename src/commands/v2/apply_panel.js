@@ -1,0 +1,71 @@
+const { SlashCommandBuilder, PermissionFlagsBits, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { createCustomEmbed, createErrorEmbed } = require('../../utils/enhancedEmbeds');
+const { ApplicationConfig } = require('../../database/mongo');
+
+module.exports = {
+    data: new SlashCommandBuilder()
+        .setName('apply_panel')
+        .setDescription('Spawn the interactive application UI panel in the current channel')
+        .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
+
+    async execute(interaction) {
+        try {
+            await interaction.deferReply({ ephemeral: true });
+
+            const config = await ApplicationConfig.findOne({ guildId: interaction.guildId }).lean();
+            if (!config || !config.enabled) {
+                return interaction.editReply({ embeds: [createErrorEmbed('The application system has not been configured yet. Please run `/apply_setup` first.')] });
+            }
+
+            if (!config.applyChannelId || !config.reviewChannelId) {
+                return interaction.editReply({ embeds: [createErrorEmbed('The application or review channels are missing. Please re-run `/apply_setup`.')] });
+            }
+
+            if (!config.questions || config.questions.length === 0) {
+                return interaction.editReply({ embeds: [createErrorEmbed('You must configure at least one question using `/apply_fields add` before spawning the panel.')] });
+            }
+
+            const panelEmbed = await createCustomEmbed(interaction, {
+                title: config.panelTitle || '📋 Strategic Personnel Acquisition',
+                description: '### 🛡️ Authorized Recruitment Terminal\nInitialize your official application for service within the **${interaction.guild.name}** sector. Please provide authentic telemetry responses to all terminal prompts.\n\n> Submission signals are encrypted and routed directly to the high-command review grid.',
+                thumbnail: interaction.guild.iconURL({ dynamic: true }),
+                footer: `Official Recruitment Engine • ${interaction.guild.name} Staffing`,
+                color: 'enterprise'
+            });
+
+            const actionRow = new ActionRowBuilder().addComponents(
+                new ButtonBuilder()
+                    .setCustomId('start_application')
+                    .setLabel('Initialize Application')
+                    .setEmoji('📝')
+                    .setStyle(ButtonStyle.Success)
+            );
+
+            // Fetch channel and send
+            const applyChannel = await interaction.guild.channels.fetch(config.applyChannelId).catch(() => null);
+
+            if (!applyChannel) {
+                return interaction.editReply({ embeds: [createErrorEmbed(`Search failed: Could not locate the injection node <#${config.applyChannelId}>.`)] });
+            }
+
+            await applyChannel.send({ embeds: [panelEmbed], components: [actionRow] });
+
+            const success = await createCustomEmbed(interaction, {
+                title: '✅ Recruitment Terminal Deployed',
+                description: `Successfully materialized the interactive application interface in <#${config.applyChannelId}>.`,
+                color: 'success'
+            });
+            await interaction.editReply({ embeds: [success] });
+
+        } catch (error) {
+            console.error('Apply Panel Error:', error);
+            const errEmbed = createErrorEmbed('A fatal error occurred while attempting to cast the panel. Please verify I have permissions to write in the target channel.');
+            if (interaction.deferred || interaction.replied) {
+                await interaction.editReply({ embeds: [errEmbed] });
+            } else {
+                await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
+            }
+        }
+    }
+};
+

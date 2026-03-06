@@ -1,21 +1,58 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { createCustomEmbed, createErrorEmbed } = require('../../utils/enhancedEmbeds');
+const { User } = require('../../database/mongo');
 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('reward_points')
-    .setDescription('View reward points')
+    .setDescription('View authentic reward points available to a staff member')
     .addUserOption(opt => opt.setName('user').setDescription('Staff member').setRequired(false)),
-  
+
   async execute(interaction) {
-    const user = interaction.options.getUser('user') || interaction.user;
-    const embed = new EmbedBuilder()
-      .setTitle(`🎁 ${user.username}'s Reward Points`)
-      .addFields(
-        { name: 'Available', value: '150', inline: true },
-        { name: 'Lifetime', value: '500', inline: true }
-      )
-      .setColor('#f1c40f');
-    
-    await interaction.reply({ embeds: [embed] });
+    try {
+      await interaction.deferReply();
+      const targetUser = interaction.options.getUser('user') || interaction.user;
+
+      const userDoc = await User.findOne({ userId: targetUser.id, guildId: interaction.guildId }).lean();
+
+      if (!userDoc || !userDoc.staff) {
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_reward_points').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [createErrorEmbed(`No staff record found for <@${targetUser.id}> in this server.`)], components: [row] });
+      }
+
+      const available = userDoc.staff.points || 0;
+      // We calculate lifetime by aggregating all shifts this user has worked in this guild
+      const shifts = await require('../../database/mongo').Shift.find({ userId: targetUser.id, guildId: interaction.guildId }).lean();
+
+      const lifetimeHours = Math.floor(shifts.reduce((acc, s) => acc + (s.duration || 0), 0) / 3600);
+      const totalShifts = shifts.length;
+
+      const embed = await createCustomEmbed(interaction, {
+        title: `?? Specialized Reward Profile: ${targetUser.username}`,
+        thumbnail: targetUser.displayAvatarURL({ dynamic: true }),
+        description: `High-fidelity reward metrics tracking for <@${targetUser.id}> within the **${interaction.guild.name}** operational sector.`,
+        fields: [
+          { name: '? Available Points', value: `\`${available.toLocaleString()}\``, inline: true },
+          { name: '?? Lifetime Logged', value: `\`${lifetimeHours.toLocaleString()}\` **HRS**`, inline: true },
+          { name: '?? Total Engagements', value: `\`${totalShifts.toLocaleString()}\` **Shifts**`, inline: true }
+        ],
+        color: available > 1000 ? 'enterprise' : 'premium'
+      });
+
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_reward_points').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
+
+    } catch (error) {
+      console.error('Reward Points Error:', error);
+      const errEmbed = createErrorEmbed('An error occurred while fetching reward point algorithms.');
+            if (interaction.deferred || interaction.replied) {
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_reward_points').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            return await interaction.editReply({ embeds: [errEmbed], components: [row] });
+      } else {
+        await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
+      }
+    }
   }
 };
+
+

@@ -1,0 +1,116 @@
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { createCustomEmbed, createErrorEmbed } = require('../../utils/enhancedEmbeds');
+const { User, Guild, Shift, Warning } = require('../../database/mongo');
+
+module.exports = {
+  data: new SlashCommandBuilder()
+    .setName('next_promotion')
+    .setDescription('[Premium] See who is next in line for promotion within this server'),
+
+  async execute(interaction) {
+    try {
+      await interaction.deferReply();
+      const guildId = interaction.guildId;
+      const guild = await Guild.findOne({ guildId }).lean();
+
+      if (!guild || !guild.promotionRequirements) {
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_nextPromotion').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [createErrorEmbed('This server has not configured any promotion requirements.')], components: [row] });
+      }
+
+      const users = await User.find({
+        guildId: guildId,
+        'staff.rank': { $ne: null }
+      }).lean();
+
+      const eligible = [];
+      const rankOrder = Object.keys(guild.promotionRequirements);
+      // Let's ensure "member" and "trial" are considered preliminary ranks before the formal track if they exist implicitly
+      if (!rankOrder.includes('member')) rankOrder.unshift('member');
+      if (!rankOrder.includes('trial')) rankOrder.splice(1, 0, 'trial');
+
+      for (const user of users) {
+        const currentRank = user.staff?.rank || 'member';
+        const points = user.staff?.points || 0;
+        const consistency = user.staff?.consistency || 0;
+
+        const currentIndex = rankOrder.indexOf(currentRank);
+        const nextRank = rankOrder[currentIndex + 1];
+
+        if (!nextRank || !guild.promotionRequirements[nextRank]) continue;
+
+        const shiftCount = await Shift.countDocuments({ userId: user.userId, guildId, endTime: { $ne: null } });
+        const warningCount = await Warning.countDocuments({ userId: user.userId, guildId });
+
+        const req = guild.promotionRequirements[nextRank];
+        const reqPoints = req.points || 100;
+        const reqShifts = req.shifts || 5;
+        const reqConsistency = req.consistency || 70;
+        const reqMaxWarnings = req.maxWarnings ?? 3;
+
+        const canPromote =
+          points >= reqPoints &&
+          shiftCount >= reqShifts &&
+          consistency >= reqConsistency &&
+          warningCount <= reqMaxWarnings;
+
+        if (canPromote) {
+          const progress = Math.round(((points / reqPoints) + (shiftCount / reqShifts) + (consistency / 100)) / 3 * 100);
+
+          let username = user.username;
+          if (!username) {
+            const fetched = await interaction.client.users.fetch(user.userId).catch(() => null);
+            username = fetched ? fetched.username : 'Unknown';
+          }
+
+          eligible.push({
+            userId: user.userId,
+            username: username,
+            currentRank,
+            nextRank,
+            points,
+            shiftCount,
+            consistency,
+            progress
+          });
+        }
+      }
+
+      eligible.sort((a, b) => b.progress - a.progress);
+
+      if (!eligible.length) {
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_nextPromotion').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [createErrorEmbed('No staff members are currently eligible for promotion.')], components: [row] });
+      }
+
+      const top5 = eligible.slice(0, 5);
+      const list = top5.map((e, i) => {
+        const positions = ['?? TOP PRIORITY', '?? HIGH PRIORITY', '?? TARGETED', '?? MONITORING', '?? MONITORING'];
+        const tag = positions[i] || `\`#${i + 1}\``;
+        return `> **${tag}**: **${e.username}**\n> ? **Target**: \`${e.nextRank.toUpperCase()}\`\n> ?? **Metrics**: ? \`${e.points.toLocaleString()}\` | ?? \`${e.shiftCount}\` | ?? \`${e.consistency}%\` | ?? \`${e.progress}%\` Readied\n`;
+      }).join('\n');
+
+      const embed = await createCustomEmbed(interaction, {
+        title: '?? Enterprise Promotion Pipeline',
+        thumbnail: interaction.guild.iconURL({ dynamic: true }),
+        description: `### ??? Authorized Personnel Queue\nCurrently **${eligible.length}** personnel meet or exceed the eligibility threshold for advancement in the **${interaction.guild.name}** sector.\n\n${list}\n\n*Queue is generated based on real-time performance telemetry.*`,
+        footer: 'Automated Advancement Algorithms'
+      });
+
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_nextPromotion').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
+
+    } catch (error) {
+      console.error('Next Promotion Error:', error);
+      const errEmbed = createErrorEmbed('An error occurred while calculating the promotion queue.');
+            if (interaction.deferred || interaction.replied) {
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_nextPromotion').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            return await interaction.editReply({ embeds: [errEmbed], components: [row] });
+      } else {
+        await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
+      }
+    }
+  }
+};
+
+

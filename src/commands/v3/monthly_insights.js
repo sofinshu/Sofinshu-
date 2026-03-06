@@ -1,77 +1,98 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
-const { Activity, Shift, User } = require('../../database/mongo');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { validatePremiumLicense } = require('../../utils/enhancedPremiumGuard');
+const { createCustomEmbed, createErrorEmbed, createPremiumEmbed, createProgressBar, createSuccessEmbed } = require('../../utils/enhancedEmbeds');
+const { Activity, Shift, Warning, User } = require('../../database/mongo');
 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('monthly_insights')
-    .setDescription('View monthly insights and statistics'),
+    .setDescription('?? Comprehensive 30-day performance insights with real analytics'),
 
   async execute(interaction) {
-    const guildId = interaction.guildId;
-    const now = new Date();
-    const firstOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    try {
+      await interaction.deferReply();
 
-    const activities = await Activity.find({
-      guildId,
-      createdAt: { $gte: firstOfMonth }
-    }).lean();
+      const license = await validatePremiumLicense(interaction, 'premium');
+      if (!license.allowed) {
+        return interaction.editReply({ embeds: [license.embed], components: license.components });
+      }
 
-    const shifts = await Shift.find({
-      guildId,
-      startTime: { $gte: firstOfMonth }
-    }).lean();
+      const guildId = interaction.guildId;
+      const now = new Date();
+      const thirtyDaysAgo = new Date(now - 30 * 86400000);
+      const sixtyDaysAgo = new Date(now - 60 * 86400000);
 
-    const commandCount = activities.filter(a => a.type === 'command').length;
-    const messageCount = activities.filter(a => a.type === 'message').length;
-    const warningCount = activities.filter(a => a.type === 'warning').length;
-    const promotionCount = activities.filter(a => a.type === 'promotion').length;
+      const [thisMonthActs, lastMonthActs, shifts, warnings, promotions, topUsers] = await Promise.all([
+        Activity.find({ guildId, createdAt: { $gte: thirtyDaysAgo } }).lean(),
+        Activity.find({ guildId, createdAt: { $gte: sixtyDaysAgo, $lt: thirtyDaysAgo } }).lean(),
+        Shift.find({ guildId, startTime: { $gte: thirtyDaysAgo }, endTime: { $ne: null } }).lean(),
+        Warning.find({ guildId, createdAt: { $gte: thirtyDaysAgo } }).lean(),
+        Activity.find({ guildId, type: 'promotion', createdAt: { $gte: thirtyDaysAgo } }).lean(),
+        User.find({ userId: { $exists: true }, 'staff.points': { $gt: 0 } })
+          .sort({ 'staff.points': -1 }).limit(5).lean()
+      ]);
 
-    const activeStaff = [...new Set(shifts.map(s => s.userId))];
-    const totalShiftHours = shifts.reduce((acc, s) => acc + (s.duration || 0), 0) / 60;
+      const cmdCount = thisMonthActs.filter(a => a.type === 'command').length;
+      const lastCmdCount = lastMonthActs.filter(a => a.type === 'command').length;
+      const growth = lastCmdCount > 0 ? ((cmdCount - lastCmdCount) / lastCmdCount * 100).toFixed(1) : '8';
+      const growthEmoji = parseFloat(growth) >= 0 ? '??' : '??';
 
-    const users = await User.find({
-      'guilds.guildId': guildId
-    }).lean();
+      const activeUsers = new Set(thisMonthActs.map(a => a.userId)).size;
+      const totalShiftSecs = shifts.reduce((s, sh) => s + (sh.duration || 0), 0);
+      const shiftHours = Math.floor(totalShiftSecs / 3600);
 
-    const totalStaff = users.length;
-    const activeThisMonth = users.filter(u => {
-      const userActivity = activities.find(a => a.userId === u.userId);
-      return userActivity;
-    });
+      // Daily avg
+      const dailyAvg = (cmdCount / 30).toFixed(1);
 
-    const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-    const lastMonthActivities = await Activity.find({
-      guildId,
-      createdAt: { $gte: lastMonth, $lt: firstOfMonth }
-    }).lean();
+      // Engagement %
+      const engagePct = Math.min(100, Math.round((activeUsers / Math.max(interaction.guild.memberCount, 1)) * 100));
 
-    const commandChange = lastMonthActivities.length > 0 
-      ? ((commandCount - lastMonthActivities.filter(a => a.type === 'command').length) / lastMonthActivities.filter(a => a.type === 'command').length * 100).toFixed(1)
-      : 0;
+      // Top performers
+      const topList = topUsers.length > 0
+        ? topUsers.slice(0, 5).map((u, i) => {
+          const medals = ['??', '??', '??', '4??', '5??'];
+          return `${medals[i]} ${u.username || `<@${u.userId}>`} � \`${(u.staff?.points || 0).toLocaleString()} pts\``;
+        }).join('\n')
+        : '`No data yet`';
 
-    const embed = new EmbedBuilder()
-      .setTitle('📊 Monthly Insights')
-      .setColor(0x9b59b6)
-      .setDescription(`Statistics for ${interaction.guild.name} - ${now.toLocaleString('default', { month: 'long', year: 'numeric' })}`)
-      .setTimestamp();
+      // Day-of-week breakdown
+      const dayCounts = new Array(7).fill(0);
+      const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      thisMonthActs.forEach(a => { dayCounts[new Date(a.createdAt).getDay()]++; });
+      const peakDay = dayNames[dayCounts.indexOf(Math.max(...dayCounts))];
+      const dayBarline = dayCounts.map((c, i) => {
+        const pct = Math.round((c / Math.max(...dayCounts, 1)) * 5);
+        return `${dayNames[i]}: ${'�'.repeat(pct)}${'�'.repeat(5 - pct)} ${c}`;
+      }).join('\n');
 
-    embed.addFields(
-      { name: 'Commands Used', value: commandCount.toString(), inline: true },
-      { name: 'Messages', value: messageCount.toString(), inline: true },
-      { name: 'Warnings', value: warningCount.toString(), inline: true },
-      { name: 'Promotions', value: promotionCount.toString(), inline: true }
-    );
+      const embed = await createCustomEmbed(interaction, {
+        title: `?? Monthly Insights � ${interaction.guild.name}`,
+        thumbnail: interaction.guild.iconURL({ dynamic: true }),
+        description: `Full 30-day performance breakdown for **${interaction.guild.name}**.\n\n**Engagement Rate:** \`${createProgressBar(engagePct)}\` **${engagePct}%**`,
+        fields: [
+          { name: '? Commands This Month', value: `\`${cmdCount.toLocaleString()}\` ${growthEmoji} \`${growth}%\` vs last month`, inline: true },
+          { name: '?? Daily Average', value: `\`${dailyAvg}\` cmds/day`, inline: true },
+          { name: '?? Unique Active Users', value: `\`${activeUsers}\``, inline: true },
+          { name: '?? Shifts Completed', value: `\`${shifts.length}\` shifts � \`${shiftHours}h\` total`, inline: true },
+          { name: '?? Warnings Issued', value: `\`${warnings.length}\``, inline: true },
+          { name: '?? Promotions', value: `\`${promotions.length}\``, inline: true },
+          { name: '?? Activity by Day', value: `\`\`\`\n${dayBarline}\`\`\``, inline: false },
+          { name: '?? Peak Day', value: `\`${peakDay}\``, inline: true },
+          { name: '??? Top 5 Staff', value: topList, inline: false }
+        ],
+        color: 'premium',
+        footer: 'uwu-chan � Premium Monthly Insights � Last 30 Days'
+      });
 
-    embed.addFields(
-      { name: 'Total Staff', value: totalStaff.toString(), inline: true },
-      { name: 'Active This Month', value: activeThisMonth.length.toString(), inline: true },
-      { name: 'Shift Hours', value: totalShiftHours.toFixed(1), inline: true }
-    );
-
-    embed.addFields(
-      { name: 'Command Change', value: `${commandChange > 0 ? '📈' : '📉'} ${Math.abs(commandChange)}%`, inline: true }
-    );
-
-    await interaction.reply({ embeds: [embed] });
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_monthly_insights').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
+    } catch (error) {
+      console.error('[monthly_insights] Error:', error);
+      const errEmbed = createErrorEmbed('Failed to generate monthly insights.');
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_monthly_insights').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary)); if (interaction.deferred || interaction.replied) {
+            return await interaction.editReply({ embeds: [errEmbed], components: [row] }); } else await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
+    }
   }
 };
+
+

@@ -1,61 +1,90 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
-const { Guild, Warning, Shift, Activity } = require('../../database/mongo');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { createCustomEmbed, createEnterpriseEmbed, createErrorEmbed, createProgressBar, createSuccessEmbed } = require('../../utils/enhancedEmbeds');
+const { Activity, Warning, Shift, User } = require('../../database/mongo');
 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('server_health')
-    .setDescription('View overall server health and statistics'),
+    .setDescription('?? Enterprise server health score � calculated from real retention, safety, and engagement data'),
 
-  async execute(interaction, client) {
-    await interaction.deferReply();
-    const guildId = interaction.guildId;
-    const oneDayAgo = new Date(Date.now() - 86400000);
-    const sevenDaysAgo = new Date(Date.now() - 7 * 86400000);
+  async execute(interaction) {
+    try {
+      await interaction.deferReply();
 
-    const [guild, todayActivity, weekActivity, activeShifts] = await Promise.all([
-      Guild.findOne({ guildId }).lean(),
-      Activity.countDocuments({ guildId, createdAt: { $gte: oneDayAgo } }),
-      Activity.countDocuments({ guildId, createdAt: { $gte: sevenDaysAgo } }),
-      Shift.countDocuments({ guildId, endTime: null })
-    ]);
+      const license = await validatePremiumLicense(interaction, 'enterprise');
+      if (!license.allowed) {
+        return interaction.editReply({ embeds: [license.embed], components: license.components });
+      }
 
-    const stats = guild?.stats || {};
-    const memberCount = interaction.guild.memberCount;
-    const tier = guild?.premium?.tier || 'free';
+      const guildId = interaction.guildId;
+      const now = new Date();
+      const sevenDaysAgo = new Date(now - 7 * 86400000);
+      const thirtyDaysAgo = new Date(now - 30 * 86400000);
 
-    const score = Math.min(100, Math.round(
-      (Math.min(todayActivity, 50) / 50 * 40) +
-      (Math.min(memberCount, 100) / 100 * 30) +
-      (activeShifts > 0 ? 20 : 0) +
-      (tier !== 'free' ? 10 : 0)
-    ));
+      const [weekActs, monthActs, weekWarnings, weekShifts, allUsers] = await Promise.all([
+        Activity.find({ guildId, createdAt: { $gte: sevenDaysAgo } }).lean(),
+        Activity.find({ guildId, createdAt: { $gte: thirtyDaysAgo } }).lean(),
+        Warning.find({ guildId, createdAt: { $gte: sevenDaysAgo } }).lean(),
+        Shift.find({ guildId, startTime: { $gte: sevenDaysAgo }, endTime: { $ne: null } }).lean(),
+        User.find({ userId: { $exists: true } }).lean()
+      ]);
 
-    const healthBar = '▓'.repeat(Math.round(score / 10)) + '░'.repeat(10 - Math.round(score / 10));
-    const healthEmoji = score >= 80 ? '🟢' : score >= 50 ? '🟡' : '🔴';
+      const memberCount = interaction.guild.memberCount;
 
-    const uptime = process.uptime();
-    const hours = Math.floor(uptime / 3600);
-    const minutes = Math.floor((uptime % 3600) / 60);
+      // 1. Engagement score (0-100): active users vs total members
+      const activeUsers = new Set(weekActs.map(a => a.userId)).size;
+      const engageScore = Math.min(100, Math.round((activeUsers / Math.max(memberCount, 1)) * 100 * 2));
 
-    const embed = new EmbedBuilder()
-      .setTitle(`${healthEmoji} Server Health Report`)
-      .setColor(score >= 80 ? 0x2ecc71 : score >= 50 ? 0xf39c12 : 0xe74c3c)
-      .setThumbnail(interaction.guild.iconURL())
-      .addFields(
-        { name: '💊 Health Score', value: `\`${healthBar}\` ${score}/100`, inline: false },
-        { name: '👥 Members', value: memberCount.toString(), inline: true },
-        { name: '⚡ Activity Today', value: todayActivity.toString(), inline: true },
-        { name: '📅 Activity (7d)', value: weekActivity.toString(), inline: true },
-        { name: '🔄 Active Shifts', value: activeShifts.toString(), inline: true },
-        { name: '🎖️ Premium Tier', value: tier.toUpperCase(), inline: true },
-        { name: '🤖 Bot Uptime', value: `${hours}h ${minutes}m`, inline: true },
-        { name: '📊 Total Commands Used', value: (stats.commandsUsed || 0).toString(), inline: true },
-        { name: '⚠️ Total Warnings', value: (stats.warnings || 0).toString(), inline: true },
-        { name: '📨 Messages Processed', value: (stats.messagesProcessed || 0).toString(), inline: true }
-      )
-      .setFooter({ text: `${interaction.guild.name} • Health Check` })
-      .setTimestamp();
+      // 2. Safety score (0-100): fewer warnings = better
+      const warningsPerUser = weekWarnings.length / Math.max(activeUsers, 1);
+      const safetyScore = Math.max(0, Math.round(100 - (warningsPerUser * 30)));
 
-    await interaction.editReply({ embeds: [embed] });
+      // 3. Activity score (0-100): command count vs member count
+      const activityPerMember = monthActs.length / Math.max(memberCount, 1);
+      const activityScore = Math.min(100, Math.round(activityPerMember * 10));
+
+      // 4. Staff consistency (0-100): average consistency of all staff
+      const staffUsers = allUsers.filter(u => u.staff?.consistency);
+      const avgConsistency = staffUsers.length > 0
+        ? staffUsers.reduce((s, u) => s + (u.staff.consistency || 100), 0) / staffUsers.length
+        : 100;
+
+      // 5. overall health score (weighted avg)
+      const healthScore = Math.round(
+        (engageScore * 0.30) +
+        (safetyScore * 0.30) +
+        (activityScore * 0.20) +
+        (avgConsistency * 0.20)
+      );
+
+      const healthLabel = healthScore >= 80 ? '?? **Excellent**' : healthScore >= 60 ? '?? **Good**' : healthScore >= 40 ? '?? **Fair**' : '?? **Poor**';
+      const healthColor = healthScore >= 80 ? '#43b581' : healthScore >= 60 ? '#faa61a' : healthScore >= 40 ? '#ff7043' : '#f04747';
+
+      const embed = await createCustomEmbed(interaction, {
+        title: `?? Server Health � ${interaction.guild.name}`,
+        thumbnail: interaction.guild.iconURL({ dynamic: true }),
+        description: `**Overall Health Score:** ${healthLabel}\n\`${createProgressBar(healthScore)}\` **${healthScore}/100**`,
+        fields: [
+          { name: '?? Engagement', value: `\`${createProgressBar(engageScore)}\` **${engageScore}%**\n${activeUsers} active users this week`, inline: false },
+          { name: '??? Safety', value: `\`${createProgressBar(safetyScore)}\` **${safetyScore}%**\n${weekWarnings.length} warnings this week`, inline: false },
+          { name: '? Activity Level', value: `\`${createProgressBar(activityScore)}\` **${activityScore}%**\n${monthActs.length} events in 30 days`, inline: false },
+          { name: '?? Staff Consistency', value: `\`${createProgressBar(Math.round(avgConsistency))}\` **${avgConsistency.toFixed(1)}%**`, inline: false },
+          { name: '?? Shifts This Week', value: `\`${weekShifts.length}\` completed`, inline: true },
+          { name: '?? Total Members', value: `\`${memberCount.toLocaleString()}\``, inline: true }
+        ],
+        color: healthColor,
+        footer: 'uwu-chan � Enterprise Server Health � Real Data'
+      });
+
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_server_health').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
+    } catch (error) {
+      console.error('[server_health] Error:', error);
+      const errEmbed = createErrorEmbed('Failed to calculate server health score.');
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_server_health').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary)); if (interaction.deferred || interaction.replied) {
+            return await interaction.editReply({ embeds: [errEmbed], components: [row] }); } else await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
+    }
   }
 };
+
+

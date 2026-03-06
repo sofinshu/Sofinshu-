@@ -1,4 +1,5 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { createEnterpriseEmbed, createErrorEmbed, createSuccessEmbed } = require('../../utils/enhancedEmbeds');
 const { User } = require('../../database/mongo');
 
 module.exports = {
@@ -8,6 +9,11 @@ module.exports = {
 
   async execute(interaction, client) {
     await interaction.deferReply();
+
+            const license = await validatePremiumLicense(interaction, 'enterprise');
+            if (!license.allowed) {
+                return await interaction.editReply({ embeds: [license.embed], components: [license.components] });
+            }
     const { Activity } = require('../../database/mongo');
     const guildId = interaction.guildId;
     const sevenDaysAgo = new Date(Date.now() - 7 * 86400000);
@@ -16,22 +22,30 @@ module.exports = {
       User.find({ 'staff.points': { $gt: 0 } }).sort({ 'staff.points': -1 }).limit(3).lean()
     ]);
 
-    const medals = ['🥇', '🥈', '🥉'];
-    const topList = topStaff.map((u, i) => `${medals[i]} **${u.username || '?'}** — ${u.staff?.points || 0} pts`).join('\n') || 'No data.';
+    const medals = ['??', '??', '??'];
+    const topList = topStaff.map((u, i) => `${medals[i]} **${u.username || '?'}** � ${u.staff?.points || 0} pts`).join('\n') || 'No data.';
     const activeCount = [...new Set(weekActs.map(a => a.userId))].length;
     const promotions = weekActs.filter(a => a.type === 'promotion').length;
 
-    const embed = new EmbedBuilder()
-      .setTitle(`✨ Team Highlights — Week of ${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`)
-      .setColor(0xf1c40f)
+    const embed = createEnterpriseEmbed()
+      .setTitle(`? Team Highlights � Week of ${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`)
+      
       .addFields(
-        { name: '👥 Active Staff (7d)', value: activeCount.toString(), inline: true },
-        { name: '⬆️ Promotions (7d)', value: promotions.toString(), inline: true },
-        { name: '⚡ Total Events (7d)', value: weekActs.length.toString(), inline: true },
-        { name: '🏆 Top Performers This Week', value: topList }
+        { name: '?? Active Staff (7d)', value: activeCount.toString(), inline: true },
+        { name: '?? Promotions (7d)', value: promotions.toString(), inline: true },
+        { name: '? Total Events (7d)', value: weekActs.length.toString(), inline: true },
+        { name: '?? Top Performers This Week', value: topList }
       )
-      .setFooter({ text: `${interaction.guild.name} • Weekly Team Highlights` })
-      .setTimestamp();
-    await interaction.editReply({ embeds: [embed] });
+      
+      ;
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_team_highlights').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
+
+
+
+
+
+

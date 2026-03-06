@@ -1,4 +1,5 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { createPremiumEmbed } = require('../../utils/enhancedEmbeds');
 const { Activity } = require('../../database/mongo');
 
 module.exports = {
@@ -28,9 +29,9 @@ module.exports = {
       .sort((a, b) => b[1] - a[1])
       .slice(0, 5);
 
-    const embed = new EmbedBuilder()
-      .setTitle('📋 Report Summary')
-      .setColor(0x34495e)
+    const embed = createPremiumEmbed()
+      .setTitle('?? Report Summary')
+      
       .addFields(
         { name: 'Total Activities', value: activities.length.toString(), inline: true },
         { name: 'Messages', value: (typeCounts.message || 0).toString(), inline: true },
@@ -40,8 +41,14 @@ module.exports = {
         { name: 'Period', value: `${days} days`, inline: true }
       )
       .setDescription(`Top 5 Active Users:\n${topUsers.map(([uid, count], i) => `${i + 1}. <@${uid}>: ${count}`).join('\n')}`)
-      .setTimestamp();
+      ;
 
-    await interaction.reply({ embeds: [embed] });
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_report_summary').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
+
+
+
+

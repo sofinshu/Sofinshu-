@@ -1,71 +1,81 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { validatePremiumLicense } = require('../../utils/enhancedPremiumGuard');
+const { createCustomEmbed, createErrorEmbed, createPremiumEmbed, createSuccessEmbed } = require('../../utils/enhancedEmbeds');
 const { User } = require('../../database/mongo');
 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('achievement_tracker')
-    .setDescription('Track and view your achievements')
+    .setDescription('Track and view custom staff achievements securely mapped to this server')
     .addUserOption(option =>
       option.setName('user')
         .setDescription('User to check achievements for')
         .setRequired(false)),
 
   async execute(interaction) {
-    const targetUser = interaction.options.getUser('user') || interaction.user;
-    const guildId = interaction.guildId;
+    try {
+      await interaction.deferReply();
 
-    let user = await User.findOne({ userId: targetUser.id });
-    if (!user) {
-      user = new User({ userId: targetUser.id, username: targetUser.username });
-      await user.save();
-    }
-
-    const achievements = user.staff?.achievements || [];
-    const achievementList = [
-      { id: 'first_shift', name: 'First Shift', desc: 'Complete your first shift', icon: '🎯' },
-      { id: 'week_streak', name: 'Week Warrior', desc: '7 day streak', icon: '🔥' },
-      { id: 'point_100', name: 'Century', desc: 'Earn 100 points', icon: '💯' },
-      { id: 'point_500', name: 'High Roller', desc: 'Earn 500 points', icon: '🎰' },
-      { id: 'point_1000', name: 'Point Master', desc: 'Earn 1000 points', icon: '👑' },
-      { id: 'mod_note_10', name: 'Note Taker', desc: 'Write 10 mod notes', icon: '📝' },
-      { id: 'alert_5', name: 'Alert Expert', desc: 'Handle 5 alerts', icon: '⚠️' },
-      { id: 'promoted', name: 'Rising Star', desc: 'Get promoted', icon: '⭐' },
-      { id: 'perfect_week', name: 'Perfect Week', desc: '100% attendance for a week', icon: '💎' },
-      { id: 'mentor', name: 'Mentor', desc: 'Help new staff members', icon: '🎓' }
-    ];
-
-    const embed = new EmbedBuilder()
-      .setTitle(`🏆 Achievement Tracker - ${targetUser.username}`)
-      .setColor(0xf1c40f)
-      .setThumbnail(targetUser.displayAvatarURL());
-
-    let unlockedCount = 0;
-    const unlockedAchievements = [];
-    const lockedAchievements = [];
-
-    for (const achievement of achievementList) {
-      const isUnlocked = achievements.includes(achievement.id);
-      if (isUnlocked) {
-        unlockedCount++;
-        unlockedAchievements.push(`${achievement.icon} **${achievement.name}** - ${achievement.desc}`);
-      } else {
-        lockedAchievements.push(`${achievement.icon} ${achievement.name} - ${achievement.desc}`);
+      const license = await validatePremiumLicense(interaction, 'premium');
+      if (!license.allowed) {
+        return await interaction.editReply({ embeds: [license.embed], components: [license.components] });
       }
+      const targetUser = interaction.options.getUser('user') || interaction.user;
+      const guildId = interaction.guildId;
+
+      const guildData = await Guild.findOne({ guildId }).select('achievements premium').lean();
+      const user = await User.findOne({ userId: targetUser.id }).lean();
+      const guildProfile = user?.guilds?.find(g => g.guildId === guildId);
+
+      if (!guildProfile || !guildProfile.staff) {
+        return await interaction.editReply({
+          embeds: [createErrorEmbed(`No staff record exists for <@${targetUser.id}> in this server. Only registered staff can track achievements.`)]
+        });
+      }
+
+      const guildAchievements = guildData?.achievements || [];
+      const userUnlockedIds = guildProfile.staff.achievements || [];
+
+      const unlockedCount = userUnlockedIds.length;
+      const totalCount = guildAchievements.length || 1; // Avoid div by zero
+      const progress = Math.round((unlockedCount / totalCount) * 100);
+      const filled = Math.floor(progress / 10);
+      const progressBar = `\`${'▰'.repeat(filled)}${'▱'.repeat(10 - filled)}\` **${progress}%**`;
+
+      const unlockedLines = guildAchievements
+        .filter(a => userUnlockedIds.includes(a.id))
+        .map(a => `${a.icon || '🏅'} **${a.name}** - *${a.description || 'Achievement unlocked'}*`);
+
+      const lockedLines = guildAchievements
+        .filter(a => !userUnlockedIds.includes(a.id))
+        .map(a => `🔒 **${a.name}** - *Criteria: ${a.criteria?.value} ${a.criteria?.type}*`);
+
+      const embed = await createCustomEmbed(interaction, {
+        title: `🏆 Personnel Achievement Matrix: ${targetUser.username}`,
+        thumbnail: targetUser.displayAvatarURL({ dynamic: true }),
+        description: `### 📂 Strategic Milestone Registry\nReviewing milestones authenticated within **${interaction.guild.name}**.`,
+        fields: [
+          { name: '📈 Operational Progress', value: progressBar, inline: false },
+          { name: '🛡️ Current Rank', value: `\`${(guildProfile.staff.rank || 'trial').toUpperCase()}\``, inline: true },
+          { name: '✨ Staff Points', value: `\`${(guildProfile.staff.points || 0).toLocaleString()}\``, inline: true },
+          { name: '✅ Unlocked Milestones', value: unlockedLines.join('\n') || '*No authenticated milestones detected.*', inline: false }
+        ],
+        footer: 'Continuous operational execution required for high-tier unlocks. • V3 Strategic',
+        color: 'premium'
+      });
+
+      if (lockedLines.length > 0) {
+        embed.addFields({ name: '🔐 Upcoming Objectives', value: lockedLines.slice(0, 5).join('\n') + (lockedLines.length > 5 ? `\n*...and ${lockedLines.length - 5} more*` : ''), inline: false });
+      }
+
+      await interaction.editReply({ embeds: [embed] });
+
+    } catch (error) {
+      console.error('Achievement Tracker Error:', error);
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_achievement_tracker').setLabel('⚙ Sync Live Data').setStyle(ButtonStyle.Secondary));
+      await interaction.editReply({ embeds: [createErrorEmbed('Milestone Registry failure: Unable to decode personnel achievement arrays.')], components: [row] });
     }
-
-    embed.addFields(
-      { name: 'Progress', value: `${unlockedCount}/${achievementList.length} Unlocked`, inline: true },
-      { name: 'Points', value: (user.staff?.points || 0).toString(), inline: true }
-    );
-
-    if (unlockedAchievements.length > 0) {
-      embed.addFields({ name: '✅ Unlocked', value: unlockedAchievements.join('\n') || 'None', inline: false });
-    }
-
-    if (lockedAchievements.length > 0) {
-      embed.addFields({ name: '🔒 Locked', value: lockedAchievements.join('\n') || 'None', inline: false });
-    }
-
-    await interaction.reply({ embeds: [embed] });
   }
 };
+
+

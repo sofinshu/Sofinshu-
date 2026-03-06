@@ -1,4 +1,5 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { createEnterpriseEmbed, createErrorEmbed, createSuccessEmbed } = require('../../utils/enhancedEmbeds');
 const { User } = require('../../database/mongo');
 
 module.exports = {
@@ -8,6 +9,11 @@ module.exports = {
 
   async execute(interaction, client) {
     await interaction.deferReply();
+
+            const license = await validatePremiumLicense(interaction, 'enterprise');
+            if (!license.allowed) {
+                return await interaction.editReply({ embeds: [license.embed], components: [license.components] });
+            }
     const THRESHOLDS = { trial: 0, staff: 100, senior: 300, manager: 600, admin: 1000, owner: 2000 };
     const RANK_ORDER = ['trial', 'staff', 'senior', 'manager', 'admin', 'owner'];
     const users = await User.find({ 'staff.points': { $gte: 100 } }).lean();
@@ -18,15 +24,23 @@ module.exports = {
       return next && pts >= THRESHOLDS[next];
     });
     const txt = ready.length
-      ? ready.map(u => `🔔 **${u.username || '?'}** is ready to promote to **${RANK_ORDER[RANK_ORDER.indexOf(u.staff?.rank || 'trial') + 1]}**`).join('\n')
-      : '✅ No staff are pending promotion right now.';
-    const embed = new EmbedBuilder()
-      .setTitle('🔔 Progress Notifications')
-      .setColor(ready.length ? 0xf39c12 : 0x2ecc71)
+      ? ready.map(u => `?? **${u.username || '?'}** is ready to promote to **${RANK_ORDER[RANK_ORDER.indexOf(u.staff?.rank || 'trial') + 1]}**`).join('\n')
+      : '? No staff are pending promotion right now.';
+    const embed = createEnterpriseEmbed()
+      .setTitle('?? Progress Notifications')
+      
       .setDescription(txt)
-      .addFields({ name: '✅ Ready for Promotion', value: ready.length.toString(), inline: true })
-      .setFooter({ text: `${interaction.guild.name} • Use /rank_announce to promote` })
-      .setTimestamp();
-    await interaction.editReply({ embeds: [embed] });
+      .addFields({ name: '? Ready for Promotion', value: ready.length.toString(), inline: true })
+      
+      ;
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_progress_notify').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
+
+
+
+
+
+

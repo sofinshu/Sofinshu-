@@ -1,4 +1,5 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { createPremiumEmbed } = require('../../utils/enhancedEmbeds');
 const { Guild } = require('../../database/mongo');
 
 module.exports = {
@@ -47,16 +48,22 @@ module.exports = {
     };
     await guild.save();
 
-    const embed = new EmbedBuilder()
-      .setTitle('⚙️ Auto-Punish Settings')
-      .setColor(enabled ? 0x2ecc71 : 0xe74c3c)
+    const embed = createPremiumEmbed()
+      .setTitle('?? Auto-Punish Settings')
+      
       .addFields(
         { name: 'Status', value: enabled ? 'Enabled' : 'Disabled', inline: true },
         { name: 'Action', value: action.toUpperCase(), inline: true },
         { name: 'Threshold', value: `${threshold} violations`, inline: true }
       )
-      .setTimestamp();
+      ;
 
-    await interaction.reply({ embeds: [embed] });
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v4_auto_punish').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
+
+
+
+

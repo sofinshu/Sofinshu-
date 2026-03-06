@@ -1,4 +1,5 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { createEnterpriseEmbed } = require('../../utils/enhancedEmbeds');
 const { User } = require('../../database/mongo');
 
 module.exports = {
@@ -9,10 +10,15 @@ module.exports = {
   async execute(interaction, client) {
     await interaction.deferReply();
 
+            const license = await validatePremiumLicense(interaction, 'enterprise');
+            if (!license.allowed) {
+                return await interaction.editReply({ embeds: [license.embed], components: [license.components] });
+            }
+
     const users = await User.find({ 'staff.points': { $gt: 0 } }).lean();
 
     if (!users.length) {
-      return interaction.editReply('📊 No staff data found yet.');
+      return interaction.editReply('?? No staff data found yet.');
     }
 
     const scored = users.map(u => ({
@@ -26,7 +32,7 @@ module.exports = {
     })).sort((a, b) => b.score - a.score);
 
     const top3 = scored.slice(0, 3);
-    const medals = ['🥇', '🥈', '🥉'];
+    const medals = ['??', '??', '??'];
 
     const fields = top3.map((u, i) => ({
       name: `${medals[i]} ${u.username} (${u.rank})`,
@@ -36,18 +42,24 @@ module.exports = {
 
     if (fields.length === 0) fields.push({ name: 'No data', value: 'No staff recorded yet.', inline: false });
 
-    const embed = new EmbedBuilder()
-      .setTitle('⭐ Staff Recommendation Summary')
-      .setColor(0xf1c40f)
+    const embed = createEnterpriseEmbed()
+      .setTitle('? Staff Recommendation Summary')
+      
       .setDescription('Top staff based on points, consistency, and reputation:')
       .addFields(fields)
       .addFields({
-        name: '📊 Selection Criteria',
-        value: '• 50% Points weight\n• 30% Consistency weight\n• 20% Reputation weight'
+        name: '?? Selection Criteria',
+        value: '� 50% Points weight\n� 30% Consistency weight\n� 20% Reputation weight'
       })
-      .setFooter({ text: `${interaction.guild.name} • Staff Recommendations` })
-      .setTimestamp();
+      
+      ;
 
-    await interaction.editReply({ embeds: [embed] });
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_recommendation_summary').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
+
+
+
+

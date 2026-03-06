@@ -1,67 +1,92 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { validatePremiumLicense } = require('../../utils/enhancedPremiumGuard');
+const { createCustomEmbed, createErrorEmbed, createPremiumEmbed, createSuccessEmbed } = require('../../utils/enhancedEmbeds');
 const { Activity, Shift, User } = require('../../database/mongo');
 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('daily_insights')
-    .setDescription('View daily insights and statistics'),
+    .setDescription('Algorithmic breakdown of server metrics compiled within the last 24 hours.'),
 
   async execute(interaction) {
-    const guildId = interaction.guildId;
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
+    try {
+      await interaction.deferReply();
 
-    const activities = await Activity.find({
-      guildId,
-      createdAt: { $gte: today, $lt: tomorrow }
-    }).lean();
+            const license = await validatePremiumLicense(interaction, 'premium');
+            if (!license.allowed) {
+                return await interaction.editReply({ embeds: [license.embed], components: [license.components] });
+            }
+      const guildId = interaction.guildId;
 
-    const shifts = await Shift.find({
-      guildId,
-      startTime: { $gte: today, $lt: tomorrow }
-    }).lean();
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
 
-    const commandCount = activities.filter(a => a.type === 'command').length;
-    const messageCount = activities.filter(a => a.type === 'message').length;
-    const warningCount = activities.filter(a => a.type === 'warning').length;
+      const activities = await Activity.find({
+        guildId,
+        createdAt: { $gte: today, $lt: tomorrow }
+      }).lean();
 
-    const activeStaff = [...new Set(shifts.map(s => s.userId))];
-    const totalShiftHours = shifts.reduce((acc, s) => acc + (s.duration || 0), 0) / 60;
+      const shifts = await Shift.find({
+        guildId,
+        startTime: { $gte: today, $lt: tomorrow }
+      }).lean();
 
-    const users = await User.find({
-      'guilds.guildId': guildId
-    }).lean();
+      const commandCount = activities.filter(a => a.type === 'command').length;
+      const messageCount = activities.filter(a => a.type === 'message').length;
+      const warningCount = activities.filter(a => a.type === 'warning').length;
 
-    const staffWithActivity = users.filter(u => {
-      const todayActivity = activities.find(a => a.userId === u.userId);
-      return todayActivity;
-    });
+      const activeStaff = [...new Set(shifts.map(s => s.userId))];
+      const totalShiftHours = shifts.reduce((acc, s) => acc + (s.duration || 0), 0) / 3600;
 
-    const embed = new EmbedBuilder()
-      .setTitle('📊 Daily Insights')
-      .setColor(0x3498db)
-      .setDescription(`Statistics for ${interaction.guild.name} - ${today.toDateString()}`)
-      .setTimestamp();
+      const users = await User.find({
+        guildId, // MUST ISOLATE DB OR ACTIVITY LEAKS GLOBALLY
+        staff: { $exists: true }
+      }).lean();
 
-    embed.addFields(
-      { name: 'Commands Used', value: commandCount.toString(), inline: true },
-      { name: 'Messages', value: messageCount.toString(), inline: true },
-      { name: 'Warnings', value: warningCount.toString(), inline: true },
-      { name: 'Active Staff', value: activeStaff.length.toString(), inline: true },
-      { name: 'Total Shift Hours', value: totalShiftHours.toFixed(1), inline: true },
-      { name: 'Staff with Activity', value: staffWithActivity.length.toString(), inline: true }
-    );
+      const staffWithActivity = users.filter(u => {
+        return activities.find(a => a.userId === u.userId);
+      });
 
-    if (activeStaff.length > 0) {
-      const staffList = await Promise.all(activeStaff.slice(0, 5).map(async userId => {
-        const user = await interaction.client.users.fetch(userId).catch(() => null);
-        return user?.username || 'Unknown';
-      }));
-      embed.addFields({ name: 'Active Staff Members', value: staffList.join(', '), inline: false });
+      const activePercentage = users.length > 0 ? ((activeStaff.length / users.length) * 100).toFixed(0) : 0;
+
+      const embed = await createCustomEmbed(interaction, {
+        title: `?? 24-Hour Network Insights`,
+        thumbnail: interaction.guild.iconURL({ dynamic: true }),
+        description: `A snapshot of authenticated ledger events and patrol durations recorded since Midnight.`,
+        fields: [
+          { name: '? Command Usage', value: `\`${commandCount}\` Invocations`, inline: true },
+          { name: '?? Total Processed', value: `\`${messageCount}\` Messages`, inline: true },
+          { name: '?? Server Warnings', value: `\`${warningCount}\` Issued`, inline: true },
+          { name: '??? Active Patrollers', value: `\`${activeStaff.length}\` Personnel`, inline: true },
+          { name: '?? Total Shift Hours', value: `\`${totalShiftHours.toFixed(1)}h\``, inline: true },
+          { name: '?? Activity Yield', value: `\`${staffWithActivity.length}\` Logs Tracked`, inline: true }
+        ],
+        footer: `${activePercentage}% of the registered hierarchy deployed today.`
+      });
+
+      if (activeStaff.length > 0) {
+        const staffList = activeStaff.slice(0, 10).map(userId => `<@${userId}>`).join(', ');
+        embed.addFields({ name: '?? Primary Responders', value: staffList || '*None available.*', inline: false });
+      } else {
+        embed.addFields({ name: '?? Primary Responders', value: '*No staff members have clocked in today.*', inline: false });
+      }
+
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_daily_insights').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
+
+    } catch (error) {
+      console.error('Daily Insights Error:', error);
+      const errEmbed = createErrorEmbed('A database error occurred tracking 24-hour log footprints.');
+            if (interaction.deferred || interaction.replied) {
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_daily_insights').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            return await interaction.editReply({ embeds: [errEmbed], components: [row] });
+      } else {
+        await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
+      }
     }
-
-    await interaction.reply({ embeds: [embed] });
   }
 };
+
+

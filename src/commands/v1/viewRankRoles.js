@@ -1,0 +1,60 @@
+﻿const { ActionRowBuilder, ButtonBuilder, ButtonStyle, SlashCommandBuilder } = require('discord.js');
+const { createCoolEmbed, createCustomEmbed, createErrorEmbed } = require('../../utils/enhancedEmbeds');
+const { Guild } = require('../../database/mongo');
+
+module.exports = {
+  data: new SlashCommandBuilder()
+    .setName('view_rank_roles')
+    .setDescription('[Free] View all configured rank roles for promotions'),
+
+  async execute(interaction) {
+    try {
+      await interaction.deferReply();
+
+      const guildId = interaction.guildId;
+      const guildData = await Guild.findOne({ guildId });
+
+      const rankRoles = guildData?.rankRoles || {};
+
+      const ranks = [
+        { key: 'staff', name: 'Staff', emoji: '?' },
+        { key: 'senior', name: 'Senior', emoji: '🎖️' },
+        { key: 'manager', name: 'Manager', emoji: '👔' },
+        { key: 'admin', name: 'Admin', emoji: '👑' }
+      ];
+
+      const roleList = ranks.map(r => {
+        const roleId = rankRoles[r.key];
+        const role = roleId ? interaction.guild.roles.cache.get(roleId) : null;
+        return {
+          name: `${r.emoji} ${r.name}`,
+          value: role ? `**${role.name}** (<@&${role.id}>)` : '? Not set',
+          inline: true
+        };
+      });
+
+      const embed = await createCustomEmbed(interaction, {
+        title: '📜 Rank Roles Index',
+        description: 'Automated role assignments configured for server promotion tiers.',
+        fields: [
+          ...roleList,
+          { name: '⚙️ Configuration', value: 'Modify these bindings using `/set_rank_roles`.', inline: false }
+        ]
+      });
+
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_viewRankRoles').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
+      await interaction.editReply({ embeds: [embed], components: [row] });
+    } catch (error) {
+      console.error(error);
+      const errEmbed = createErrorEmbed('An error occurred while fetching rank roles.');
+      if (interaction.deferred || interaction.replied) {
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_viewRankRoles').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
+        return await interaction.editReply({ embeds: [errEmbed], components: [row] });
+      } else {
+        await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
+      }
+    }
+  }
+};
+
+

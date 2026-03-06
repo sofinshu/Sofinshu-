@@ -1,4 +1,6 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { validatePremiumLicense } = require('../../utils/enhancedPremiumGuard');
+const { createEnterpriseEmbed } = require('../../utils/enhancedEmbeds');
 const { Activity } = require('../../database/mongo');
 
 module.exports = {
@@ -8,13 +10,18 @@ module.exports = {
 
   async execute(interaction, client) {
     await interaction.deferReply();
+
+            const license = await validatePremiumLicense(interaction, 'enterprise');
+            if (!license.allowed) {
+                return await interaction.editReply({ embeds: [license.embed], components: [license.components] });
+            }
     const guildId = interaction.guildId;
     const fourteenDaysAgo = new Date(Date.now() - 14 * 86400000);
 
     const activities = await Activity.find({ guildId, createdAt: { $gte: fourteenDaysAgo } }).lean();
 
     if (!activities.length) {
-      return interaction.editReply('📊 No data available for prediction chart.');
+      return interaction.editReply('?? No data available for prediction chart.');
     }
 
     const dailyCounts = {};
@@ -34,26 +41,32 @@ module.exports = {
     });
 
     const chartLines = entries.map(([date, count], i) => {
-      const bar = '█'.repeat(Math.round((count / max) * 10));
-      const rollBar = '▒'.repeat(Math.round((rolling[i] / max) * 10));
+      const bar = '�'.repeat(Math.round((count / max) * 10));
+      const rollBar = '�'.repeat(Math.round((rolling[i] / max) * 10));
       const label = new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
       return `${label}: ${bar.padEnd(10)} ${count} (avg: ${rolling[i].toFixed(1)})`;
     }).join('\n');
 
-    const trend = rolling[rolling.length - 1] > rolling[0] ? '📈 Upward' : rolling[rolling.length - 1] < rolling[0] ? '📉 Downward' : '➡️ Flat';
+    const trend = rolling[rolling.length - 1] > rolling[0] ? '?? Upward' : rolling[rolling.length - 1] < rolling[0] ? '?? Downward' : '?? Flat';
 
-    const embed = new EmbedBuilder()
-      .setTitle('📊 Activity Prediction Chart — 14 Days')
-      .setColor(0x16a085)
+    const embed = createEnterpriseEmbed()
+      .setTitle('?? Activity Prediction Chart � 14 Days')
+      
       .setDescription(`\`\`\`${chartLines}\`\`\``)
       .addFields(
-        { name: '📈 Overall Trend', value: trend, inline: true },
-        { name: '🔝 Peak Day', value: entries[counts.indexOf(max)]?.[0] || 'N/A', inline: true },
-        { name: '📊 7d Rolling Avg', value: rolling.slice(-7).reduce((s, v) => s + v, 0) / 7 > 0 ? (rolling.slice(-7).reduce((s, v) => s + v, 0) / 7).toFixed(1) : '0', inline: true }
+        { name: '?? Overall Trend', value: trend, inline: true },
+        { name: '?? Peak Day', value: entries[counts.indexOf(max)]?.[0] || 'N/A', inline: true },
+        { name: '?? 7d Rolling Avg', value: rolling.slice(-7).reduce((s, v) => s + v, 0) / 7 > 0 ? (rolling.slice(-7).reduce((s, v) => s + v, 0) / 7).toFixed(1) : '0', inline: true }
       )
-      .setFooter({ text: `${interaction.guild.name} • █ = Actual | ▒ = Rolling Avg` })
-      .setTimestamp();
+      
+      ;
 
-    await interaction.editReply({ embeds: [embed] });
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_prediction_chart').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
+
+
+
+

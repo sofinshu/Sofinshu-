@@ -1,4 +1,6 @@
-const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { validatePremiumLicense } = require('../../utils/enhancedPremiumGuard');
+const { createPremiumEmbed } = require('../../utils/enhancedEmbeds');
 const { Guild, Activity } = require('../../database/mongo');
 
 module.exports = {
@@ -22,7 +24,7 @@ module.exports = {
 
     const member = await guild.members.fetch(target.id).catch(() => null);
     if (!member) {
-      return interaction.reply({ content: 'User is not in the server!', ephemeral: true });
+      return interaction.editReply({ content: 'User is not in the server!', ephemeral: true });
     }
 
     const guildData = await Guild.findOne({ guildId: guild.id });
@@ -30,10 +32,11 @@ module.exports = {
     const mutedRole = mutedRoleId ? guild.roles.cache.get(mutedRoleId) : null;
 
     if (!mutedRole || !member.roles.cache.has(mutedRole.id)) {
-      return interaction.reply({ content: 'User is not muted!', ephemeral: true });
+      return interaction.editReply({ content: 'User is not muted!', ephemeral: true });
     }
 
     try {
+            await interaction.deferReply({ fetchReply: true });
       await member.roles.remove(mutedRole);
 
       await Activity.create({
@@ -47,24 +50,31 @@ module.exports = {
         }
       });
 
-      const embed = new EmbedBuilder()
-        .setTitle('🔊 User Unmuted')
-        .setColor(0x2ecc71)
+      const embed = createPremiumEmbed()
+        .setTitle('?? User Unmuted')
+        
         .addFields(
           { name: 'User', value: target.tag, inline: true },
           { name: 'Reason', value: reason, inline: true }
         )
-        .setFooter({ text: `Unmuted by ${interaction.user.username}` })
-        .setTimestamp();
+        
+        ;
 
-      await interaction.reply({ embeds: [embed] });
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v4_unmute_user').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
 
       try {
-        await target.send(`🔊 You have been unmuted in **${guild.name}**\n📋 Reason: ${reason}`);
+            await interaction.deferReply({ fetchReply: true });
+        await target.send(`?? You have been unmuted in **${guild.name}**\n?? Reason: ${reason}`);
       } catch (e) {}
 
     } catch (error) {
-      await interaction.reply({ content: `Failed to unmute user: ${error.message}`, ephemeral: true });
+      await interaction.editReply({ content: `Failed to unmute user: ${error.message}`, ephemeral: true });
     }
   }
 };
+
+
+
+
+

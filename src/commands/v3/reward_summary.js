@@ -1,119 +1,110 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
-const { User } = require('../../database/mongo');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { createCustomEmbed, createErrorEmbed, createPremiumEmbed, createSuccessEmbed } = require('../../utils/enhancedEmbeds');
+const { User, Guild } = require('../../database/mongo');
 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('reward_summary')
-    .setDescription('View reward summary')
+    .setDescription('Poll individual operator reward parameters locally indexing server configurations.')
     .addUserOption(option =>
       option.setName('user')
-        .setDescription('User to view rewards for')
+        .setDescription('Target specific explicit operator profile')
         .setRequired(false)),
 
   async execute(interaction) {
-    const targetUser = interaction.options.getUser('user') || interaction.user;
-    const guildId = interaction.guildId;
+    try {
+      await interaction.deferReply();
 
-    let user = await User.findOne({ userId: targetUser.id });
-    if (!user) {
-      user = new User({ userId: targetUser.id, username: targetUser.username });
-      await user.save();
-    }
+            const license = await validatePremiumLicense(interaction, 'premium');
+            if (!license.allowed) {
+                return await interaction.editReply({ embeds: [license.embed], components: [license.components] });
+            }
+      const targetUser = interaction.options.getUser('user') || interaction.user;
+      const guildId = interaction.guildId;
 
-    const staff = user.staff || {};
-    const points = staff.points || 0;
-    const reputation = staff.reputation || 0;
-    const achievements = staff.achievements || [];
+      let user = await User.findOne({ userId: targetUser.id, guildId }).lean();
+      if (!user || !user.staff) {
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_reward_summary').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [createErrorEmbed(`Unregistered Target\n <@${targetUser.id}> isn't mapped inside **${interaction.guild.name}** database clusters.`)], components: [row] });
+      }
 
-    const tierInfo = getTierInfo(points);
-    const rewards = getAvailableRewards(tierInfo.tier);
+      const staff = user.staff;
+      const points = staff.points || 0;
+      const reputation = staff.reputation || 0;
+      const achievements = staff.achievements || [];
 
-    const embed = new EmbedBuilder()
-      .setTitle(`🎁 Reward Summary - ${targetUser.username}`)
-      .setColor(tierInfo.color)
-      .setThumbnail(targetUser.displayAvatarURL());
+      // Dynamic Database Tier Polling instead of legacy Hardcoded Limits
+      const guild = await Guild.findOne({ guildId }).lean();
+      if (!guild || !guild.promotionRequirements) {
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_reward_summary').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [createErrorEmbed(`This server has no backend hierarchy thresholds setup. Admin must map limits via \`/promo_setup\`.`)], components: [row] });
+      }
 
-    embed.addFields(
-      { name: 'Current Tier', value: tierInfo.tier, inline: true },
-      { name: 'Points', value: points.toString(), inline: true },
-      { name: 'Next Tier', value: tierInfo.nextTier, inline: true },
-      { name: 'Points to Next', value: tierInfo.pointsToNext.toString(), inline: true }
-    );
+      const rankHierarchy = Object.keys(guild.promotionRequirements);
+      if (!rankHierarchy.includes('member')) rankHierarchy.unshift('member');
 
-    embed.addFields(
-      { name: 'Reputation', value: reputation.toString(), inline: true },
-      { name: 'Achievements', value: achievements.length.toString(), inline: true }
-    );
+      // Find user's tier based on mapping against actual database limits
+      let currentTier = rankHierarchy[0];
+      let nextTier = null;
+      let pointsToNext = 0;
+      let nextTierPoints = 0;
 
-    const rewardList = rewards.map(r => `${r.icon} **${r.name}** - ${r.cost} pts`);
-    embed.addFields({ name: 'Available Rewards', value: rewardList.join('\n') || 'No rewards available', inline: false });
+      for (let i = 0; i < rankHierarchy.length; i++) {
+        const r = rankHierarchy[i];
+        const reqPoints = guild.promotionRequirements[r]?.points || 0;
+        if (points >= reqPoints) {
+          currentTier = r;
+          if (i + 1 < rankHierarchy.length) {
+            nextTier = rankHierarchy[i + 1];
+            nextTierPoints = guild.promotionRequirements[nextTier]?.points || 0;
+            pointsToNext = Math.max(0, nextTierPoints - points);
+          } else {
+            nextTier = null;
+          }
+        }
+      }
 
-    const progress = generateProgressBar(points, tierInfo.nextTierPoints);
-    embed.addFields({ name: 'Progress to Next Tier', value: progress, inline: false });
+      const progressStr = generateProgressBar(points, nextTierPoints);
 
-    await interaction.reply({ embeds: [embed] });
-  }
-};
+      const embed = await createCustomEmbed(interaction, {
+        title: `?? Point Metrics Strategy: ${targetUser.username}`,
+        thumbnail: targetUser.displayAvatarURL(),
+        description: `Aggregating hierarchy thresholds directly against dynamic logic initialized by **${interaction.guild.name}**.\n\n${progressStr}`,
+        fields: [
+          { name: '? Lifetime Yield', value: `\`${points}\` Pts`, inline: true },
+          { name: '??? Target Tier', value: `\`${currentTier.toUpperCase()}\``, inline: true },
+          { name: '?? Promotion Vector', value: nextTier ? `\`${nextTier.toUpperCase()}\` ? (\`${pointsToNext} req\`)` : '`MAXIMUM`', inline: true },
+          { name: '?? Server Reputation', value: `\`${reputation}\` Auth`, inline: true },
+          { name: '?? Milestone Count', value: `\`${achievements.length}\` Nodes`, inline: true }
+        ]
+      });
 
-function getTierInfo(points) {
-  const tiers = [
-    { name: 'Bronze', min: 0, color: 0xcd7f32 },
-    { name: 'Silver', min: 500, color: 0xc0c0c0 },
-    { name: 'Gold', min: 1500, color: 0xffd700 },
-    { name: 'Platinum', min: 3000, color: 0xe5e4e2 },
-    { name: 'Diamond', min: 5000, color: 0xb9f2ff }
-  ];
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_reward_summary').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
 
-  let currentTier = tiers[0];
-  let nextTier = null;
-  let pointsToNext = 0;
-
-  for (const tier of tiers) {
-    if (points >= tier.min) {
-      currentTier = tier;
-      const nextIndex = tiers.indexOf(tier) + 1;
-      if (nextIndex < tiers.length) {
-        nextTier = tiers[nextIndex];
-        pointsToNext = nextTier.min - points;
+    } catch (error) {
+      console.error('Reward Summary Error:', error);
+      const errEmbed = createErrorEmbed('A database tracking error occurred generating hierarchical yield states.');
+            if (interaction.deferred || interaction.replied) {
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_reward_summary').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+            return await interaction.editReply({ embeds: [errEmbed], components: [row] });
+      } else {
+        await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
       }
     }
   }
-
-  return {
-    tier: currentTier.name,
-    color: currentTier.color,
-    nextTier: nextTier ? nextTier.name : 'Max',
-    nextTierPoints: nextTier ? nextTier.min : points,
-    pointsToNext
-  };
-}
-
-function getAvailableRewards(tier) {
-  const allRewards = [
-    { name: 'Custom Role', cost: 200, icon: '🎭', tier: 'Bronze' },
-    { name: 'Profile Badge', cost: 300, icon: '🏅', tier: 'Bronze' },
-    { name: 'Priority Queue', cost: 400, icon: '⏩', tier: 'Silver' },
-    { name: 'Name Color', cost: 500, icon: '🎨', tier: 'Silver' },
-    { name: 'Exclusive Channel', cost: 800, icon: '💬', tier: 'Gold' },
-    { name: 'VIP Badge', cost: 1000, icon: '✨', tier: 'Gold' },
-    { name: 'Event Host', cost: 1500, icon: '🎪', tier: 'Platinum' },
-    { name: 'Server Boost', cost: 2000, icon: '🚀', tier: 'Diamond' }
-  ];
-
-  const tierOrder = ['Bronze', 'Silver', 'Gold', 'Platinum', 'Diamond'];
-  const userTierIndex = tierOrder.indexOf(tier);
-
-  return allRewards.filter(r => tierOrder.indexOf(r.tier) <= userTierIndex);
-}
+};
 
 function generateProgressBar(points, nextTierPoints) {
   const total = 20;
-  const progress = nextTierPoints > 0 ? Math.min(total, Math.round((points / nextTierPoints) * total)) : total;
-  
+  if (!nextTierPoints || nextTierPoints === 0) return `\`��������������������\` **LOCKED**`;
+
+  const progress = Math.min(total, Math.round((points / nextTierPoints) * total));
   let bar = '';
   for (let i = 0; i < total; i++) {
-    bar += i < progress ? '🟩' : '⬜';
+    bar += i < progress ? '�' : '�';
   }
-  
-  return `${bar} ${points}/${nextTierPoints}`;
+  return `\`${bar}\` **${points} / ${nextTierPoints}**`;
 }
+
+

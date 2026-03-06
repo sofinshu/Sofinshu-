@@ -1,4 +1,6 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { validatePremiumLicense } = require('../../utils/enhancedPremiumGuard');
+const { createEnterpriseEmbed, createErrorEmbed, createSuccessEmbed } = require('../../utils/enhancedEmbeds');
 const { User } = require('../../database/mongo');
 
 module.exports = {
@@ -9,25 +11,38 @@ module.exports = {
 
   async execute(interaction, client) {
     await interaction.deferReply();
+
+            const license = await validatePremiumLicense(interaction, 'enterprise');
+            if (!license.allowed) {
+                return await interaction.editReply({ embeds: [license.embed], components: [license.components] });
+            }
     const target = interaction.options.getUser('user') || interaction.user;
     const user = await User.findOne({ userId: target.id }).lean();
     const pts = user?.staff?.points || 0;
     const rank = user?.staff?.rank || 'member';
     const consistency = user?.staff?.consistency || 100;
-    const rankEmojis = { owner: '👑', admin: '💜', manager: '💎', senior: '🌟', staff: '⭐', trial: '🔰', member: '👤' };
+    const rankEmojis = { owner: '??', admin: '??', manager: '??', senior: '??', staff: '?', trial: '??', member: '??' };
     const colors = { owner: 0xffd700, admin: 0x9b59b6, manager: 0x00bfff, senior: 0x2ecc71, staff: 0x3498db, trial: 0x95a5a6, member: 0x7f8c8d };
-    const embed = new EmbedBuilder()
-      .setTitle(`${rankEmojis[rank] || '👤'} Rank Display — ${target.username}`)
-      .setColor(colors[rank] || 0x95a5a6)
+    const embed = createEnterpriseEmbed()
+      .setTitle(`${rankEmojis[rank] || '??'} Rank Display � ${target.username}`)
+      
       .setThumbnail(target.displayAvatarURL({ size: 256 }))
       .setDescription(`**${rankEmojis[rank] || ''} ${rank.toUpperCase()}**`)
       .addFields(
-        { name: '⭐ Points', value: pts.toString(), inline: true },
-        { name: '📈 Consistency', value: `${consistency}%`, inline: true },
-        { name: '🏅 Achievements', value: (user?.staff?.achievements?.length || 0).toString(), inline: true }
+        { name: '? Points', value: pts.toString(), inline: true },
+        { name: '?? Consistency', value: `${consistency}%`, inline: true },
+        { name: '?? Achievements', value: (user?.staff?.achievements?.length || 0).toString(), inline: true }
       )
-      .setFooter({ text: `${interaction.guild.name} • Staff Rank Display` })
-      .setTimestamp();
-    await interaction.editReply({ embeds: [embed] });
+      
+      ;
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_rank_display').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+            await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
+
+
+
+
+
+
+
