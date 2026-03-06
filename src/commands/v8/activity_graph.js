@@ -1,5 +1,4 @@
-const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createEnterpriseEmbed, createErrorEmbed, createSuccessEmbed } = require('../../utils/enhancedEmbeds');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const { Activity } = require('../../database/mongo');
 
 module.exports = {
@@ -9,11 +8,6 @@ module.exports = {
 
   async execute(interaction, client) {
     await interaction.deferReply();
-
-            const license = await validatePremiumLicense(interaction, 'enterprise');
-            if (!license.allowed) {
-                return await interaction.editReply({ embeds: [license.embed], components: [license.components] });
-            }
     const guildId = interaction.guildId;
     const start = new Date(Date.now() - 14 * 86400000);
     const acts = await Activity.find({ guildId, createdAt: { $gte: start } }).lean();
@@ -24,31 +18,23 @@ module.exports = {
     const max = Math.max(...entries.map(e => e[1]), 1);
 
     const graph = entries.map(([date, count]) => {
-      const bar = '�'.repeat(Math.round((count / max) * 12)).padEnd(12, '�');
+      const bar = '█'.repeat(Math.round((count / max) * 12)).padEnd(12, '░');
       const d = new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
       return `${d}: ${bar} ${count}`;
     }).join('\n') || 'No activity data.';
 
-    const embed = createEnterpriseEmbed()
-      .setTitle('?? 14-Day Activity Graph')
-      
+    const embed = new EmbedBuilder()
+      .setTitle('📊 14-Day Activity Graph')
+      .setColor(0x2ecc71)
       .setDescription(`\`\`\`${graph}\`\`\``)
       .addFields(
-        { name: '?? Total Events', value: acts.length.toString(), inline: true },
-        { name: '?? Peak Day', value: entries.find(e => e[1] === Math.max(...entries.map(e => e[1])))?.[0] || 'N/A', inline: true },
-        { name: '?? Daily Avg', value: entries.length > 0 ? (acts.length / entries.length).toFixed(1) : '0', inline: true }
+        { name: '📊 Total Events', value: acts.length.toString(), inline: true },
+        { name: '🔝 Peak Day', value: entries.find(e => e[1] === Math.max(...entries.map(e => e[1])))?.[0] || 'N/A', inline: true },
+        { name: '📅 Daily Avg', value: entries.length > 0 ? (acts.length / entries.length).toFixed(1) : '0', inline: true }
       )
-      
-      ;
+      .setFooter({ text: `${interaction.guild.name} • Activity Graph` })
+      .setTimestamp();
 
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_activity_graph').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [embed], components: [row] });
+    await interaction.editReply({ embeds: [embed] });
   }
 };
-
-
-
-
-
-
-

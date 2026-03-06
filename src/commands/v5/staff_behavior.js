@@ -1,81 +1,46 @@
-const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { validatePremiumLicense } = require('../../utils/enhancedPremiumGuard');
-const { createCustomEmbed, createErrorEmbed, createPremiumEmbed, createSuccessEmbed } = require('../../utils/enhancedEmbeds');
-const { Activity, User } = require('../../database/mongo');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { Activity } = require('../../database/mongo');
 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('staff_behavior')
-    .setDescription('Enterprise Apex: AI Reliability Scoring & Personnel Stability Matrix')
-    .addUserOption(opt => opt.setName('user').setDescription('Staff member to analyze').setRequired(false)),
+    .setDescription('Analyze staff behavior')
+    .addUserOption(opt => opt.setName('user').setDescription('Staff member to analyze').setRequired(false))
+    .addIntegerOption(opt => opt.setName('days').setDescription('Days to analyze').setRequired(false)),
 
   async execute(interaction) {
-    try {
-      await interaction.deferReply();
+    const guildId = interaction.guildId;
+    const targetUser = interaction.options.getUser('user');
+    const userId = targetUser?.id;
+    const days = interaction.options.getInteger('days') || 30;
+    const startDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
 
-      // Enterprise License Guard
-      const license = await validatePremiumLicense(interaction, 'premium');
-      if (!license.allowed) {
-        return await interaction.editReply({ embeds: [license.embed], components: license.components });
-      }
+    const query = { guildId, createdAt: { $gte: startDate } };
+    if (userId) query.userId = userId;
 
-      const guildId = interaction.guildId;
-      const targetUser = interaction.options.getUser('user') || interaction.user;
+    const activities = await Activity.find(query);
 
-      const startDate = new Date();
-      startDate.setDate(startDate.getDate() - 30);
+    const warnings = activities.filter(a => a.type === 'warning').length;
+    const shifts = activities.filter(a => a.type === 'shift').length;
+    const commands = activities.filter(a => a.type === 'command').length;
+    const promotions = activities.filter(a => a.type === 'promotion').length;
 
-      const [activities, user] = await Promise.all([
-        Activity.find({ guildId, userId: targetUser.id, createdAt: { $gte: startDate } }).lean(),
-        User.findOne({ userId: targetUser.id, guildId }).lean()
-      ]);
+    const behavior = warnings > 5 ? 'Needs Improvement' :
+                     warnings > 2 ? 'Acceptable' : 'Excellent';
 
-      if (!user || !user.staff) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_staff_behavior').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [createErrorEmbed(`No behavioral trace found. <@${targetUser.id}> is unmapped.`)], components: [row] });
-      }
+    const embed = new EmbedBuilder()
+      .setTitle(`👀 Staff Behavior: ${targetUser?.username || 'All Staff'}`)
+      .setColor(warnings > 5 ? 0xe74c3c : warnings > 2 ? 0xf39c12 : 0x2ecc71)
+      .addFields(
+        { name: 'Warnings', value: warnings.toString(), inline: true },
+        { name: 'Shifts', value: shifts.toString(), inline: true },
+        { name: 'Commands', value: commands.toString(), inline: true },
+        { name: 'Promotions', value: promotions.toString(), inline: true },
+        { name: 'Behavior Rating', value: behavior, inline: true },
+        { name: 'Period', value: `${days} days`, inline: true }
+      )
+      .setTimestamp();
 
-      const warnings = activities.filter(a => a.type === 'warning').length;
-      const shifts = activities.filter(a => a.type === 'shift').length;
-      const commands = activities.filter(a => a.type === 'command').length;
-
-      // Enterprise AI Reliability Logic
-      const baseReliability = 100;
-      const penalty = (warnings * 15);
-      const bonus = Math.min(20, (shifts * 2) + (commands * 0.1));
-      const reliabilityScore = Math.min(100, Math.max(0, baseReliability - penalty + bonus));
-
-      // Reliability Bar
-      const barLength = 15;
-      const filled = '�'.repeat(Math.round((reliabilityScore / 100) * barLength));
-      const empty = '�'.repeat(barLength - filled.length);
-      const reliabilityViz = `\`[${filled}${empty}]\` **${reliabilityScore.toFixed(1)}% STABILITY**`;
-
-      const embed = await createCustomEmbed(interaction, {
-        title: `?? Enterprise AI Behavioral Audit: ${targetUser.username}`,
-        thumbnail: targetUser.displayAvatarURL({ dynamic: true }),
-        description: `### ??? Personnel Stability Orchestration\nMacroscopic behavioral analysis conducted over a **30-day** period in sector **${interaction.guild.name}**. Cross-referencing risk factors vs performance metabolism.\n\n**?? Enterprise APEX EXCLUSIVE**`,
-        fields: [
-          { name: '?? AI Reliability Score', value: reliabilityViz, inline: false },
-          { name: '?? Security Incidents', value: `\`${warnings}\` Flags`, inline: true },
-          { name: '?? Operational Shifting', value: `\`${shifts}\` Cycles`, inline: true },
-          { name: '? Command Precision', value: `\`${commands}\` Pings`, inline: true },
-          { name: '??? Status Rating', value: reliabilityScore > 80 ? '`S-RANK STABLE`' : (reliabilityScore > 50 ? '`B-RANK NOMINAL`' : '`F-RANK CRITICAL`'), inline: true },
-          { name: '?? Trajectory', value: reliabilityScore > 70 ? '`UPWARD`' : '`DECAYING`', inline: true }
-        ],
-        footer: 'AI Behavioral Modeling � V5 Executive Apex Suite',
-        color: reliabilityScore > 75 ? 'success' : 'premium'
-      });
-
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_staff_behavior').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [embed], components: [row] });
-
-    } catch (error) {
-      console.error('Enterprise Staff Behavior Error:', error);
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_staff_behavior').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [createErrorEmbed('Behavioral Intelligence failure: Unable to compute reliability matrices.')], components: [row] });
-    }
+    await interaction.reply({ embeds: [embed] });
   }
 };
-
-

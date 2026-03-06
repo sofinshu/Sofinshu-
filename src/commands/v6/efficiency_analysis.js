@@ -1,6 +1,4 @@
-const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { validatePremiumLicense } = require('../../utils/enhancedPremiumGuard');
-const { createEnterpriseEmbed } = require('../../utils/enhancedEmbeds');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const { User, Shift } = require('../../database/mongo');
 
 module.exports = {
@@ -10,11 +8,6 @@ module.exports = {
 
   async execute(interaction, client) {
     await interaction.deferReply();
-
-            const license = await validatePremiumLicense(interaction, 'enterprise');
-            if (!license.allowed) {
-                return await interaction.editReply({ embeds: [license.embed], components: [license.components] });
-            }
     const guildId = interaction.guildId;
     const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
 
@@ -24,7 +17,7 @@ module.exports = {
     ]);
 
     if (!users.length) {
-      return interaction.editReply('?? No staff data found yet. Staff need to use bot commands first.');
+      return interaction.editReply('📊 No staff data found yet. Staff need to use bot commands first.');
     }
 
     const shiftMap = {};
@@ -40,7 +33,7 @@ module.exports = {
       .map(u => {
         const hours = (shiftMap[u.userId]?.totalMin || 0) / 60;
         const pts = u.staff?.points || 0;
-        const efficiency = hours > 0 ? (pts / hours).toFixed(2) : pts > 0 ? '8' : '0';
+        const efficiency = hours > 0 ? (pts / hours).toFixed(2) : pts > 0 ? '∞' : '0';
         return { userId: u.userId, username: u.username, pts, hours: hours.toFixed(1), efficiency };
       })
       .sort((a, b) => parseFloat(b.efficiency) - parseFloat(a.efficiency))
@@ -50,27 +43,21 @@ module.exports = {
     const totalShifts = shifts.length;
 
     const leaderboard = efficiencies.map((e, i) =>
-      `\`${String(i + 1).padStart(2)}\` **${e.username || 'Unknown'}** � ${e.pts} pts / ${e.hours}h = **${e.efficiency} pts/h**`
+      `\`${String(i + 1).padStart(2)}\` **${e.username || 'Unknown'}** — ${e.pts} pts / ${e.hours}h = **${e.efficiency} pts/h**`
     ).join('\n') || 'No data available.';
 
-    const embed = createEnterpriseEmbed()
-      .setTitle('? Staff Efficiency Analysis')
-      
+    const embed = new EmbedBuilder()
+      .setTitle('⚡ Staff Efficiency Analysis')
+      .setColor(0x2ecc71)
       .addFields(
-        { name: '?? Total Shift Hours (30d)', value: totalShiftHours.toFixed(1), inline: true },
-        { name: '?? Total Shifts (30d)', value: totalShifts.toString(), inline: true },
-        { name: '?? Staff Tracked', value: users.length.toString(), inline: true },
-        { name: '?? Efficiency Leaderboard (pts/hour)', value: leaderboard }
+        { name: '⏱️ Total Shift Hours (30d)', value: totalShiftHours.toFixed(1), inline: true },
+        { name: '🔄 Total Shifts (30d)', value: totalShifts.toString(), inline: true },
+        { name: '👥 Staff Tracked', value: users.length.toString(), inline: true },
+        { name: '🏆 Efficiency Leaderboard (pts/hour)', value: leaderboard }
       )
-      
-      ;
+      .setFooter({ text: `${interaction.guild.name} • Efficiency Analysis` })
+      .setTimestamp();
 
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_efficiency_analysis').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [embed], components: [row] });
+    await interaction.editReply({ embeds: [embed] });
   }
 };
-
-
-
-
-

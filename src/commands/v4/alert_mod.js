@@ -1,6 +1,4 @@
-const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { validatePremiumLicense } = require('../../utils/enhancedPremiumGuard');
-const { createPremiumEmbed } = require('../../utils/enhancedEmbeds');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const { Activity } = require('../../database/mongo');
 
 module.exports = {
@@ -33,14 +31,14 @@ module.exports = {
       }
     });
 
-    const embed = createPremiumEmbed()
-      .setTitle('?? Moderator Alert')
-      
+    const embed = new EmbedBuilder()
+      .setTitle('🚨 Moderator Alert')
+      .setColor(0xe74c3c)
       .addFields(
         { name: 'Alerted By', value: interaction.user.tag, inline: true },
         { name: 'Message', value: message, inline: false }
       )
-      ;
+      .setTimestamp();
 
     if (user) {
       embed.addFields({ name: 'Related User', value: user.tag, inline: true });
@@ -52,15 +50,9 @@ module.exports = {
 
     if (modChannel) {
       await modChannel.send({ embeds: [embed] });
-      await interaction.editReply({ content: 'Moderators have been alerted!', ephemeral: true });
+      await interaction.reply({ content: 'Moderators have been alerted!', ephemeral: true });
     } else {
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v4_alert_mod').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [embed], components: [row] });
+      await interaction.reply({ embeds: [embed] });
     }
   }
 };
-
-
-
-
-

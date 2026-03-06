@@ -1,5 +1,4 @@
-const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createEnterpriseEmbed } = require('../../utils/enhancedEmbeds');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const { Activity } = require('../../database/mongo');
 
 module.exports = {
@@ -9,18 +8,13 @@ module.exports = {
 
   async execute(interaction, client) {
     await interaction.deferReply();
-
-            const license = await validatePremiumLicense(interaction, 'enterprise');
-            if (!license.allowed) {
-                return await interaction.editReply({ embeds: [license.embed], components: [license.components] });
-            }
     const guildId = interaction.guildId;
     const todayStart = new Date(); todayStart.setHours(0, 0, 0, 0);
 
     const todayActivity = await Activity.find({ guildId, createdAt: { $gte: todayStart } }).lean();
 
     if (!todayActivity.length) {
-      return interaction.editReply('?? No activity recorded today yet. Be the first to earn points!');
+      return interaction.editReply('📊 No activity recorded today yet. Be the first to earn points!');
     }
 
     const userCounts = {};
@@ -30,30 +24,24 @@ module.exports = {
 
     const sorted = Object.entries(userCounts).sort((a, b) => b[1] - a[1]).slice(0, 5);
     const topUser = sorted[0];
-    const medals = ['??', '??', '??', '4??', '5??'];
+    const medals = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣'];
 
     const leaderboard = sorted.map(([uid, count], i) =>
-      `${medals[i]} <@${uid}> � **${count}** actions today`
+      `${medals[i]} <@${uid}> — **${count}** actions today`
     ).join('\n');
 
-    const embed = createEnterpriseEmbed()
-      .setTitle(`?? Daily Activity Standings � ${new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}`)
-      
+    const embed = new EmbedBuilder()
+      .setTitle(`🌟 Daily Activity Standings — ${new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}`)
+      .setColor(0xf1c40f)
       .addFields(
-        { name: '?? Today\'s Top Earner', value: `<@${topUser[0]}> with **${topUser[1]}** actions`, inline: false },
-        { name: '?? Total Actions Today', value: todayActivity.length.toString(), inline: true },
-        { name: '?? Active Users', value: sorted.length.toString(), inline: true },
-        { name: '?? Daily Standings', value: leaderboard }
+        { name: '🌟 Today\'s Top Earner', value: `<@${topUser[0]}> with **${topUser[1]}** actions`, inline: false },
+        { name: '📊 Total Actions Today', value: todayActivity.length.toString(), inline: true },
+        { name: '👥 Active Users', value: sorted.length.toString(), inline: true },
+        { name: '🏆 Daily Standings', value: leaderboard }
       )
-      
-      ;
+      .setFooter({ text: `${interaction.guild.name} • Resets at midnight` })
+      .setTimestamp();
 
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_daily_bonus').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [embed], components: [row] });
+    await interaction.editReply({ embeds: [embed] });
   }
 };
-
-
-
-
-

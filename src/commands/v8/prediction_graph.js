@@ -1,5 +1,4 @@
-const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createEnterpriseEmbed, createErrorEmbed, createSuccessEmbed } = require('../../utils/enhancedEmbeds');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const { Activity } = require('../../database/mongo');
 
 module.exports = {
@@ -9,16 +8,11 @@ module.exports = {
 
   async execute(interaction, client) {
     await interaction.deferReply();
-
-            const license = await validatePremiumLicense(interaction, 'enterprise');
-            if (!license.allowed) {
-                return await interaction.editReply({ embeds: [license.embed], components: [license.components] });
-            }
     const guildId = interaction.guildId;
     const fourteenDaysAgo = new Date(Date.now() - 14 * 86400000);
     const acts = await Activity.find({ guildId, createdAt: { $gte: fourteenDaysAgo } }).lean();
 
-    if (!acts.length) return interaction.editReply('?? Not enough data for predictions.');
+    if (!acts.length) return interaction.editReply('📊 Not enough data for predictions.');
 
     const daily = {};
     acts.forEach(a => { const k = new Date(a.createdAt).toISOString().split('T')[0]; daily[k] = (daily[k] || 0) + 1; });
@@ -35,28 +29,20 @@ module.exports = {
     for (let i = 1; i <= 7; i++) {
       const d = new Date(now.getTime() + i * 86400000);
       const pred = Math.round(recentAvg * trendFactor * ((d.getDay() === 0 || d.getDay() === 6) ? 0.7 : 1.1));
-      const bar = '�'.repeat(Math.round(Math.min(pred, maxPred) / maxPred * 10)).padEnd(10, '�');
+      const bar = '█'.repeat(Math.round(Math.min(pred, maxPred) / maxPred * 10)).padEnd(10, '░');
       lines.push(`${dayNames[d.getDay()]}: ${bar} ~${pred}`);
     }
 
-    const embed = createEnterpriseEmbed()
-      .setTitle('?? Prediction Graph � Next 7 Days')
-      
+    const embed = new EmbedBuilder()
+      .setTitle('🔮 Prediction Graph — Next 7 Days')
+      .setColor(0x8e44ad)
       .setDescription(`\`\`\`${lines.join('\n')}\`\`\``)
       .addFields(
-        { name: '?? 14d Avg/Day', value: avg.toFixed(1), inline: true },
-        { name: '?? Recent Trend Factor', value: trendFactor.toFixed(2) + 'x', inline: true }
+        { name: '📊 14d Avg/Day', value: avg.toFixed(1), inline: true },
+        { name: '📈 Recent Trend Factor', value: trendFactor.toFixed(2) + 'x', inline: true }
       )
-      
-      ;
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_prediction_graph').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [embed], components: [row] });
+      .setFooter({ text: `${interaction.guild.name} • Prediction Graph` })
+      .setTimestamp();
+    await interaction.editReply({ embeds: [embed] });
   }
 };
-
-
-
-
-
-
-

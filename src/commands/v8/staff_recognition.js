@@ -1,6 +1,4 @@
-const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { validatePremiumLicense } = require('../../utils/enhancedPremiumGuard');
-const { createEnterpriseEmbed, createErrorEmbed, createSuccessEmbed } = require('../../utils/enhancedEmbeds');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const { User } = require('../../database/mongo');
 
 module.exports = {
@@ -12,36 +10,23 @@ module.exports = {
 
   async execute(interaction, client) {
     await interaction.deferReply();
-
-            const license = await validatePremiumLicense(interaction, 'enterprise');
-            if (!license.allowed) {
-                return await interaction.editReply({ embeds: [license.embed], components: [license.components] });
-            }
     const target = interaction.options.getUser('user');
     const reason = interaction.options.getString('reason') || 'Outstanding dedication and teamwork!';
     const user = await User.findOne({ userId: target.id }).lean();
     const pts = user?.staff?.points || 0;
     const rank = user?.staff?.rank || 'member';
-    const embed = createEnterpriseEmbed()
-      .setTitle('?? Staff Recognition')
-      
+    const embed = new EmbedBuilder()
+      .setTitle('🌟 Staff Recognition')
+      .setColor(0x2ecc71)
       .setThumbnail(target.displayAvatarURL())
-      .setDescription(`?? **${target.username}** is being recognized by <@${interaction.user.id}>!`)
+      .setDescription(`🎊 **${target.username}** is being recognized by <@${interaction.user.id}>!`)
       .addFields(
-        { name: '??? Rank', value: rank.toUpperCase(), inline: true },
-        { name: '? Points', value: pts.toString(), inline: true },
-        { name: '?? Recognition Reason', value: reason }
+        { name: '🎖️ Rank', value: rank.toUpperCase(), inline: true },
+        { name: '⭐ Points', value: pts.toString(), inline: true },
+        { name: '💬 Recognition Reason', value: reason }
       )
-      
-      ;
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_staff_recognition').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [embed], components: [row] });
+      .setFooter({ text: `${interaction.guild.name} • Staff Recognition Program` })
+      .setTimestamp();
+    await interaction.editReply({ embeds: [embed] });
   }
 };
-
-
-
-
-
-
-

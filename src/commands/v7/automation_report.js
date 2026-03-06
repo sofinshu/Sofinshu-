@@ -1,5 +1,4 @@
-const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createEnterpriseEmbed } = require('../../utils/enhancedEmbeds');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const { Activity, Warning } = require('../../database/mongo');
 
 module.exports = {
@@ -9,11 +8,6 @@ module.exports = {
 
   async execute(interaction, client) {
     await interaction.deferReply();
-
-            const license = await validatePremiumLicense(interaction, 'enterprise');
-            if (!license.allowed) {
-                return await interaction.editReply({ embeds: [license.embed], components: [license.components] });
-            }
     const guildId = interaction.guildId;
     const thirtyDaysAgo = new Date(Date.now() - 30 * 86400000);
 
@@ -36,27 +30,21 @@ module.exports = {
     });
     const weekText = weeks.map((c, i) => `Week ${4 - i}: **${c}** events`).reverse().join('\n');
 
-    const embed = createEnterpriseEmbed()
-      .setTitle('?? Automation Report � Last 30 Days')
-      
+    const embed = new EmbedBuilder()
+      .setTitle('📋 Automation Report — Last 30 Days')
+      .setColor(0x9b59b6)
       .addFields(
-        { name: '?? Promotions', value: promotions.toString(), inline: true },
-        { name: '?? Shifts Tracked', value: shifts.toString(), inline: true },
-        { name: '? Commands Executed', value: commands.toString(), inline: true },
-        { name: '?? Auto-Warnings', value: autoWarnings.toString(), inline: true },
-        { name: '?? Manual Warnings', value: (warnings.length - autoWarnings).toString(), inline: true },
-        { name: '?? Total Events', value: activities.length.toString(), inline: true },
-        { name: '?? Weekly Breakdown', value: weekText }
+        { name: '⬆️ Promotions', value: promotions.toString(), inline: true },
+        { name: '🔄 Shifts Tracked', value: shifts.toString(), inline: true },
+        { name: '⚡ Commands Executed', value: commands.toString(), inline: true },
+        { name: '🤖 Auto-Warnings', value: autoWarnings.toString(), inline: true },
+        { name: '⚠️ Manual Warnings', value: (warnings.length - autoWarnings).toString(), inline: true },
+        { name: '📊 Total Events', value: activities.length.toString(), inline: true },
+        { name: '📅 Weekly Breakdown', value: weekText }
       )
-      
-      ;
+      .setFooter({ text: `${interaction.guild.name} • Monthly Automation Report` })
+      .setTimestamp();
 
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_automation_report').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [embed], components: [row] });
+    await interaction.editReply({ embeds: [embed] });
   }
 };
-
-
-
-
-

@@ -1,44 +1,32 @@
-const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, PermissionFlagsBits } = require('discord.js');
-const { createCustomEmbed, createErrorEmbed, createPremiumEmbed, createSuccessEmbed } = require('../../utils/enhancedEmbeds');
-const { validatePremiumLicense } = require('../../utils/enhancedPremiumGuard');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const { Activity } = require('../../database/mongo');
 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('moderation_chart')
-    .setDescription('📈 Enterprise Apex: Macroscopic Threat Curves & Security Analytics')
+    .setDescription('View moderation statistics chart')
     .addStringOption(option =>
       option.setName('period')
-        .setDescription('Initial observation period')
+        .setDescription('Time period')
         .setRequired(false)
         .addChoices(
-          { name: 'Last 24h', value: 'today' },
-          { name: 'Last 7 Days', value: 'week' }
-        ))
-    .setDefaultMemberPermissions(PermissionFlagsBits.ModerateMembers),
+          { name: 'Today', value: 'today' },
+          { name: 'This Week', value: 'week' },
+          { name: 'This Month', value: 'month' }
+        )),
 
-  async execute(interaction, client) {
-    try {
-      if (!interaction.deferred && !interaction.replied) await interaction.deferReply();
-
-      const license = await validatePremiumLicense(interaction, 'premium');
-      if (!license.allowed) {
-        return await interaction.editReply({ embeds: [license.embed], components: license.components });
-      }
-
-      const period = interaction.options?.getString('period') || 'week';
-      await this.renderChart(interaction, period);
-    } catch (error) {
-      console.error('Enterprise Moderation Chart Error:', error);
-      await interaction.editReply({ embeds: [createErrorEmbed('Guardian Analytics failure: Unable to establish macroscopic threat curves.')] });
-    }
-  },
-
-  async renderChart(interaction, period) {
+  async execute(interaction) {
+    const period = interaction.options.getString('period') || 'week';
     const guildId = interaction.guildId;
+
     let startDate = new Date();
-    if (period === 'today') startDate.setHours(startDate.getHours() - 24);
-    else startDate.setDate(startDate.getDate() - 7);
+    if (period === 'today') {
+      startDate.setHours(0, 0, 0, 0);
+    } else if (period === 'week') {
+      startDate.setDate(startDate.getDate() - 7);
+    } else {
+      startDate.setMonth(startDate.getMonth() - 1);
+    }
 
     const actions = await Activity.aggregate([
       {
@@ -56,70 +44,41 @@ module.exports = {
       }
     ]);
 
-    const stats = { warn: 0, ban: 0, kick: 0, mute: 0, strike: 0 };
-    actions.forEach(a => { if (stats.hasOwnProperty(a._id)) stats[a._id] = a.count; });
-    const total = Object.values(stats).reduce((a, b) => a + b, 0);
+    if (actions.length === 0) {
+      return interaction.reply({ content: 'No moderation data found for this period.', ephemeral: true });
+    }
 
-    const pulseSegments = 12;
-    const threatDensity = Math.min(pulseSegments, Math.ceil((total / (period === 'today' ? 10 : 50)) * pulseSegments));
-    const pulse = '█'.repeat(threatDensity) + '░'.repeat(pulseSegments - threatDensity);
-    const threatCurve = `\`[${pulse}]\` **${total > 20 ? '🚨 HIGH PULSE' : '🟢 STABLE'}**`;
+    const stats = {
+      warn: 0,
+      ban: 0,
+      kick: 0,
+      mute: 0,
+      strike: 0
+    };
 
-    const embed = await createCustomEmbed(interaction, {
-      title: `⚡ Apex Intelligence: ${period === 'today' ? '24h Pulse' : '7d Velocity'}`,
-      thumbnail: interaction.guild.iconURL({ dynamic: true }),
-      description: `### 📉 Macroscopic Threat Modeling\nTracing security interventions for sector **${interaction.guild.name}**. Real-time metabolic curves.\n\n**💎 Enterprise APEX EXCLUSIVE**`,
-      fields: [
-        { name: '🛰️ Macroscopic Threat Pulse', value: threatCurve, inline: false },
-        { name: '⚠️ Discipline', value: `\`${stats.warn}\``, inline: true },
-        { name: '🔨 Neutralization', value: `\`${stats.ban}\``, inline: true },
-        { name: '👢 Extraction', value: `\`${stats.kick}\``, inline: true },
-        { name: '🔇 Silencing', value: `\`${stats.mute}\``, inline: true },
-        { name: '🚨 Infractions', value: `\`${stats.strike}\``, inline: true },
-        { name: '🛡️ Shield Status', value: '`🟢 ACTIVE`', inline: true }
-      ],
-      footer: `Nexus Sync: ${new Date().toLocaleTimeString()} • V4 Guardian Suite`,
-      color: total > 15 ? 'premium' : 'success'
+    actions.forEach(a => {
+      const key = a._id || 'other';
+      if (stats.hasOwnProperty(key)) {
+        stats[key] = a.count;
+      }
     });
 
-    const row = new ActionRowBuilder().addComponents(
-      new ButtonBuilder()
-        .setCustomId(`chart_trend_${period}`)
-        .setLabel('Analyze Trends')
-        .setStyle(ButtonStyle.Primary)
-        .setEmoji('🧠'),
-      new ButtonBuilder()
-        .setCustomId(`chart_period_${period === 'today' ? 'week' : 'today'}`)
-        .setLabel(period === 'today' ? 'Switch to 7d' : 'Switch to 24h')
-        .setStyle(ButtonStyle.Secondary)
-        .setEmoji('⏳'),
-      new ButtonBuilder()
-        .setCustomId('auto_v4_moderation_chart')
-        .setLabel('Refresh Pulse')
-        .setStyle(ButtonStyle.Secondary)
-        .setEmoji('🔄')
-    );
+    const total = Object.values(stats).reduce((a, b) => a + b, 0);
 
-    await interaction.editReply({ embeds: [embed], components: [row] });
-  },
+    const embed = new EmbedBuilder()
+      .setTitle('📊 Moderation Statistics')
+      .setColor(0x3498db)
+      .addFields(
+        { name: 'Warnings', value: stats.warn.toString(), inline: true },
+        { name: 'Bans', value: stats.ban.toString(), inline: true },
+        { name: 'Kicks', value: stats.kick.toString(), inline: true },
+        { name: 'Mutes', value: stats.mute.toString(), inline: true },
+        { name: 'Strikes', value: stats.strike.toString(), inline: true },
+        { name: 'Total', value: total.toString(), inline: true }
+      )
+      .setFooter({ text: `Period: ${period}` })
+      .setTimestamp();
 
-  async handleChartButtons(interaction, client) {
-    const { customId, member } = interaction;
-    if (!member.permissions.has(PermissionFlagsBits.ModerateMembers)) {
-      return interaction.reply({ content: '❌ Authority level insufficient for Apex analytics access.', ephemeral: true });
-    }
-
-    const parts = customId.split('_');
-    const action = parts[1];
-    const period = parts[2];
-
-    await interaction.deferUpdate();
-
-    if (action === 'period') {
-      await this.renderChart(interaction, period);
-    } else if (action === 'trend') {
-      const trendEmbed = createSuccessEmbed('🧠 Apex Trend Analysis', `Macroscopic analysis for the last **${period}** suggests a **${Math.random() > 0.5 ? 'rising' : 'declining'}** threat curve. Staff presence remains efficient, maintaining a **98.4%** sector stability index.`);
-      await interaction.followUp({ embeds: [trendEmbed], ephemeral: true });
-    }
+    await interaction.reply({ embeds: [embed] });
   }
 };

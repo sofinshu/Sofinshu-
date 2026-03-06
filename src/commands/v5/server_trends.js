@@ -1,5 +1,4 @@
-const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createPremiumEmbed } = require('../../utils/enhancedEmbeds');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const { Activity, User } = require('../../database/mongo');
 
 module.exports = {
@@ -29,25 +28,19 @@ module.exports = {
       return `${change > 0 ? '+' : ''}${change}%`;
     };
 
-    const embed = createPremiumEmbed()
-      .setTitle('?? Server Trends')
-      
+    const embed = new EmbedBuilder()
+      .setTitle('📈 Server Trends')
+      .setColor(0x1abc9c)
       .addFields(
         { name: 'Messages', value: `${currentMessages} (${calcTrend(currentMessages, previousMessages)})`, inline: true },
         { name: 'Active Users', value: `${currentUsers} (${calcTrend(currentUsers, previousUsers)})`, inline: true },
         { name: 'Period', value: `${days} days`, inline: true }
       )
       .setDescription(
-        currentMessages >= previousMessages ? '?? Trending Up' : '?? Trending Down'
+        currentMessages >= previousMessages ? '📈 Trending Up' : '📉 Trending Down'
       )
-      ;
+      .setTimestamp();
 
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_server_trends').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [embed], components: [row] });
+    await interaction.reply({ embeds: [embed] });
   }
 };
-
-
-
-
-

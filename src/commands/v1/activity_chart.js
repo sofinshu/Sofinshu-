@@ -1,105 +1,40 @@
-﻿const { ActionRowBuilder, ButtonBuilder, ButtonStyle, SlashCommandBuilder } = require('discord.js');
-const { createCustomEmbed, createErrorEmbed } = require('../../utils/enhancedEmbeds');
-const QuickChart = require('quickchart-js');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const { Activity } = require('../../database/mongo');
 
 module.exports = {
-    data: new SlashCommandBuilder()
-        .setName('activity_chart')
-        .setDescription('V1 Foundation: Standard Intensity Ribbons & 7D Analytics'),
+  data: new SlashCommandBuilder()
+    .setName('activity_chart')
+    .setDescription('View activity chart'),
 
-    async execute(interaction) {
-        try {
-            await interaction.deferReply();
+  async execute(interaction) {
+    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    
+    const activities = await Activity.find({ 
+      guildId: interaction.guildId, 
+      createdAt: { $gte: sevenDaysAgo } 
+    });
+    
+    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const dailyActivity = {};
+    
+    activities.forEach(a => {
+      const day = days[a.createdAt.getDay()];
+      dailyActivity[day] = (dailyActivity[day] || 0) + 1;
+    });
+    
+    const maxActivity = Math.max(...Object.values(dailyActivity), 1);
+    const chart = days.slice(1, 6).map(day => {
+      const count = dailyActivity[day] || 0;
+      const bars = Math.round((count / maxActivity) * 10);
+      const barStr = '█'.repeat(bars) + '░'.repeat(10 - bars);
+      return `${day}: ${barStr} ${count}`;
+    }).join('\n');
+    
+    const embed = new EmbedBuilder()
+      .setTitle('📈 Activity Chart (Last 5 Days)')
+      .setDescription(`\`\`\`\n${chart}\n\`\`\``)
+      .setColor('#2ecc71');
 
-            const labels = [];
-            const dataPoints = [];
-            let totalActivity = 0;
-            let peakDay = { date: 'N/A', count: 0 };
-
-            for (let i = 6; i >= 0; i--) {
-                const d = new Date();
-                d.setDate(d.getDate() - i);
-                const dateStr = d.toISOString().split('T')[0];
-                labels.push(dateStr);
-
-                const startOfDay = new Date(d); startOfDay.setHours(0, 0, 0, 0);
-                const endOfDay = new Date(d); endOfDay.setHours(23, 59, 59, 999);
-
-                const count = await Activity.countDocuments({
-                    guildId: interaction.guild.id,
-                    createdAt: { $gte: startOfDay, $lte: endOfDay }
-                });
-
-                dataPoints.push(count);
-                totalActivity += count;
-                if (count > peakDay.count) peakDay = { date: dateStr, count: count };
-            }
-
-            // 1. Peak Intensity Ribbon (ASCII)
-            const max = Math.max(...dataPoints, 1);
-            const segments = 15;
-            const intensityChars = [' ', '▂', '▃', '▄', '▅', '▆', '▇', '█'];
-            const intensityRibbonStr = dataPoints.map(p => {
-                const idx = Math.floor((p / max) * 7);
-                return intensityChars[idx];
-            }).join('');
-            const peakIntensityRibbon = `\`[${intensityRibbonStr.repeat(2).slice(0, 15)}]\` **${Math.round((totalActivity / 700) * 100)}% DENSITY**`;
-
-            const chart = new QuickChart();
-            chart.setWidth(800).setHeight(400);
-            chart.setBackgroundColor('transparent');
-            chart.setConfig({
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Intensity Events',
-                        data: dataPoints,
-                        borderColor: '#5865F2',
-                        backgroundColor: 'rgba(88, 101, 242, 0.3)',
-                        borderWidth: 4,
-                        fill: true,
-                        tension: 0.4,
-                        pointBackgroundColor: '#FFFFFF'
-                    }]
-                },
-                options: {
-                    plugins: { legend: { labels: { color: "#FFFFFF" } } },
-                    scales: {
-                        x: { grid: { color: "rgba(255, 255, 255, 0.05)" }, ticks: { color: "#B9BBBE" } },
-                        y: { grid: { color: "rgba(255, 255, 255, 0.05)" }, ticks: { color: "#B9BBBE" }, beginAtZero: true }
-                    }
-                }
-            });
-
-            const chartUrl = await chart.getShortUrl();
-
-            const embed = await createCustomEmbed(interaction, {
-                title: '📈 V1 Foundation: Engagement Analytics',
-                thumbnail: interaction.guild.iconURL({ dynamic: true }),
-                description: `### 🚀 Signal Intensity\nHigh-fidelity telemetry showing sector activity thresholds over the trailing 7-day cycle.\n\n**💎 V1 Foundation EXCLUSIVE**`,
-                fields: [
-                    { name: '🔥 Peak Intensity Ribbon', value: peakIntensityRibbon, inline: false },
-                    { name: '📊 Total Velocity', value: `\`${totalActivity.toLocaleString()}\` events`, inline: true },
-                    { name: '⏱️ Throughput', value: `\`${Math.round(totalActivity / 7).toLocaleString()}\` daily`, inline: true },
-                    { name: '🏢 Peak Load', value: `\`${peakDay.count}\` signals`, inline: true },
-                    { name: '✨ Model Sync', value: '`CONNECTED`', inline: true },
-                    { name: '📡 Fidelity', value: '`99.9%`', inline: true }
-                ],
-                image: chartUrl,
-                footer: 'Engagement Analytics Engine • V1 Foundation Hyper-Apex Suite',
-                color: 'primary'
-            });
-
-            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_activity_chart').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [embed], components: [row] });
-        } catch (error) {
-            console.error('V1 Activity Chart Error:', error);
-            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v1_activity_chart').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [createErrorEmbed('Engagement Analytics failure: Unable to synchronize signal intensity.')], components: [row] });
-        }
-    }
+    await interaction.reply({ embeds: [embed] });
+  }
 };
-
-

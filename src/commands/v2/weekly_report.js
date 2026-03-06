@@ -1,95 +1,36 @@
-const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createCustomEmbed, createErrorEmbed, createProgressBar } = require('../../utils/enhancedEmbeds');
-const { Activity, Shift, Warning, User } = require('../../database/mongo');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { Activity, Shift, User } = require('../../database/mongo');
 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('weekly_report')
-    .setDescription('?? Full weekly performance report � shifts, points, warnings, promotions'),
+    .setDescription('View weekly staff report'),
 
   async execute(interaction) {
-    try {
-      await interaction.deferReply();
-      const guildId = interaction.guildId;
-      const now = new Date();
-      const sevenDaysAgo = new Date(now - 7 * 86400000);
-      const fourteenDaysAgo = new Date(now - 14 * 86400000);
+    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    
+    const [shifts, activities, users] = await Promise.all([
+      Shift.find({ guildId: interaction.guildId, createdAt: { $gte: sevenDaysAgo } }),
+      Activity.find({ guildId: interaction.guildId, createdAt: { $gte: sevenDaysAgo } }),
+      User.find({ 'guilds.guildId': interaction.guildId, 'staff.points': { $gt: 0 } })
+    ]);
+    
+    const activeStaff = new Set(shifts.map(s => s.userId)).size;
+    const totalHours = shifts.reduce((acc, s) => acc + (s.duration || 0), 0) / 3600;
+    const avgHours = activeStaff > 0 ? (totalHours / activeStaff).toFixed(1) : 0;
+    
+    const embed = new EmbedBuilder()
+      .setTitle('📊 Weekly Report')
+      .addFields(
+        { name: 'Total Shifts', value: `${shifts.length}`, inline: true },
+        { name: 'Active Staff', value: `${activeStaff}`, inline: true },
+        { name: 'Avg. Hours', value: `${avgHours}h`, inline: true },
+        { name: 'Total Activities', value: `${activities.length}`, inline: true },
+        { name: 'Staff Members', value: `${users.length}`, inline: true }
+      )
+      .setColor('#3498db')
+      .setTimestamp();
 
-      // Fetch current week and previous week in parallel
-      const [
-        thisWeekActs, lastWeekActs,
-        thisWeekShifts, lastWeekShifts,
-        thisWeekWarnings,
-        topUsers
-      ] = await Promise.all([
-        Activity.find({ guildId, createdAt: { $gte: sevenDaysAgo } }).lean(),
-        Activity.find({ guildId, createdAt: { $gte: fourteenDaysAgo, $lt: sevenDaysAgo } }).lean(),
-        Shift.find({ guildId, startTime: { $gte: sevenDaysAgo }, endTime: { $ne: null } }).lean(),
-        Shift.find({ guildId, startTime: { $gte: fourteenDaysAgo, $lt: sevenDaysAgo }, endTime: { $ne: null } }).lean(),
-        Warning.find({ guildId, createdAt: { $gte: sevenDaysAgo } }).lean(),
-        User.find({ userId: { $exists: true }, 'staff.points': { $gt: 0 } })
-          .sort({ 'staff.points': -1 })
-          .limit(3)
-          .lean()
-      ]);
-
-      // Analytics
-      const cmdCount = thisWeekActs.filter(a => a.type === 'command').length;
-      const lastCmdCount = lastWeekActs.filter(a => a.type === 'command').length;
-      const activeUsers = new Set(thisWeekActs.map(a => a.userId)).size;
-
-      const shiftTime = thisWeekShifts.reduce((s, sh) => s + (sh.duration || 0), 0);
-      const lastShiftTime = lastWeekShifts.reduce((s, sh) => s + (sh.duration || 0), 0);
-
-      const cmdDelta = lastCmdCount > 0 ? ((cmdCount - lastCmdCount) / lastCmdCount * 100).toFixed(1) : '8';
-      const shiftDelta = lastShiftTime > 0 ? ((shiftTime - lastShiftTime) / lastShiftTime * 100).toFixed(1) : '8';
-      const cmdArrow = parseFloat(cmdDelta) > 0 ? '??' : (parseFloat(cmdDelta) < 0 ? '??' : '??');
-      const shiftArrow = parseFloat(shiftDelta) > 0 ? '??' : (parseFloat(shiftDelta) < 0 ? '??' : '??');
-
-      const shiftHours = Math.floor(shiftTime / 3600);
-      const shiftMins = Math.floor((shiftTime % 3600) / 60);
-
-      // Top performers
-      const topList = topUsers.length > 0
-        ? await Promise.all(topUsers.map(async (u, i) => {
-          const medals = ['??', '??', '??'];
-          let username = u.username || `User ${u.userId}`;
-          const pts = u.staff?.points || 0;
-          return `${medals[i]} **${username}** � \`${pts.toLocaleString()} pts\``;
-        }))
-        : ['*No data yet.*'];
-
-      // Activity bar
-      const actBar = createProgressBar(Math.min(100, Math.round((activeUsers / Math.max(interaction.guild.memberCount, 1)) * 100)), 15);
-
-      const embed = await createCustomEmbed(interaction, {
-        title: `?? Weekly Report � ${interaction.guild.name}`,
-        thumbnail: interaction.guild.iconURL({ dynamic: true }),
-        description: `Performance summary for the week of **<t:${Math.floor(sevenDaysAgo.getTime() / 1000)}:D>** ? **<t:${Math.floor(now.getTime() / 1000)}:D>**`,
-        fields: [
-          { name: '? Commands Executed', value: `\`${cmdCount.toLocaleString()}\` ${cmdArrow} \`${cmdDelta}%\` vs last week`, inline: true },
-          { name: '?? Shifts Completed', value: `\`${thisWeekShifts.length}\` shifts � \`${shiftHours}h ${shiftMins}m\` ${shiftArrow} \`${shiftDelta}%\``, inline: true },
-          { name: '?? Warnings Issued', value: `\`${thisWeekWarnings.length}\` warnings`, inline: true },
-          { name: '?? Active Staff', value: `\`${actBar}\` **${activeUsers}** users active`, inline: false },
-          { name: '?? Top Performers', value: topList.join('\n'), inline: false },
-          { name: '?? Week Summary', value: `\`${thisWeekActs.length}\` total events tracked this week`, inline: false }
-        ],
-        color: '#5865F2',
-        footer: 'uwu-chan � Weekly Report � Real DB Data'
-      });
-
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_weekly_report').setLabel('  Sync Live Data').setStyle(ButtonStyle.Secondary));
-      await interaction.editReply({ embeds: [embed], components: [row] });
-    } catch (error) {
-      console.error('[weekly_report] Error:', error);
-      const errEmbed = createErrorEmbed('Failed to generate weekly report.');
-            if (interaction.deferred || interaction.replied) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_weekly_report').setLabel('  Sync Live Data').setStyle(ButtonStyle.Secondary));
-        return await interaction.editReply({ embeds: [errEmbed], components: [row] });
-      } else {
-        await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
-      }
-    }
+    await interaction.reply({ embeds: [embed] });
   }
 };
-
