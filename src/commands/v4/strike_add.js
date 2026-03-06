@@ -1,6 +1,4 @@
-const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { validatePremiumLicense } = require('../../utils/enhancedPremiumGuard');
-const { createPremiumEmbed } = require('../../utils/enhancedEmbeds');
+const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder } = require('discord.js');
 const { User, Activity } = require('../../database/mongo');
 
 module.exports = {
@@ -37,23 +35,17 @@ module.exports = {
       data: { action: 'strike', reason, moderatorId: interaction.user.id }
     });
 
-    const embed = createPremiumEmbed()
-      .setTitle('? Strike Added')
-      
+    const embed = new EmbedBuilder()
+      .setTitle('⚡ Strike Added')
+      .setColor(0xf39c12)
       .addFields(
         { name: 'User', value: target.tag, inline: true },
         { name: 'Reason', value: reason, inline: true },
         { name: 'Total Strikes', value: user.staff.warnings.toString(), inline: true }
       )
-      
-      ;
+      .setFooter({ text: `By ${interaction.user.username}` })
+      .setTimestamp();
 
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v4_strike_add').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [embed], components: [row] });
+    await interaction.reply({ embeds: [embed] });
   }
 };
-
-
-
-
-

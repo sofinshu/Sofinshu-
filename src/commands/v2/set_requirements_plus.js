@@ -1,14 +1,12 @@
-const { SlashCommandBuilder, PermissionFlagsBits, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createCustomEmbed, createErrorEmbed } = require('../../utils/enhancedEmbeds');
+const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } = require('discord.js');
 const { Guild } = require('../../database/mongo');
 
+// v2 (FREE) — 5 requirements: + maxWarnings, shiftHours
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('set_requirements_plus')
-        .setDescription('[Free+] Set 5 promotion requirements including warnings and shift hours for a target rank')
+        .setDescription('[Free+] Set 5 promotion requirements including warnings and shift hours')
         .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
-        // Note: the choices here CAN be statically defined because Discord registering slash commands happens before DB calls
-        // However, admins will overwrite keys. To prevent confusion, let's keep the standard 4 but note they act as dict keys.
         .addStringOption(opt => opt.setName('rank').setDescription('Which rank to configure').setRequired(true)
             .addChoices(
                 { name: 'Staff', value: 'staff' },
@@ -22,58 +20,37 @@ module.exports = {
         .addIntegerOption(opt => opt.setName('max_warnings').setDescription('Req 4: Max allowed warnings (0 = zero tolerance)').setRequired(true).setMinValue(0).setMaxValue(99))
         .addIntegerOption(opt => opt.setName('shift_hours').setDescription('Req 5: Min total shift hours (0 = disabled)').setRequired(true).setMinValue(0).setMaxValue(9999)),
 
-    async execute(interaction) {
-        try {
-            await interaction.deferReply({ ephemeral: true });
-            const guildId = interaction.guildId;
-            const rank = interaction.options.getString('rank');
-            const points = interaction.options.getInteger('points');
-            const shifts = interaction.options.getInteger('shifts');
-            const consistency = interaction.options.getInteger('consistency');
-            const maxWarnings = interaction.options.getInteger('max_warnings');
-            const shiftHours = interaction.options.getInteger('shift_hours');
+    async execute(interaction, client) {
+        await interaction.deferReply({ ephemeral: true });
+        const guildId = interaction.guildId;
+        const rank = interaction.options.getString('rank');
+        const points = interaction.options.getInteger('points');
+        const shifts = interaction.options.getInteger('shifts');
+        const consistency = interaction.options.getInteger('consistency');
+        const maxWarnings = interaction.options.getInteger('max_warnings');
+        const shiftHours = interaction.options.getInteger('shift_hours');
 
-            let guildData = await Guild.findOne({ guildId });
-            if (!guildData) {
-                guildData = new Guild({ guildId, name: interaction.guild.name, ownerId: interaction.guild.ownerId });
-            }
+        let guildData = await Guild.findOne({ guildId }) || new Guild({ guildId, name: interaction.guild.name, ownerId: interaction.guild.ownerId });
 
-            if (!guildData.promotionRequirements) guildData.promotionRequirements = {};
-            if (!guildData.promotionRequirements[rank]) guildData.promotionRequirements[rank] = {};
+        if (!guildData.promotionRequirements) guildData.promotionRequirements = {};
+        if (!guildData.promotionRequirements[rank]) guildData.promotionRequirements[rank] = {};
+        Object.assign(guildData.promotionRequirements[rank], { points, shifts, consistency, maxWarnings, shiftHours });
+        guildData.markModified('promotionRequirements');
+        await guildData.save();
 
-            Object.assign(guildData.promotionRequirements[rank], { points, shifts, consistency, maxWarnings, shiftHours });
+        const embed = new EmbedBuilder()
+            .setTitle(`⚙️ Extended Requirements Set — ${rank.toUpperCase()}`)
+            .setColor(0x2ecc71)
+            .setDescription('**Free tier: 5 requirements configured.**\n💎 Upgrade to Premium to unlock achievements & reputation requirements.\n🌟 Enterprise unlocks all 10.')
+            .addFields(
+                { name: '1️⃣ ⭐ Min Points', value: points.toString(), inline: true },
+                { name: '2️⃣ 🔄 Min Shifts', value: shifts.toString(), inline: true },
+                { name: '3️⃣ 📈 Min Consistency %', value: `${consistency}%`, inline: true },
+                { name: '4️⃣ ⚠️ Max Warnings', value: maxWarnings.toString(), inline: true },
+                { name: '5️⃣ ⏱️ Min Shift Hours', value: shiftHours > 0 ? `${shiftHours}h` : 'Disabled', inline: true }
+            )
+            .setFooter({ text: 'Auto-promotion checks these every 15 minutes' });
 
-            guildData.markModified('promotionRequirements');
-            await guildData.save();
-
-            const embed = await createCustomEmbed(interaction, {
-                title: `?? Operational Calibration: ${rank.toUpperCase()}`,
-                description: `Successfully synchronized 5 advanced target constraints for the **${rank.toUpperCase()}** milestone within the **${interaction.guild.name}** sector.`,
-                fields: [
-                    { name: '1?? ? Target Points', value: `\`${points.toLocaleString()}\``, inline: true },
-                    { name: '2?? ?? Engagement Shifts', value: `\`${shifts}\``, inline: true },
-                    { name: '3?? ?? Reliability Index', value: `\`${consistency}%\``, inline: true },
-                    { name: '4?? ?? Risk Tolerance', value: `\`<= ${maxWarnings}\``, inline: true },
-                    { name: '5?? ?? Flight Time', value: shiftHours > 0 ? `\`${shiftHours}h\`` : '*No Constraint Established*', inline: true }
-                ],
-                footer: 'Milestone parameters are enforced by the background automation engine.',
-                color: 'enterprise'
-            });
-
-            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_set_requirements_plus').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [embed], components: [row] });
-
-        } catch (error) {
-            console.error('Set Req Plus Error:', error);
-            const errEmbed = createErrorEmbed('An error occurred while attempting to write settings to the configuration server.');
-            if (interaction.deferred || interaction.replied) {
-                const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_set_requirements_plus').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
-            return await interaction.editReply({ embeds: [errEmbed], components: [row] });
-            } else {
-                await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
-            }
-        }
+        await interaction.editReply({ embeds: [embed] });
     }
 };
-
-

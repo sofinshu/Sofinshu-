@@ -1,87 +1,65 @@
-const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createCustomEmbed, createErrorEmbed, createPremiumEmbed, createSuccessEmbed } = require('../../utils/enhancedEmbeds');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const { Activity } = require('../../database/mongo');
 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('alert_summary')
-    .setDescription('Review algorithmic server alerts filtered by state')
+    .setDescription('View alert summary')
     .addStringOption(option =>
       option.setName('status')
-        .setDescription('Filter logs by priority state')
+        .setDescription('Filter by status')
         .setRequired(false)
         .addChoices(
-          { name: 'Active / Pending', value: 'active' },
-          { name: 'Resolved / Mitigated', value: 'resolved' },
-          { name: 'All Chronological Logs', value: 'all' }
+          { name: 'Active', value: 'active' },
+          { name: 'Resolved', value: 'resolved' },
+          { name: 'All', value: 'all' }
         )),
 
   async execute(interaction) {
-    try {
-      await interaction.deferReply();
+    const guildId = interaction.guildId;
+    const status = interaction.options.getString('status') || 'all';
 
-            const license = await validatePremiumLicense(interaction, 'premium');
-            if (!license.allowed) {
-                return await interaction.editReply({ embeds: [license.embed], components: [license.components] });
-            }
-      const guildId = interaction.guildId;
-      const status = interaction.options.getString('status') || 'all';
+    const query = { guildId };
+    if (status !== 'all') {
+      query['data.status'] = status;
+    }
 
-      const query = { guildId, type: 'alert' };
-      if (status !== 'all') {
-        query['data.status'] = status;
-      }
+    const alerts = await Activity.find({
+      guildId,
+      type: 'alert',
+      ...(status !== 'all' ? { 'data.status': status } : {})
+    })
+    .sort({ createdAt: -1 })
+    .limit(20)
+    .lean();
 
-      const alerts = await Activity.find(query)
-        .sort({ createdAt: -1 })
-        .limit(20)
-        .lean();
+    const embed = new EmbedBuilder()
+      .setTitle('🚨 Alert Summary')
+      .setColor(0xe74c3c)
+      .setDescription(`Server alerts for ${interaction.guild.name}`);
 
-      if (alerts.length === 0) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_alert_summary').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [createErrorEmbed(`No log traces found mapping to the \`${status}\` parameter on this server.`)], components: [row] });
-      }
+    const totalAlerts = await Activity.countDocuments({ guildId, type: 'alert' });
+    const activeAlerts = await Activity.countDocuments({ guildId, type: 'alert', 'data.status': 'active' });
+    const resolvedAlerts = await Activity.countDocuments({ guildId, type: 'alert', 'data.status': 'resolved' });
 
-      const totalAlerts = await Activity.countDocuments({ guildId, type: 'alert' });
-      const activeAlerts = await Activity.countDocuments({ guildId, type: 'alert', 'data.status': 'active' });
-      const resolvedAlerts = await Activity.countDocuments({ guildId, type: 'alert', 'data.status': 'resolved' });
+    embed.addFields(
+      { name: 'Total Alerts', value: totalAlerts.toString(), inline: true },
+      { name: 'Active', value: activeAlerts.toString(), inline: true },
+      { name: 'Resolved', value: resolvedAlerts.toString(), inline: true }
+    );
 
-      const embed = await createCustomEmbed(interaction, {
-        title: `?? Server Alert Aggregator`,
-        description: `Tracing infrastructure events recorded within **${interaction.guild.name}**.`,
-        thumbnail: interaction.guild.iconURL({ dynamic: true }),
-        fields: [
-          { name: '??? Parameter Bounds', value: `\`${status.toUpperCase()}\``, inline: false },
-          { name: '? Resolved Matrices', value: `\`${resolvedAlerts}\` Cleared`, inline: true },
-          { name: '?? Pending Trajectories', value: `\`${activeAlerts}\` Active`, inline: true },
-          { name: '?? Total Lifetime Logs', value: `\`${totalAlerts}\` Traces`, inline: true }
-        ],
-        footer: 'Background network engine intercepts automated alerts based on thresholds.'
-      });
-
+    if (alerts.length > 0) {
       const alertList = alerts.map(alert => {
         const alertStatus = alert.data?.status || 'unknown';
-        const emoji = alertStatus === 'active' ? '??' : '??';
-        const unixTime = Math.floor(new Date(alert.createdAt).getTime() / 1000);
-        return `> ${emoji} **${alert.data?.title || 'Unknown Alert Hash'}** (<t:${unixTime}:R>)`;
+        const emoji = alertStatus === 'active' ? '🔴' : '🟢';
+        const date = new Date(alert.createdAt).toLocaleDateString();
+        return `${emoji} ${alert.data?.title || 'Alert'} - ${date}`;
       });
-
-      embed.addFields({ name: `?? Target Filter: ${status}`, value: alertList.join('\n'), inline: false });
-
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_alert_summary').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [embed], components: [row] });
-
-    } catch (error) {
-      console.error('Alert Summary Error:', error);
-      const errEmbed = createErrorEmbed('A database error occurred parsing the algorithmic alert summary tree.');
-            if (interaction.deferred || interaction.replied) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_alert_summary').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
-            return await interaction.editReply({ embeds: [errEmbed], components: [row] });
-      } else {
-        await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
-      }
+      embed.addFields({ name: 'Recent Alerts', value: alertList.join('\n'), inline: false });
+    } else {
+      embed.addFields({ name: 'Recent Alerts', value: 'No alerts found', inline: false });
     }
+
+    await interaction.reply({ embeds: [embed] });
   }
 };
-
-

@@ -1,116 +1,83 @@
-const { SlashCommandBuilder, PermissionFlagsBits, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { validatePremiumLicense } = require('../../utils/enhancedPremiumGuard');
-const { createCustomEmbed, createErrorEmbed, createPremiumEmbed, createSuccessEmbed } = require('../../utils/enhancedEmbeds');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const { Activity, User } = require('../../database/mongo');
 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('task_reassign')
-    .setDescription('Forcefully migrate backend operational task IDs between operator networks.')
-    .setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages)
+    .setDescription('Reassign a task to another user')
     .addStringOption(option =>
       option.setName('task_id')
-        .setDescription('Internal MongoDB Log Record Hash Object ID')
+        .setDescription('ID of the task to reassign')
         .setRequired(true))
     .addUserOption(option =>
       option.setName('new_user')
-        .setDescription('Hierarchy assignee target')
+        .setDescription('User to reassign the task to')
         .setRequired(true))
     .addStringOption(option =>
       option.setName('reason')
-        .setDescription('Context array mapping the explicit boundary shift')
+        .setDescription('Reason for reassignment')
         .setRequired(false)),
 
   async execute(interaction) {
-    try {
-      await interaction.deferReply();
-      const taskId = interaction.options.getString('task_id');
-      const newUser = interaction.options.getUser('new_user');
-      const reason = interaction.options.getString('reason') || 'Algorithmic Reassignment Matrix';
-      const guildId = interaction.guildId;
-      const moderatorId = interaction.user.id;
+    const taskId = interaction.options.getString('task_id');
+    const newUser = interaction.options.getUser('new_user');
+    const reason = interaction.options.getString('reason') || 'No reason provided';
+    const guildId = interaction.guildId;
+    const moderatorId = interaction.user.id;
 
-      // Sandboxed Query ensures no external cross-server tasks get mapped here securely
-      const activity = await Activity.findOne({
-        _id: taskId,
-        guildId,
-        type: { $in: ['command', 'message', 'task'] }
-      }).catch(() => null);
+    const activity = await Activity.findOne({
+      _id: taskId,
+      guildId,
+      type: { $in: ['command', 'message', 'task'] }
+    });
 
-      if (!activity) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_task_reassign').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [createErrorEmbed(`Invalid query target. Hash \`${taskId}\` doesn't trace back to a valid task mapped on this server.`)], components: [row] });
-      }
-
-      const oldUserId = activity.userId;
-
-      activity.userId = newUser.id;
-      activity.data = activity.data || {};
-      activity.data.reassignedBy = moderatorId;
-      activity.data.reassignedAt = new Date();
-      activity.data.reason = reason;
-      activity.data.previousUserId = oldUserId;
-      await activity.save();
-
-      let newUserDoc = await User.findOne({ userId: newUser.id, guildId });
-      if (!newUserDoc) {
-        newUserDoc = new User({
-          userId: newUser.id,
-          username: newUser.username,
-          guildId
-        });
-        await newUserDoc.save();
-      }
-
-      const logTrace = new Activity({
-        guildId,
-        userId: newUser.id,
-        type: 'command',
-        data: {
-          command: 'task_reassign',
-          taskId,
-          previousUserId: oldUserId,
-          reason,
-          reassignedBy: moderatorId
-        }
-      });
-      await logTrace.save();
-
-      const embed = await createCustomEmbed(interaction, {
-        title: '? Reassignment Sequence Resolved',
-        description: `Successfully overrode array tracking metrics moving workload dependencies.`,
-        thumbnail: newUser.displayAvatarURL(),
-        fields: [
-          { name: '?? Global Trace ID', value: `\`${taskId}\``, inline: false },
-          { name: '?? Old Node Target', value: `<@${oldUserId}>`, inline: true },
-          { name: '?? Bound Node Target', value: `<@${newUser.id}>`, inline: true },
-          { name: '?? Commanding Author', value: `<@${moderatorId}>`, inline: true },
-          { name: '?? Action Reason context', value: `\`${reason}\``, inline: false }
-        ],
-        footer: 'The chronology log has explicitly mapped parameters permanently to database timeline trackers.'
-      });
-
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_task_reassign').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [embed], components: [row] });
-
-    } catch (error) {
-      console.error('Task Reassign Error:', error);
-      if (error.kind === 'ObjectId') {
-        const errEmbed = createErrorEmbed(`The Hash string provided doesn't structurally align against a 12-byte trace matrix. Verification blocked.`);
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_task_reassign').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary)); if (interaction.deferred || interaction.replied) {
-            return await interaction.editReply({ embeds: [errEmbed], components: [row] }); } else await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
-        return;
-      }
-
-      const errEmbed = createErrorEmbed('A database tracking error abruptly halted executing array assignment models.');
-      if (interaction.deferred || interaction.replied) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_task_reassign').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
-            return await interaction.editReply({ embeds: [errEmbed], components: [row] });
-      } else {
-        await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
-      }
+    if (!activity) {
+      return interaction.reply({ content: 'Task not found.', ephemeral: true });
     }
+
+    const oldUserId = activity.userId;
+
+    activity.userId = newUser.id;
+    activity.data = activity.data || {};
+    activity.data.reassignedBy = moderatorId;
+    activity.data.reassignedAt = new Date();
+    activity.data.reason = reason;
+    activity.data.previousUserId = oldUserId;
+    await activity.save();
+
+    let newUserDoc = await User.findOne({ userId: newUser.id });
+    if (!newUserDoc) {
+      newUserDoc = new User({
+        userId: newUser.id,
+        username: newUser.username,
+        guilds: [{ guildId, joinedAt: new Date() }]
+      });
+      await newUserDoc.save();
+    }
+
+    await Activity.create({
+      guildId,
+      userId: newUser.id,
+      type: 'command',
+      data: {
+        command: 'task_reassign',
+        taskId,
+        previousUserId: oldUserId,
+        reason,
+        reassignedBy: moderatorId
+      }
+    });
+
+    const embed = new EmbedBuilder()
+      .setTitle('✅ Task Reassigned')
+      .setColor(0x2ecc71)
+      .addFields(
+        { name: 'Task ID', value: taskId, inline: true },
+        { name: 'New Assignee', value: newUser.username, inline: true },
+        { name: 'Reason', value: reason, inline: false }
+      )
+      .setTimestamp();
+
+    await interaction.reply({ embeds: [embed] });
   }
 };
-
-

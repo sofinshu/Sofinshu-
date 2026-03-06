@@ -1,86 +1,57 @@
-const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createCustomEmbed, createEnterpriseEmbed, createErrorEmbed, createSuccessEmbed } = require('../../utils/enhancedEmbeds');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const { User } = require('../../database/mongo');
 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('role_efficiency')
-    .setDescription('Enterprise Hyper-Apex: Hierarchical Synergy Curves & Productivity Density'),
+    .setDescription('Compare performance efficiency across different staff ranks'),
 
-  async execute(interaction) {
-    try {
-      await interaction.deferReply();
+  async execute(interaction, client) {
+    await interaction.deferReply();
 
-      // Enterprise License Guard
-      const license = await validatePremiumLicense(interaction, 'enterprise');
-      if (!license.allowed) {
-        return await interaction.editReply({ embeds: [license.embed], components: license.components });
-      }
+    const users = await User.find({}).lean();
 
-      const users = await User.find({ guildId: interaction.guildId }).lean();
-      const roles = ['admin', 'manager', 'staff', 'trial'];
-      const stats = {};
-      roles.forEach(r => stats[r] = { points: 0, count: 0 });
-
-      users.forEach(u => {
-        const r = (u.staff?.rank || 'member').toLowerCase();
-        if (stats[r]) {
-          stats[r].points += u.staff?.points || 0;
-          stats[r].count++;
-        }
-      });
-
-      const totalPoints = Object.values(stats).reduce((a, b) => a + b.points, 1);
-
-      // 1. Hierarchical Synergy Curve (ASCII)
-      const segments = 15;
-      const synergyCurve = Array.from({ length: segments }, (_, i) => {
-        const x = i / segments;
-        const y = Math.pow(x, 2) * 5; // Exponential synergy curve
-        const chars = [' ', '?', '?', '_', '?', '?', '?', '�'];
-        return chars[Math.max(0, Math.min(7, Math.round(y)))];
-      }).join('');
-
-      const synergyFactor = (totalPoints / (users.length * 15)).toFixed(2);
-      const synergyRibbon = `\`[${synergyCurve}]\` **${synergyFactor}x SYNERGY**`;
-
-      const fields = roles.map(r => {
-        const s = stats[r];
-        const avg = s.count > 0 ? (s.points / s.count).toFixed(1) : 0;
-        const density = Math.min(10, Math.round(avg / 10));
-        const densityRibbon = `\`[${'�'.repeat(density)}${'�'.repeat(10 - density)}]\``;
-
-        return {
-          name: `??? ${r.toUpperCase()} Hierarchy`,
-          value: `> Density: ${densityRibbon}\n> Efficiency: \`${avg}\` pts/node\n> Signal: \`${s.points.toLocaleString()}\``,
-          inline: true
-        };
-      });
-
-      const embed = await createCustomEmbed(interaction, {
-        title: '?? Enterprise Hyper-Apex: Hierarchical Efficiency',
-        thumbnail: interaction.guild.iconURL({ dynamic: true }),
-        description: `### ?? Macroscopic Synergy Mapping\nAnalyzing hierarchical signal density and cross-role productivity curves for sector **${interaction.guild.name}**.\n\n**?? Enterprise HYPER-APEX EXCLUSIVE**`,
-        fields: [
-          { name: '?? Hierarchical Synergy Curve', value: synergyRibbon, inline: false },
-          ...fields,
-          { name: '? Sync Bio-Grid', value: '`STABLE`', inline: true },
-          { name: '?? Global Grid', value: '`CONNECTED`', inline: true },
-          { name: '?? Performance', value: '`ELITE S-RANK`', inline: true }
-        ],
-        footer: 'Hierarchical Efficiency Matrix � V6 Enterprise Hyper-Apex Suite',
-        color: 'premium'
-      });
-
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_role_efficiency').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [embed], components: [row] });
-
-    } catch (error) {
-      console.error('Enterprise Role Efficiency Error:', error);
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_role_efficiency').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [createErrorEmbed('Enterprise Matrix failure: Unable to compute hierarchical synergy curves.')], components: [row] });
+    if (!users.length) {
+      return interaction.editReply('📊 No staff data found yet.');
     }
+
+    const rankGroups = {};
+    users.forEach(u => {
+      const rank = u.staff?.rank || 'member';
+      if (!rankGroups[rank]) rankGroups[rank] = { totalPoints: 0, totalConsistency: 0, count: 0 };
+      rankGroups[rank].totalPoints += u.staff?.points || 0;
+      rankGroups[rank].totalConsistency += u.staff?.consistency || 100;
+      rankGroups[rank].count++;
+    });
+
+    const rankOrder = ['owner', 'admin', 'manager', 'senior', 'staff', 'trial', 'member'];
+    const sortedRanks = Object.entries(rankGroups).sort((a, b) => {
+      const ia = rankOrder.indexOf(a[0]);
+      const ib = rankOrder.indexOf(b[0]);
+      return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib);
+    });
+
+    const allAvgPoints = sortedRanks.map(([, g]) => g.totalPoints / g.count);
+    const maxAvg = Math.max(...allAvgPoints, 1);
+
+    const fields = sortedRanks.map(([rank, g]) => {
+      const avgPts = (g.totalPoints / g.count).toFixed(1);
+      const avgCon = (g.totalConsistency / g.count).toFixed(1);
+      const bar = '▓'.repeat(Math.round((g.totalPoints / g.count / maxAvg) * 8)) + '░'.repeat(8 - Math.round((g.totalPoints / g.count / maxAvg) * 8));
+      return {
+        name: `🎖️ ${rank.charAt(0).toUpperCase() + rank.slice(1)} (${g.count} staff)`,
+        value: `Points avg: \`${bar}\` **${avgPts}** | Consistency: **${avgCon}%**`,
+        inline: false
+      };
+    });
+
+    const embed = new EmbedBuilder()
+      .setTitle('🎖️ Role Efficiency Analysis')
+      .setColor(0x27ae60)
+      .addFields(fields)
+      .setFooter({ text: `${interaction.guild.name} • Role Efficiency` })
+      .setTimestamp();
+
+    await interaction.editReply({ embeds: [embed] });
   }
 };
-
-

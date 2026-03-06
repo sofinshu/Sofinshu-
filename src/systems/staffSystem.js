@@ -13,34 +13,16 @@ class StaffSystem {
   async getOrCreateUser(userId, guildId, username) {
     let user = await User.findOne({ userId });
     if (!user) {
-      user = new User({
-        userId,
-        username,
-        guilds: [{
-          guildId,
-          joinedAt: new Date(),
-          staff: { rank: 'trial', points: 0, warnings: 0, shiftTime: 0, consistency: 100 }
-        }]
-      });
+      user = new User({ userId, username, guilds: [{ guildId, joinedAt: new Date() }] });
       await user.save();
     } else {
       const guildIndex = user.guilds.findIndex(g => g.guildId === guildId);
       if (guildIndex === -1) {
-        user.guilds.push({
-          guildId,
-          joinedAt: new Date(),
-          staff: { rank: 'trial', points: 0, warnings: 0, shiftTime: 0, consistency: 100 }
-        });
+        user.guilds.push({ guildId, joinedAt: new Date() });
         await user.save();
       }
     }
     return user;
-  }
-
-  getGuildStats(user, guildId) {
-    if (!user || !user.guilds) return null;
-    const guild = user.guilds.find(g => g.guildId === guildId);
-    return guild ? guild.staff : null;
   }
 
   async startShift(userId, guildId) {
@@ -51,7 +33,7 @@ class StaffSystem {
       startTime: new Date()
     });
     await shift.save();
-
+    
     await Activity.create({
       guildId,
       userId,
@@ -59,106 +41,26 @@ class StaffSystem {
       data: { action: 'start', shiftId: shift._id }
     });
 
-    // --- On Duty Role Auto Assignment ---
-    const guildData = await Guild.findOne({ guildId });
-    if (guildData?.settings?.onDutyRole) {
-      try {
-        const discordGuild = await this.client.guilds.fetch(guildId);
-        if (discordGuild) {
-          const member = await discordGuild.members.fetch(userId);
-          if (member) {
-            await member.roles.add(guildData.settings.onDutyRole, 'Started Shift');
-          }
-        }
-      } catch (e) {
-        logger.error(`Failed to assign On Duty role: ${e.message}`);
-      }
-    }
-
-    // --- Shift Streak Gamification ---
-    let streakDays = 0;
-    const now = new Date();
-
-    // Check if there's a shift from the previous day (between 24-48 hours ago)
-    const yesterdayStart = new Date(now.getTime() - 48 * 60 * 60 * 1000);
-    const yesterdayEnd = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-
-    // Find the most recent shift before today
-    const lastShiftBeforeToday = await Shift.findOne({
-      userId,
-      guildId,
-      startTime: { $lt: new Date(now.getTime() - 12 * 60 * 60 * 1000) } // At least 12 hours ago to prevent double counting same day
-    }).sort({ startTime: -1 });
-
-    const guildStats = this.getGuildStats(user, guildId);
-    if (guildStats) {
-      streakDays = guildStats.streak || 0;
-
-      if (lastShiftBeforeToday) {
-        const timeDiffHours = (now - lastShiftBeforeToday.startTime) / (1000 * 60 * 60);
-        // If their last shift was between 12 and 48 hours ago, increment streak
-        if (timeDiffHours <= 48) {
-          streakDays += 1;
-        } else {
-          // Streak broken
-          streakDays = 1;
-        }
-      } else {
-        // First shift ever or in a long time
-        streakDays = 1;
-      }
-
-      guildStats.streak = streakDays;
-      await user.save();
-    }
-
-    return { success: true, startTime: shift.startTime, shiftId: shift._id, streakDays };
+    return { success: true, startTime: shift.startTime, shiftId: shift._id };
   }
 
   async endShift(userId, guildId) {
-    const shift = await Shift.findOne({
-      guildId,
-      userId,
-      endTime: null
+    const shift = await Shift.findOne({ 
+      guildId, 
+      userId, 
+      endTime: null 
     }).sort({ startTime: -1 });
 
     if (!shift) return { success: false, message: 'No active shift found' };
 
-    // If currently paused, end the pause first
-    if (shift.status === 'paused') {
-      const lastPause = shift.pauses[shift.pauses.length - 1];
-      if (lastPause && !lastPause.endedAt) {
-        lastPause.endedAt = new Date();
-        lastPause.duration = (lastPause.endedAt - lastPause.startedAt) / 1000;
-      }
-    }
-
-    shift.status = 'ended';
     shift.endTime = new Date();
-
-    // Calculate total paused time
-    const totalPausedTimeMs = shift.pauses.reduce((acc, p) => acc + (p.duration * 1000), 0);
-
-    // Formula: (EndTime - StartTime) - TotalPausedTime
-    const rawDurationMs = shift.endTime - shift.startTime;
-    shift.duration = Math.max(0, (rawDurationMs - totalPausedTimeMs) / 1000);
-
+    shift.duration = (shift.endTime - shift.startTime) / 1000;
     await shift.save();
 
-    let pointsEarned = 0;
-    const user = await User.findOne({ userId, 'guilds.guildId': guildId });
-    const guildStats = this.getGuildStats(user, guildId);
-
-    if (guildStats) {
-      guildStats.shiftTime = (guildStats.shiftTime || 0) + shift.duration;
-      guildStats.lastShift = new Date();
-
-      pointsEarned = Math.floor(shift.duration / 300);
-      guildStats.points = (guildStats.points || 0) + pointsEarned;
-
-      const consistency = await this.calculateConsistency(userId, guildId);
-      guildStats.consistency = consistency;
-
+    const user = await User.findOne({ userId });
+    if (user && user.staff) {
+      user.staff.shiftTime = (user.staff.shiftTime || 0) + shift.duration;
+      user.staff.lastShift = new Date();
       await user.save();
     }
 
@@ -169,99 +71,15 @@ class StaffSystem {
       data: { action: 'end', shiftId: shift._id, duration: shift.duration }
     });
 
-    const guild = await Guild.findOne({ guildId });
-    const autoPromoEnabled = guild?.settings?.modules?.automation ?? false;
-
-    if (autoPromoEnabled) {
-      const PromotionSystem = require('../utils/promotionSystem');
-      await PromotionSystem.checkEligibility(userId, guildId, this.client);
-    }
-
     const hours = Math.floor(shift.duration / 3600);
     const minutes = Math.floor((shift.duration % 3600) / 60);
 
-    // --- Shift Trophies Check ---
-    if (guildStats) {
-      if (!guildStats.trophies) guildStats.trophies = [];
-      let newTrophies = false;
-
-      // 1. First Shift Trophy
-      if (!guildStats.trophies.includes('First Shift Completed')) {
-        guildStats.trophies.push('First Shift Completed');
-        newTrophies = true;
-      }
-
-      // 2. Iron Man Trophy (Shift longer than 4 hours)
-      if (hours >= 4 && !guildStats.trophies.includes('Iron Worker (4hr+ Shift)')) {
-        guildStats.trophies.push('Iron Worker (4hr+ Shift)');
-        newTrophies = true;
-      }
-
-      // 3. Streak Trophy
-      if (guildStats.streak >= 7 && !guildStats.trophies.includes('7-Day Streak Master')) {
-        guildStats.trophies.push('7-Day Streak Master');
-        newTrophies = true;
-      }
-
-      if (newTrophies) await user.save();
-    }
-
-    // --- Remove On Duty Role ---
-    if (guild?.settings?.onDutyRole) {
-      try {
-        const discordGuild = await this.client.guilds.fetch(guildId);
-        if (discordGuild) {
-          const member = await discordGuild.members.fetch(userId);
-          if (member) {
-            await member.roles.remove(guild.settings.onDutyRole, 'Ended Shift');
-          }
-        }
-      } catch (e) {
-        logger.error(`Failed to remove On Duty role: ${e.message}`);
-      }
-    }
-
-    return {
-      success: true,
+    return { 
+      success: true, 
       duration: shift.duration,
       hours,
-      minutes,
-      pointsEarned
+      minutes
     };
-  }
-
-  async pauseShift(userId, guildId) {
-    const shift = await Shift.findOne({ guildId, userId, endTime: null, status: 'active' }).sort({ startTime: -1 });
-    if (!shift) return { success: false, message: 'No active shift to pause.' };
-
-    shift.status = 'paused';
-    shift.pauses.push({ startedAt: new Date() });
-    await shift.save();
-
-    await Activity.create({
-      guildId, userId, type: 'shift', data: { action: 'pause', shiftId: shift._id }
-    });
-
-    return { success: true };
-  }
-
-  async resumeShift(userId, guildId) {
-    const shift = await Shift.findOne({ guildId, userId, endTime: null, status: 'paused' }).sort({ startTime: -1 });
-    if (!shift) return { success: false, message: 'No paused shift to resume.' };
-
-    shift.status = 'active';
-    const currentPause = shift.pauses[shift.pauses.length - 1];
-    if (currentPause && !currentPause.endedAt) {
-      currentPause.endedAt = new Date();
-      currentPause.duration = (currentPause.endedAt - currentPause.startedAt) / 1000;
-    }
-    await shift.save();
-
-    await Activity.create({
-      guildId, userId, type: 'shift', data: { action: 'resume', shiftId: shift._id }
-    });
-
-    return { success: true };
   }
 
   async addWarning(userId, guildId, reason, moderatorId, severity = 'medium') {
@@ -278,28 +96,10 @@ class StaffSystem {
     });
     await warning.save();
 
-    const user = await this.getOrCreateUser(userId, guildId);
-    const guildStats = this.getGuildStats(user, guildId);
-    if (guildStats) {
-      guildStats.warnings = (guildStats.warnings || 0) + points;
+    const user = await User.findOne({ userId });
+    if (user && user.staff) {
+      user.staff.warnings = (user.staff.warnings || 0) + points;
       await user.save();
-    }
-
-    // --- Moderation Trophies Check (For the Moderator) ---
-    const moderator = await User.findOne({ userId: moderatorId, 'guilds.guildId': guildId });
-    const modStats = this.getGuildStats(moderator, guildId);
-    if (modStats) {
-      if (!modStats.trophies) modStats.trophies = [];
-
-      const modWarnings = await Warning.countDocuments({ moderatorId, guildId });
-
-      if (modWarnings === 1 && !modStats.trophies.includes('First Warning Issued')) {
-        modStats.trophies.push('First Warning Issued');
-        await moderator.save();
-      } else if (modWarnings === 50 && !modStats.trophies.includes('Justice Hammer (50 Warns)')) {
-        modStats.trophies.push('Justice Hammer (50 Warns)');
-        await moderator.save();
-      }
     }
 
     const guild = await Guild.findOne({ guildId });
@@ -334,11 +134,13 @@ class StaffSystem {
   }
 
   async addPoints(userId, guildId, points, reason) {
-    const user = await this.getOrCreateUser(userId, guildId);
-    const guildStats = this.getGuildStats(user, guildId);
-    if (!guildStats) return { success: false, message: 'Could not resolve guild statistics' };
+    const user = await User.findOne({ userId });
+    if (!user) return { success: false, message: 'User not found' };
 
-    guildStats.points = (guildStats.points || 0) + points;
+    if (!user.staff) {
+      user.staff = { points: 0, rank: 'member' };
+    }
+    user.staff.points = (user.staff.points || 0) + points;
     await user.save();
 
     await Activity.create({
@@ -348,30 +150,20 @@ class StaffSystem {
       data: { action: 'points', amount: points, reason }
     });
 
-    const guild = await Guild.findOne({ guildId });
-    const autoPromoEnabled = guild?.settings?.modules?.automation ?? false;
-
-    if (autoPromoEnabled) {
-      const PromotionSystem = require('../utils/promotionSystem');
-      await PromotionSystem.checkEligibility(userId, guildId, this.client);
-    }
-
     return { success: true, total: user.staff.points };
   }
 
   async getPoints(userId, guildId) {
-    const user = await User.findOne({ userId, 'guilds.guildId': guildId });
-    const stats = this.getGuildStats(user, guildId);
-    return stats ? (stats.points || 0) : 0;
+    const user = await User.findOne({ userId });
+    if (!user || !user.staff) return 0;
+    return user.staff.points || 0;
   }
 
   async setRank(userId, guildId, rank) {
     const user = await this.getOrCreateUser(userId, guildId);
-    const stats = this.getGuildStats(user, guildId);
-    if (stats) {
-      stats.rank = rank;
-      await user.save();
-    }
+    if (!user.staff) user.staff = {};
+    user.staff.rank = rank;
+    await user.save();
 
     await Activity.create({
       guildId,
@@ -384,25 +176,24 @@ class StaffSystem {
   }
 
   async getRank(userId, guildId) {
-    const user = await User.findOne({ userId, 'guilds.guildId': guildId });
-    const stats = this.getGuildStats(user, guildId);
-    return stats ? (stats.rank || 'trial') : 'trial';
+    const user = await User.findOne({ userId });
+    if (!user || !user.staff) return 'member';
+    return user.staff.rank || 'member';
   }
 
   async calculateStaffScore(userId, guildId) {
-    const user = await User.findOne({ userId, 'guilds.guildId': guildId });
-    const stats = this.getGuildStats(user, guildId);
-    if (!stats) return 0;
+    const user = await User.findOne({ userId });
+    if (!user || !user.staff) return 0;
 
-    const points = stats.points || 0;
-    const warnings = stats.warnings || 0;
-    const shiftTime = stats.shiftTime || 0;
-    const consistency = stats.consistency || 100;
+    const points = user.staff.points || 0;
+    const warnings = user.staff.warnings || 0;
+    const shiftTime = user.staff.shiftTime || 0;
+    const consistency = user.staff.consistency || 100;
 
-    const score = Math.min(100,
-      (points / 10) +
-      (shiftTime / 3600) * 5 +
-      consistency -
+    const score = Math.min(100, 
+      (points / 10) + 
+      (shiftTime / 3600) * 5 + 
+      consistency - 
       (warnings * 5)
     );
 
@@ -410,9 +201,8 @@ class StaffSystem {
   }
 
   async updateConsistency(userId, guildId) {
-    const user = await User.findOne({ userId, 'guilds.guildId': guildId });
-    const stats = this.getGuildStats(user, guildId);
-    if (!stats) return 0;
+    const user = await User.findOne({ userId });
+    if (!user || !user.staff) return 0;
 
     const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
     const activities = await Activity.find({
@@ -425,45 +215,56 @@ class StaffSystem {
     const actualShifts = activities.filter(a => a.type === 'shift').length;
     const consistency = Math.min(100, Math.round((actualShifts / expectedShifts) * 100));
 
-    stats.consistency = consistency;
+    user.staff.consistency = consistency;
     await user.save();
 
     return consistency;
   }
 
   async getLeaderboard(guildId, limit = 10) {
-    const users = await User.find({ 'guilds.guildId': guildId, 'guilds.staff.points': { $gt: 0 } })
-      .sort({ 'guilds.staff.points': -1 })
+    const users = await User.find({ 'guilds.guildId': guildId, 'staff.points': { $gt: 0 } })
+      .sort({ 'staff.points': -1 })
       .limit(limit);
 
-    return users.map(u => {
-      const stats = this.getGuildStats(u, guildId);
-      return {
-        userId: u.userId,
-        username: u.username,
-        points: stats?.points || 0,
-        rank: stats?.rank || 'trial',
-        warnings: stats?.warnings || 0
-      };
-    });
+    return users.map(u => ({
+      userId: u.userId,
+      username: u.username,
+      points: u.staff?.points || 0,
+      rank: u.staff?.rank || 'member',
+      warnings: u.staff?.warnings || 0
+    }));
   }
 
-  async calculateConsistency(userId, guildId) {
-    const shifts = await Shift.find({ userId, guildId, endTime: { $ne: null } }).sort({ endTime: -1 }).limit(30);
+  async getPromotionRequirements(currentRank) {
+    const ranks = {
+      'member': { points: 0, next: 'trial', requirements: 'None' },
+      'trial': { points: 100, next: 'staff', requirements: '100 points, 80% consistency' },
+      'staff': { points: 500, next: 'moderator', requirements: '500 points, 90% consistency' },
+      'moderator': { points: 1000, next: 'admin', requirements: '1000 points, 95% consistency' },
+      'admin': { points: 2500, next: 'owner', requirements: '2500 points, 100% consistency' }
+    };
+    return ranks[currentRank] || ranks['member'];
+  }
 
-    if (shifts.length === 0) return 100;
+  async predictPromotion(userId, guildId) {
+    const user = await User.findOne({ userId });
+    if (!user || !user.staff) return null;
 
-    const now = new Date();
-    const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const currentRank = user.staff.rank || 'member';
+    const requirements = await this.getPromotionRequirements(currentRank);
+    const currentPoints = user.staff.points || 0;
+    const pointsNeeded = Math.max(0, requirements.points - currentPoints);
 
-    const recentShifts = shifts.filter(s => new Date(s.endTime) > weekAgo);
+    const avgPointsPerWeek = 50;
+    const weeksNeeded = Math.ceil(pointsNeeded / avgPointsPerWeek);
 
-    if (recentShifts.length === 0) return 0;
-
-    const expectedShiftsPerWeek = 3;
-    const consistency = Math.min(100, Math.round((recentShifts.length / expectedShiftsPerWeek) * 100));
-
-    return consistency;
+    return {
+      currentRank,
+      nextRank: requirements.next,
+      currentPoints,
+      pointsNeeded,
+      estimatedWeeks: weeksNeeded
+    };
   }
 }
 

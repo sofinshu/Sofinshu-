@@ -1,5 +1,4 @@
-const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createPremiumEmbed } = require('../../utils/enhancedEmbeds');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const { Activity } = require('../../database/mongo');
 
 module.exports = {
@@ -26,23 +25,17 @@ module.exports = {
                   score >= 60 ? 'Good' :
                   score >= 40 ? 'Fair' : 'Low';
 
-    const embed = createPremiumEmbed()
-      .setTitle('?? Engagement Score')
-      
+    const embed = new EmbedBuilder()
+      .setTitle('💫 Engagement Score')
+      .setColor(0x9b59b6)
       .addFields(
         { name: 'Score', value: `${score}/100`, inline: true },
         { name: 'Level', value: level, inline: true },
         { name: 'Active Users', value: `${uniqueUsers}/${memberCount}`, inline: true },
         { name: 'Messages (7d)', value: messages.toLocaleString(), inline: true }
       )
-      ;
+      .setTimestamp();
 
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_engagement_score').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [embed], components: [row] });
+    await interaction.reply({ embeds: [embed] });
   }
 };
-
-
-
-
-

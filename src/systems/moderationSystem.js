@@ -13,7 +13,7 @@ class ModerationSystem {
 
   async createCase(guildId, userId, action, reason, moderatorId) {
     const caseId = Date.now().toString(36);
-
+    
     await Activity.create({
       guildId,
       userId,
@@ -31,16 +31,16 @@ class ModerationSystem {
   }
 
   async getCase(guildId, caseId) {
-    const activities = await Activity.find({
-      guildId,
-      'data.caseId': caseId
+    const activities = await Activity.find({ 
+      guildId, 
+      'data.caseId': caseId 
     }).sort({ createdAt: -1 });
     return activities[0];
   }
 
   async getUserHistory(guildId, userId) {
-    return await Activity.find({
-      guildId,
+    return await Activity.find({ 
+      guildId, 
       userId,
       type: 'warning'
     }).sort({ createdAt: -1 }).limit(50);
@@ -48,7 +48,7 @@ class ModerationSystem {
 
   async getModerationStats(guildId, days = 7) {
     const cutoff = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
-
+    
     const warns = await Activity.countDocuments({
       guildId,
       type: 'warning',
@@ -86,7 +86,7 @@ class ModerationSystem {
 
     const guild = message.guild;
     const member = message.member;
-
+    
     if (!member) return { triggered: false };
 
     if (settings.antiSpam && message.content.length > 1000) {
@@ -198,7 +198,7 @@ class ModerationSystem {
       } else {
         await guild.bans.create(userId, { reason });
       }
-
+      
       await this.createCase(guildId, userId, 'ban', reason, moderatorId);
       return { success: true };
     } catch (e) {
@@ -210,20 +210,13 @@ class ModerationSystem {
     const user = await User.findOne({ userId });
     if (!user) return { success: false, message: 'User not found' };
 
-    // Find or create guild entry
-    let guildEntry = user.guilds.find(g => g.guildId === guildId);
-    if (!guildEntry) {
-      guildEntry = { guildId, joinedAt: new Date(), staff: { rank: 'trial', points: 0, warnings: 0 } };
-      user.guilds.push(guildEntry);
-    }
-
-    if (!guildEntry.staff) guildEntry.staff = { rank: 'trial', points: 0, warnings: 0 };
-    guildEntry.staff.warnings = (guildEntry.staff.warnings || 0) + 1;
+    if (!user.staff) user.staff = {};
+    user.staff.warnings = (user.staff.warnings || 0) + 1;
     await user.save();
 
     await this.createCase(guildId, userId, 'strike', reason, moderatorId);
 
-    return { success: true, strikes: guildEntry.staff.warnings };
+    return { success: true, strikes: user.staff.warnings };
   }
 
   async getStrikes(userId, guildId) {

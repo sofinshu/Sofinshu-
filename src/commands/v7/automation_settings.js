@@ -1,5 +1,4 @@
-const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createEnterpriseEmbed } = require('../../utils/enhancedEmbeds');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const { Guild } = require('../../database/mongo');
 
 module.exports = {
@@ -20,11 +19,6 @@ module.exports = {
 
   async execute(interaction, client) {
     await interaction.deferReply();
-
-            const license = await validatePremiumLicense(interaction, 'enterprise');
-            if (!license.allowed) {
-                return await interaction.editReply({ embeds: [license.embed], components: [license.components] });
-            }
     const guildId = interaction.guildId;
     const moduleChoice = interaction.options.getString('module');
     const enabledChoice = interaction.options.getBoolean('enabled');
@@ -34,34 +28,28 @@ module.exports = {
 
     if (moduleChoice && enabledChoice !== null) {
       if (!interaction.member.permissions.has('ManageGuild')) {
-        return interaction.editReply('? You need **Manage Server** permission to change settings.');
+        return interaction.editReply('❌ You need **Manage Server** permission to change settings.');
       }
       guild.settings.modules[moduleChoice] = enabledChoice;
       await guild.save();
     }
 
     const modules = guild.settings?.modules || {};
-    const statusIcon = v => v ? '? Enabled' : '? Disabled';
+    const statusIcon = v => v ? '✅ Enabled' : '❌ Disabled';
 
-    const embed = createEnterpriseEmbed()
-      .setTitle('?? Automation Settings')
-      
+    const embed = new EmbedBuilder()
+      .setTitle('⚙️ Automation Settings')
+      .setColor(0x3498db)
       .addFields(
-        { name: '??? Moderation', value: statusIcon(modules.moderation), inline: true },
-        { name: '?? Analytics', value: statusIcon(modules.analytics), inline: true },
-        { name: '?? Automation', value: statusIcon(modules.automation), inline: true },
-        { name: '?? Tickets', value: statusIcon(modules.tickets), inline: true },
-        { name: '?? How to Toggle', value: 'Use `/automation_settings module:analytics enabled:true` to enable a module.' }
+        { name: '🛡️ Moderation', value: statusIcon(modules.moderation), inline: true },
+        { name: '📊 Analytics', value: statusIcon(modules.analytics), inline: true },
+        { name: '🤖 Automation', value: statusIcon(modules.automation), inline: true },
+        { name: '🎫 Tickets', value: statusIcon(modules.tickets), inline: true },
+        { name: '📌 How to Toggle', value: 'Use `/automation_settings module:analytics enabled:true` to enable a module.' }
       )
-      
-      ;
+      .setFooter({ text: moduleChoice ? `Updated ${moduleChoice} module` : `${interaction.guild.name} • Module Settings` })
+      .setTimestamp();
 
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_automation_settings').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
-            await interaction.editReply({ embeds: [embed], components: [row] });
+    await interaction.editReply({ embeds: [embed] });
   }
 };
-
-
-
-
-
