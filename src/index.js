@@ -223,7 +223,8 @@ client.once('ready', async () => {
   await initAutoChat(client);
 
   const testGuildId = process.env.TEST_GUILD_ID;
-  await commandHandler.deployCommands(client, testGuildId || null).catch(e => logger.error('Deploy error: ' + e.message));
+  const isSnowflake = testGuildId && /^\d+$/.test(testGuildId);
+  await commandHandler.deployCommands(client, isSnowflake ? testGuildId : null).catch(e => logger.error('Deploy error: ' + e.message));
 
   setInterval(() => client.systems.license.syncLicenses(), 60000);
 

@@ -25,7 +25,8 @@ console.log("Loaded", commands.length, "commands");
 
 let token = process.env.DISCORD_TOKEN || "";
 let id = process.env.CLIENT_ID || "";
-let guildId = process.env.TEST_GUILD_ID || "";
+const rawGuildId = process.env.TEST_GUILD_ID || "";
+const guildId = /^\d+$/.test(rawGuildId) ? rawGuildId : "";
 
 if (!token || !id) { console.log("ERROR: No token/id in .env or env variables"); process.exit(1); }
 
