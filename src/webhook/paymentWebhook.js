@@ -1,6 +1,15 @@
 const express = require('express');
 const router = express.Router();
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+
+let stripe = null;
+if (process.env.STRIPE_SECRET_KEY) {
+  try {
+    stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+  } catch (err) {
+    console.error('Failed to initialize Stripe:', err.message);
+  }
+}
+
 const axios = require('axios');
 const crypto = require('crypto');
 const logger = require('../utils/logger');
@@ -72,6 +81,11 @@ function verifyPayPalSignature(req) {
 }
 
 router.post('/stripe', express.raw({ type: 'application/json' }), async (req, res) => {
+  if (!stripe) {
+    logger.warn('Stripe webhook received but Stripe is not configured');
+    return res.status(503).send('Stripe integration disabled');
+  }
+
   const sig = req.headers['stripe-signature'];
   let event;
 
@@ -309,6 +323,10 @@ router.post('/paypal', express.json(), async (req, res) => {
 });
 
 router.post('/create-checkout-session', express.json(), async (req, res) => {
+  if (!stripe) {
+    return res.status(503).json({ error: 'Stripe payments are currently disabled' });
+  }
+
   try {
     const { plan, guildId, userId } = req.body;
 

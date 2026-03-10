@@ -6,6 +6,13 @@ const fs = require('fs');
 require('dotenv').config();
 
 const logger = require('./utils/logger');
+
+// Catch early unhandled issues before systems load
+process.on('uncaughtException', (err) => {
+  console.error('FATAL UNCAUGHT EXCEPTION:', err);
+  process.exit(1);
+});
+
 const { versionGuard } = require('./guards/versionGuard');
 const LicenseSystem = require('./systems/licenseSystem');
 const StaffSystem = require('./systems/staffSystem');
