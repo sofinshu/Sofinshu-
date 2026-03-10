@@ -754,8 +754,14 @@ const app = express();
 app.locals.client = client;
 
 // Security middleware - helmet should be first
-app.use(require('helmet')());
-app.use(require('cors')());
+app.use(require('helmet')({ crossOriginResourcePolicy: false, crossOriginOpenerPolicy: false }));
+// CORS: allow any origin so the Strata dashboard (and any future frontend) can call this API
+app.use(require('cors')({
+  origin: true,           // reflect the request origin (allows all)
+  credentials: true,      // allow cookies/auth headers
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 // Raw body parsing for Stripe webhooks (must be before express.json)
 app.use('/webhooks/stripe', express.raw({ type: 'application/json' }));
