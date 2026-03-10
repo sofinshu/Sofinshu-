@@ -1,4 +1,4 @@
-﻿const {
+const {
     SlashCommandBuilder,
     StringSelectMenuBuilder,
     StringSelectMenuOptionBuilder,
@@ -54,7 +54,7 @@ module.exports = {
                 .setTitle(`🔭 Target Lost: ${targetUser.username}`)
                 .setDescription('🔒 This user is **Offline**, **Invisible**, or has privacy settings enabled.')
                 .setThumbnail(targetUser.displayAvatarURL({ dynamic: true, size: 512 }))
-                .setColor('primary')
+                .setColor(0x5865F2)
                 .setFooter({ text: 'Telemetry Unavailable' });
             return interaction.editReply({ embeds: [offlineEmbed] });
         }
@@ -197,7 +197,7 @@ module.exports = {
                 const posEmbed = new EmbedBuilder()
                     .setTitle(`🚪 Join Position: ${targetUser.username}`)
                     .setDescription(`They were the **#${pos}** member to join this server.`)
-                    .setColor('primary');
+                    .setColor(0x5865F2);
                 await i.editReply({ embeds: [posEmbed] });
             }
             else if (action === 'mutual_servers') {
@@ -210,7 +210,7 @@ module.exports = {
                 const mutualEmbed = new EmbedBuilder()
                     .setTitle(`🤝 Mutual Servers`)
                     .setDescription(`I share **${count}** servers with ${targetUser.username}.\n\n${list || 'None'}`)
-                    .setColor('primary');
+                    .setColor(0x5865F2);
                 await i.editReply({ embeds: [mutualEmbed] });
             }
             else if (action === 'trust_check') {
@@ -229,7 +229,7 @@ module.exports = {
                 const histEmbed = new EmbedBuilder()
                     .setTitle(`📜 Activity Timeline: ${targetUser.username}`)
                     .setDescription(buildTimelineText(hist))
-                    .setColor('primary');
+                    .setColor(0x5865F2);
                 await i.editReply({ embeds: [histEmbed] });
             }
             else if (action === 'avatar_banner') {
