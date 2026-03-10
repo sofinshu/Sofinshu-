@@ -34,10 +34,14 @@ redisClient.on('connect', () => {
     console.log('Connected to Redis instance.');
 });
 
-// Connect to Redis asynchronously 
-redisClient.connect().catch(() => {
-    isConnected = false;
-});
+// Connect to Redis asynchronously if URL is provided
+if (process.env.REDIS_URL) {
+    redisClient.connect().catch(() => {
+        isConnected = false;
+    });
+} else {
+    console.log('No REDIS_URL provided. Skipping Redis connection and using memory cache immediately.');
+}
 
 // Export a transparent wrapper mimicking Redis functions but routing to memoryCache if offline
 module.exports = {

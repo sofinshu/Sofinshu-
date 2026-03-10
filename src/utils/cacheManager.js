@@ -17,14 +17,15 @@ class CacheManager {
   async connect() {
     if (this.isConnected) return;
 
+    if (!process.env.REDIS_URL) {
+      logger.warn('[Cache] No REDIS_URL provided. Cache is disabled and will use local memory fallback or run without cache.');
+      return;
+    }
+
     try {
-      if (process.env.REDIS_URL) {
-        this.client = redis.createClient({
-          url: process.env.REDIS_URL
-        });
-      } else {
-        this.client = redis.createClient();
-      }
+      this.client = redis.createClient({
+        url: process.env.REDIS_URL
+      });
 
       this.client.on('error', (err) => {
         logger.error('[Cache] Redis error:', err);
