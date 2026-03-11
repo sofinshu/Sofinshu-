@@ -768,13 +768,17 @@ router.get('/guild/:guildId/systems/tickets', auth, guildAuth, async (req, res) 
 router.patch('/guild/:guildId/systems/tickets', auth, guildAuth, async (req, res) => {
     try {
         const sanitizedBody = sanitizeInput(req.body);
+        
+        // Convert empty strings to null for Discord channel IDs
+        const panelChannel = sanitizedBody.panelChannelId ? sanitizedBody.panelChannelId : null;
+        
         await Guild.findOneAndUpdate(
             { guildId: req.params.guildId },
             {
                 $set: {
                     'settings.modules.tickets': sanitizedBody,
                     'settings.ticketEnabled': !!sanitizedBody.enabled,
-                    'settings.ticketChannel': sanitizedBody.panelChannelId || null
+                    'settings.ticketChannel': panelChannel
                 }
             },
             { upsert: true, new: true }
