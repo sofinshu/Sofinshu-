@@ -174,7 +174,7 @@ router.patch('/guild/:guildId/settings', auth, guildAuth, async (req, res) => {
         const result = await Guild.findOneAndUpdate({ guildId }, { $set: update }, { upsert: true, new: true });
         invalidateCache(guildId);
         res.json({ success: true, settings: result.settings });
-    } catch (e) { res.status(500).json({ error: 'Internal server error' }); }
+    } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 // GET /api/dashboard/guild/:guildId/promotion-requirements
@@ -785,7 +785,7 @@ router.patch('/guild/:guildId/systems/tickets', auth, guildAuth, async (req, res
         );
         invalidateCache(req.params.guildId);
         res.json({ success: true });
-    } catch (e) { res.status(500).json({ error: 'Internal server error' }); }
+    } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 // GET /api/dashboard/guild/:guildId/autochat
