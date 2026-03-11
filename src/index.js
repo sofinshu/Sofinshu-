@@ -777,7 +777,8 @@ const limiter = rateLimit({
   max: 100,
   standardHeaders: true,
   legacyHeaders: false,
-  message: { error: 'Too many requests, please try again later' }
+  message: { error: 'Too many requests, please try again later' },
+  validate: { xForwardedForHeader: false }
 });
 app.use('/api/', limiter);
 
@@ -787,7 +788,8 @@ const webhookLimiter = rateLimit({
   max: 50, // 50 webhook events per 5 minutes
   standardHeaders: true,
   legacyHeaders: false,
-  message: { error: 'Too many webhook requests' }
+  message: { error: 'Too many webhook requests' },
+  validate: { xForwardedForHeader: false }
 });
 app.use('/webhooks/', webhookLimiter);
 
@@ -797,7 +799,8 @@ const checkoutLimiter = rateLimit({
   max: 5, // 5 checkout creations per minute per IP
   standardHeaders: true,
   legacyHeaders: false,
-  message: { error: 'Too many checkout attempts, please try again later' }
+  message: { error: 'Too many checkout attempts, please try again later' },
+  validate: { xForwardedForHeader: false }
 });
 
 app.get('/health', (req, res) => {
