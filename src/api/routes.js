@@ -815,4 +815,29 @@ router.patch('/guild/:guildId/autochat', auth, guildAuth, async (req, res) => {
     } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
+// GET /api/dashboard/guild/:guildId/channels
+router.get('/guild/:guildId/channels', auth, guildAuth, async (req, res) => {
+    try {
+        const { guildId } = req.params;
+        const guild = req.app.get('client').guilds.cache.get(guildId);
+        
+        if (!guild) {
+            return res.status(404).json({ error: 'Guild not found in bot cache' });
+        }
+
+        const channels = guild.channels.cache
+            .filter(c => c.type === 0 || c.type === 5) // 0: Text, 5: Announcement
+            .map(c => ({
+                id: c.id,
+                name: c.name,
+                type: c.type
+            }))
+            .sort((a, b) => a.name.localeCompare(b.name));
+
+        res.json(channels);
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
+
 module.exports = router;
