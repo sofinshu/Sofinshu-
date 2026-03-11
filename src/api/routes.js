@@ -276,6 +276,7 @@ router.patch('/guild/:guildId/custom-commands', auth, guildAuth, async (req, res
             { guildId: req.params.guildId },
             { $set: { customCommands: commands } }
         );
+        invalidateCache(req.params.guildId);
         res.json({ success: true });
     } catch (e) { res.status(500).json({ error: e.message }); }
 });
@@ -296,6 +297,7 @@ router.patch('/guild/:guildId/staff-rewards', auth, guildAuth, async (req, res) 
             { guildId: req.params.guildId },
             { $set: { achievements: achievements || [], roleRewards: roleRewards || [] } }
         );
+        invalidateCache(req.params.guildId);
         res.json({ success: true });
     } catch (e) { res.status(500).json({ error: e.message }); }
 });
@@ -315,6 +317,7 @@ router.patch('/guild/:guildId/welcome', auth, guildAuth, async (req, res) => {
             { guildId: req.params.guildId },
             { $set: { welcomeConfig: req.body } }
         );
+        invalidateCache(req.params.guildId);
         res.json({ success: true });
     } catch (e) { res.status(500).json({ error: e.message }); }
 });
@@ -679,6 +682,7 @@ router.patch('/guild/:guildId/systems/welcome', auth, guildAuth, async (req, res
             { $set: { 'settings.modules.welcome': sanitizedBody } },
             { upsert: true, new: true }
         );
+        invalidateCache(req.params.guildId);
         res.json({ success: true });
     } catch (e) { res.status(500).json({ error: 'Internal server error' }); }
 });
@@ -700,6 +704,7 @@ router.patch('/guild/:guildId/systems/autorole', auth, guildAuth, async (req, re
             { $set: { 'settings.modules.autorole': sanitizedBody } },
             { upsert: true, new: true }
         );
+        invalidateCache(req.params.guildId);
         res.json({ success: true });
     } catch (e) { res.status(500).json({ error: 'Internal server error' }); }
 });
@@ -721,6 +726,7 @@ router.patch('/guild/:guildId/systems/logging', auth, guildAuth, async (req, res
             { $set: { 'settings.modules.logging': sanitizedBody } },
             { upsert: true, new: true }
         );
+        invalidateCache(req.params.guildId);
         res.json({ success: true });
     } catch (e) { res.status(500).json({ error: 'Internal server error' }); }
 });
@@ -742,6 +748,7 @@ router.patch('/guild/:guildId/systems/antispam', auth, guildAuth, async (req, re
             { $set: { 'settings.modules.antispam': sanitizedBody } },
             { upsert: true, new: true }
         );
+        invalidateCache(req.params.guildId);
         res.json({ success: true });
     } catch (e) { res.status(500).json({ error: 'Internal server error' }); }
 });
@@ -772,6 +779,7 @@ router.patch('/guild/:guildId/systems/tickets', auth, guildAuth, async (req, res
             },
             { upsert: true, new: true }
         );
+        invalidateCache(req.params.guildId);
         res.json({ success: true });
     } catch (e) { res.status(500).json({ error: 'Internal server error' }); }
 });
@@ -798,6 +806,7 @@ router.patch('/guild/:guildId/autochat', auth, guildAuth, async (req, res) => {
         };
 
         const result = await Guild.findOneAndUpdate({ guildId }, { $set: update }, { new: true });
+        invalidateCache(guildId);
         res.json({ success: true, config: result.autoChatConfig });
     } catch (e) { res.status(500).json({ error: e.message }); }
 });
