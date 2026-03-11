@@ -203,7 +203,7 @@ client.on('guildCreate', async (guild) => {
   await ensureGuildRegistered(guild);
 });
 
-client.once('ready', async () => {
+client.once('clientReady', async () => {
   const tierDisplay = process.env.ENABLED_TIERS ? process.env.ENABLED_TIERS : 'v1-v8';
   logger.info(`Bot logged in as ${client.user.tag}`);
   logger.info(`Active Command Tiers: ${tierDisplay}`);
