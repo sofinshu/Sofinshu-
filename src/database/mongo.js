@@ -19,10 +19,13 @@ const guildSchema = new mongoose.Schema({
     language: { type: String, default: 'en' },
     timezone: { type: String, default: 'UTC' },
     modules: {
-      moderation: { type: Boolean, default: true },
-      analytics: { type: Boolean, default: true },
-      automation: { type: Boolean, default: false },
-      tickets: { type: Boolean, default: false }
+      type: mongoose.Schema.Types.Mixed,
+      default: {
+        moderation: true,
+        analytics: true,
+        automation: false,
+        tickets: false
+      }
     },
     autoRoles: [String],
     mutedRole: String,
