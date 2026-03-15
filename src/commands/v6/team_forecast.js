@@ -48,12 +48,12 @@ module.exports = {
       // Weekends slightly lower
       const multiplier = (dayOfWeek === 0 || dayOfWeek === 6) ? 0.7 : 1.15;
       const predicted = Math.max(0, Math.round((weekly + trend * 0.05 * i) * multiplier));
-      const bar = '�'.repeat(Math.min(10, Math.round(predicted / Math.max(weekly * 2, 1) * 10)));
+      const bar = '█'.repeat(Math.min(10, Math.round(predicted / Math.max(weekly * 2, 1) * 10)));
       lines.push(`${dayNames[dayOfWeek]} ${day.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}: ${bar.padEnd(10)} ~${predicted} events`);
     }
 
     const embed = createEnterpriseEmbed()
-      .setTitle('?? Team Activity Forecast � Next 7 Days')
+      .setTitle('?? Team Activity Forecast • Next 7 Days')
       
       .setDescription(`\`\`\`${lines.join('\n')}\`\`\``)
       .addFields(
@@ -64,7 +64,7 @@ module.exports = {
       
       ;
 
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_team_forecast').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_team_forecast').setLabel('•🔄 Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };

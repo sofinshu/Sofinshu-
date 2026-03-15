@@ -22,18 +22,18 @@ module.exports = {
     const earned = BADGES.filter(b => pts >= b.min).map(b => b.badge);
     const next = BADGES.find(b => pts < b.min);
     const embed = createEnterpriseEmbed()
-      .setTitle(`?? Reward Display � ${target.username}`)
+      .setTitle(`?? Reward Display • ${target.username}`)
       
       .setThumbnail(target.displayAvatarURL())
       .addFields(
         { name: '? Points', value: pts.toString(), inline: true },
         { name: '?? Badges Earned', value: earned.length.toString(), inline: true },
-        { name: '??? Your Badges', value: earned.length ? earned.join('\n') : '?? No badges yet � earn 50+ points!' },
+        { name: '??? Your Badges', value: earned.length ? earned.join('\n') : '?? No badges yet • earn 50+ points!' },
         { name: '?? Next Reward', value: next ? `${next.badge} at **${next.min}** pts (need ${next.min - pts} more)` : '?? All rewards unlocked!' }
       )
       
       ;
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_reward_display').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_reward_display').setLabel('•🔄 Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };

@@ -20,11 +20,11 @@ module.exports = {
     const totalHrs = shifts.reduce((s, sh) => s + (sh.duration || (new Date(sh.endTime) - new Date(sh.startTime)) / 3600000), 0);
     const goal = 40;
     const pct = Math.min(100, Math.round((totalHrs / goal) * 100));
-    const bar = '�'.repeat(Math.round(pct / 10)) + '�'.repeat(10 - Math.round(pct / 10));
+    const bar = '█'.repeat(Math.round(pct / 10)) + '█'.repeat(10 - Math.round(pct / 10));
     const frames = ['?', '?', '?', '?', '?', '?', '?', '?', '?', '?'];
     const frame = frames[Math.floor(Date.now() / 100) % frames.length];
     const embed = createEnterpriseEmbed()
-      .setTitle(`${frame} Progress Animation � ${interaction.user.username}`)
+      .setTitle(`${frame} Progress Animation • ${interaction.user.username}`)
       
       .addFields(
         { name: '?? Shift Hours (30d)', value: `${totalHrs.toFixed(1)}h / ${goal}h goal`, inline: true },
@@ -33,7 +33,7 @@ module.exports = {
       )
       
       ;
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_progress_animation').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_progress_animation').setLabel('•🔄 Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };

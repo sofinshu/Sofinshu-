@@ -41,11 +41,11 @@ module.exports = {
     const fields = MILESTONES.map(m => {
       const current = getValue(m.type);
       const progress = Math.min(100, Math.round((current / m.target) * 100));
-      const bar = '�'.repeat(Math.round(progress / 10)) + '�'.repeat(10 - Math.round(progress / 10));
+      const bar = '█'.repeat(Math.round(progress / 10)) + '█'.repeat(10 - Math.round(progress / 10));
       const status = current >= m.target ? '? Achieved!' : `${current}/${m.target}`;
       return {
         name: `${current >= m.target ? '?' : '??'} ${m.label}`,
-        value: `\`${bar}\` **${progress}%** � ${status}`,
+        value: `\`${bar}\` **${progress}%** • ${status}`,
         inline: false
       };
     });
@@ -65,7 +65,7 @@ module.exports = {
       
       ;
 
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_milestone_summary').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_milestone_summary').setLabel('•🔄 Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };

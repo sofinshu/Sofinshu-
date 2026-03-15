@@ -29,7 +29,7 @@ module.exports = {
     const bars = Object.entries(typeData).map(([type, count]) => {
       const pct = total > 0 ? (count / total * 100).toFixed(1) : 0;
       const barLen = Math.min(15, Math.floor((count / (maxType[1] || 1)) * 15));
-      const bar = '�'.repeat(barLen) + '�'.repeat(15 - barLen);
+      const bar = '█'.repeat(barLen) + '█'.repeat(15 - barLen);
       return `${type}: ${bar} ${pct}%`;
     }).join('\n');
 
@@ -44,7 +44,7 @@ module.exports = {
       )
       ;
 
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_visual_summary').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_visual_summary').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };

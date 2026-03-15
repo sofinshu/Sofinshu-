@@ -37,7 +37,7 @@ module.exports = {
     const weekText = weeks.map((c, i) => `Week ${4 - i}: **${c}** events`).reverse().join('\n');
 
     const embed = createEnterpriseEmbed()
-      .setTitle('?? Automation Report � Last 30 Days')
+      .setTitle('?? Automation Report • Last 30 Days')
       
       .addFields(
         { name: '?? Promotions', value: promotions.toString(), inline: true },
@@ -51,7 +51,7 @@ module.exports = {
       
       ;
 
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_automation_report').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_automation_report').setLabel('•🔄 Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };

@@ -44,10 +44,10 @@ module.exports = {
       : '0';
 
     const lowText = lowPerformers.length
-      ? lowPerformers.map(u => `� **${u.username || 'Unknown'}** � ${u.staff?.points || 0} pts, ${warnMap[u.userId] || 0} warns`).join('\n')
+      ? lowPerformers.map(u => `• **${u.username || 'Unknown'}** • ${u.staff?.points || 0} pts, ${warnMap[u.userId] || 0} warns`).join('\n')
       : '? No underperforming staff found!';
 
-    const topText = topPerformers.map(u => `� **${u.username || 'Unknown'}** � ${u.staff?.points || 0} pts`).join('\n');
+    const topText = topPerformers.map(u => `• **${u.username || 'Unknown'}** • ${u.staff?.points || 0} pts`).join('\n');
 
     const embed = createEnterpriseEmbed()
       .setTitle('?? Optimization Report')
@@ -62,7 +62,7 @@ module.exports = {
       
       ;
 
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_optimization_report').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_optimization_report').setLabel('•🔄 Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };

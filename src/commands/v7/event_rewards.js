@@ -30,7 +30,7 @@ module.exports = {
     endOfWeek.setDate(startOfWeek.getDate() + 6);
     endOfWeek.setHours(23, 59, 59, 999);
 
-    const weekLabel = `${startOfWeek.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} � ${endOfWeek.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
+    const weekLabel = `${startOfWeek.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} • ${endOfWeek.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
 
     const fields = WEEKLY_EVENTS.map(e => ({
       name: `${e.active ? '??' : '??'} ${e.name}`,
@@ -39,7 +39,7 @@ module.exports = {
     }));
 
     const embed = createEnterpriseEmbed()
-      .setTitle(`?? Event Rewards � Week of ${weekLabel}`)
+      .setTitle(`?? Event Rewards • Week of ${weekLabel}`)
       
       .addFields(
         { name: '?? Event Period', value: weekLabel, inline: true },
@@ -49,7 +49,7 @@ module.exports = {
       
       ;
 
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_event_rewards').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_event_rewards').setLabel('•🔄 Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };

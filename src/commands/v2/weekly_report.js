@@ -5,7 +5,7 @@ const { Activity, Shift, Warning, User } = require('../../database/mongo');
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('weekly_report')
-    .setDescription('?? Full weekly performance report � shifts, points, warnings, promotions'),
+    .setDescription('?? Full weekly performance report • shifts, points, warnings, promotions'),
 
   async execute(interaction) {
     try {
@@ -55,7 +55,7 @@ module.exports = {
           const medals = ['??', '??', '??'];
           let username = u.username || `User ${u.userId}`;
           const pts = u.staff?.points || 0;
-          return `${medals[i]} **${username}** � \`${pts.toLocaleString()} pts\``;
+          return `${medals[i]} **${username}** • \`${pts.toLocaleString()} pts\``;
         }))
         : ['*No data yet.*'];
 
@@ -63,19 +63,19 @@ module.exports = {
       const actBar = createProgressBar(Math.min(100, Math.round((activeUsers / Math.max(interaction.guild.memberCount, 1)) * 100)), 15);
 
       const embed = await createCustomEmbed(interaction, {
-        title: `?? Weekly Report � ${interaction.guild.name}`,
+        title: `?? Weekly Report • ${interaction.guild.name}`,
         thumbnail: interaction.guild.iconURL({ dynamic: true }),
         description: `Performance summary for the week of **<t:${Math.floor(sevenDaysAgo.getTime() / 1000)}:D>** ? **<t:${Math.floor(now.getTime() / 1000)}:D>**`,
         fields: [
           { name: '? Commands Executed', value: `\`${cmdCount.toLocaleString()}\` ${cmdArrow} \`${cmdDelta}%\` vs last week`, inline: true },
-          { name: '?? Shifts Completed', value: `\`${thisWeekShifts.length}\` shifts � \`${shiftHours}h ${shiftMins}m\` ${shiftArrow} \`${shiftDelta}%\``, inline: true },
+          { name: '?? Shifts Completed', value: `\`${thisWeekShifts.length}\` shifts • \`${shiftHours}h ${shiftMins}m\` ${shiftArrow} \`${shiftDelta}%\``, inline: true },
           { name: '?? Warnings Issued', value: `\`${thisWeekWarnings.length}\` warnings`, inline: true },
           { name: '?? Active Staff', value: `\`${actBar}\` **${activeUsers}** users active`, inline: false },
           { name: '?? Top Performers', value: topList.join('\n'), inline: false },
           { name: '?? Week Summary', value: `\`${thisWeekActs.length}\` total events tracked this week`, inline: false }
         ],
         color: '#5865F2',
-        footer: 'uwu-chan � Weekly Report � Real DB Data'
+        footer: 'uwu-chan • Weekly Report • Real DB Data'
       });
 
       const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_weekly_report').setLabel('  Sync Live Data').setStyle(ButtonStyle.Secondary));

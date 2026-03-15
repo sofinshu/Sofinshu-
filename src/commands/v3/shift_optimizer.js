@@ -28,7 +28,7 @@ module.exports = {
       ]);
 
       if (shifts.length === 0) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_shift_optimizer').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_shift_optimizer').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed(`Insufficient metabolic data recorded in the last \`${period}\` days to generate a Enterprise predictive model.`)], components: [row] });
       }
 
@@ -63,7 +63,7 @@ module.exports = {
           { name: '?? Predictive Confidence', value: `\`98.4%\``, inline: true },
           { name: '??? License Tier', value: '`?? Enterprise (TITAN)`', inline: true }
         ],
-        footer: 'Enterprise Predictive Engine � V3 Executive Strategic Suite',
+        footer: 'Enterprise Predictive Engine • V3 Executive Strategic Suite',
         color: 'premium'
       });
 
@@ -75,12 +75,12 @@ module.exports = {
 
       embed.addFields({ name: '?? Enterprise Strategic Recommendation', value: recommendation, inline: false });
 
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_shift_optimizer').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_shift_optimizer').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
     } catch (error) {
       console.error('Enterprise Shift Optimizer Error:', error);
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_shift_optimizer').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_shift_optimizer').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('Enterprise Strategic failure: Unable to synchronize predictive matrices.')], components: [row] });
     }
   }

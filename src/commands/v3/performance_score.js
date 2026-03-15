@@ -24,7 +24,7 @@ module.exports = {
 
       const user = await User.findOne({ userId: targetUser.id, guildId }).lean();
       if (!user || !user.staff) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_performance_score').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_performance_score').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed(`No staff records found for <@${targetUser.id}> inside this server.`)], components: [row] });
       }
 
@@ -57,7 +57,7 @@ module.exports = {
       const grade = getGrade(performanceScore);
 
       const filledScore = Math.min(10, Math.floor(performanceScore / 10));
-      const progressBar = `\`${'�'.repeat(filledScore)}${'�'.repeat(10 - filledScore)}\``;
+      const progressBar = `\`${'█'.repeat(filledScore)}${'█'.repeat(10 - filledScore)}\``;
 
       const embed = await createCustomEmbed(interaction, {
         title: `?? Operational Performance: ${targetUser.username}`,
@@ -75,14 +75,14 @@ module.exports = {
         footer: 'Analytic output derived against true Guild mapping constraints.'
       });
 
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_performance_score').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_performance_score').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
     } catch (error) {
       console.error('Performance Score Error:', error);
       const errEmbed = createErrorEmbed('A database error occurred plotting performance trajectory charts.');
             if (interaction.deferred || interaction.replied) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_performance_score').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_performance_score').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
             return await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {
         await interaction.editReply({ embeds: [errEmbed], ephemeral: true });

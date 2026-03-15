@@ -41,16 +41,16 @@ module.exports = {
           { name: '? Velocity', value: '`CONSTANT`', inline: true },
           { name: '??? License', value: '`PLATINUM`', inline: true }
         ],
-        footer: 'Strategic Yield Correlation � V5 Executive Suite',
+        footer: 'Strategic Yield Correlation • V5 Executive Suite',
         color: 'premium'
       });
 
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_staff_productivity').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_staff_productivity').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
     } catch (error) {
       console.error('Enterprise Productivity Error:', error);
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_staff_productivity').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_staff_productivity').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('Yield Correlation failure: Unable to decode personnel efficiency clusters.')], components: [row] });
     }
   }

@@ -34,7 +34,7 @@ module.exports = {
 
     const maxDay = Math.max(...dayCounts);
     const dayBars = dayNames.map((d, i) => {
-      const bar = '�'.repeat(Math.round((dayCounts[i] / Math.max(maxDay, 1)) * 8)) + '�'.repeat(8 - Math.round((dayCounts[i] / Math.max(maxDay, 1)) * 8));
+      const bar = '█'.repeat(Math.round((dayCounts[i] / Math.max(maxDay, 1)) * 8)) + '█'.repeat(8 - Math.round((dayCounts[i] / Math.max(maxDay, 1)) * 8));
       return `${d}: ${bar} ${dayCounts[i]}`;
     }).join('\n');
 
@@ -42,7 +42,7 @@ module.exports = {
     const weekends = dayCounts[0] + dayCounts[6];
 
     const embed = createEnterpriseEmbed()
-      .setTitle('?? Activity Patterns � Last 30 Days')
+      .setTitle('?? Activity Patterns • Last 30 Days')
       
       .addFields(
         { name: '?? Total Events', value: activities.length.toString(), inline: true },
@@ -56,7 +56,7 @@ module.exports = {
       
       ;
 
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_activity_patterns').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_activity_patterns').setLabel('•🔄 Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };

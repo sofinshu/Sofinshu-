@@ -29,7 +29,7 @@ module.exports = {
       const qualityScore = Math.max(0, 100 - (warnings.total * 5));
 
       const filledScore = Math.min(10, Math.floor(score / 10));
-      const progressBar = `\`${'�'.repeat(filledScore)}${'�'.repeat(10 - filledScore)}\``;
+      const progressBar = `\`${'█'.repeat(filledScore)}${'█'.repeat(10 - filledScore)}\``;
 
       const embed = await createCustomEmbed(interaction, {
         title: `?? Staff Quality Algorithm: ${targetUser.username}`,

@@ -29,7 +29,7 @@ module.exports = {
 
     const chart = users.map((u, i) => {
       const pts = u.staff?.points || 0;
-      const bar = '�'.repeat(Math.round((pts / maxPoints) * 10)).padEnd(10, '�');
+      const bar = '█'.repeat(Math.round((pts / maxPoints) * 10)).padEnd(10, '░');
       const medal = medals[i] || `\`${i + 1}.\``;
       return `${medal} ${u.username || '?'}: ${bar} ${pts}`;
     }).join('\n');
@@ -41,7 +41,7 @@ module.exports = {
       
       ;
 
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_visualStaff').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_visualStaff').setLabel('•🔄 Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };

@@ -20,7 +20,7 @@ module.exports = {
         { name: 'Premium', value: guild?.premium?.isActive ? 'Active' : 'Free', inline: true }
       );
 
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_data_insights').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_data_insights').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };

@@ -26,7 +26,7 @@ module.exports = {
 
     const membersActive = [...new Set(weekActs.map(a => a.userId))].length;
     const engRate = Math.min(100, Math.round((membersActive / Math.max(interaction.guild.memberCount, 1)) * 100));
-    const engBar = '�'.repeat(Math.round(engRate / 10)) + '�'.repeat(10 - Math.round(engRate / 10));
+    const engBar = '█'.repeat(Math.round(engRate / 10)) + '█'.repeat(10 - Math.round(engRate / 10));
 
     const embed = createEnterpriseEmbed()
       .setTitle('?? Activity Summary Dashboard')
@@ -44,7 +44,7 @@ module.exports = {
       
       ;
 
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_activity_summary').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_activity_summary').setLabel('•🔄 Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };

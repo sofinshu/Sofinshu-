@@ -42,13 +42,13 @@ module.exports = {
         const list = staffPage.map((u, i) => {
           const rank = u.staff?.rank || 'trial';
           const points = u.staff?.points || 0;
-          return `\`${String(start + i + 1).padStart(2)}.\` **${u.username || 'Unknown'}** � \`${rank.toUpperCase()}\` � ${points} pts`;
+          return `\`${String(start + i + 1).padStart(2)}.\` **${u.username || 'Unknown'}** • \`${rank.toUpperCase()}\` • ${points} pts`;
         }).join('\n');
 
         return await createCustomEmbed(interaction, {
           title: `👔 Server Staff Index (${users.length} Records)`,
           description: list || 'No staff identified within this sector.',
-          footer: `Page ${page} / ${totalPages} � Real-time database dump`
+          footer: `Page ${page} / ${totalPages} • Real-time database dump`
         });
       };
 

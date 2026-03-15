@@ -37,7 +37,7 @@ module.exports = {
       const synergyCurve = Array.from({ length: segments }, (_, i) => {
         const x = i / segments;
         const y = Math.pow(x, 2) * 5; // Exponential synergy curve
-        const chars = [' ', '?', '?', '_', '?', '?', '?', '�'];
+        const chars = [' ', '?', '?', '_', '?', '?', '?', '░'];
         return chars[Math.max(0, Math.min(7, Math.round(y)))];
       }).join('');
 
@@ -48,7 +48,7 @@ module.exports = {
         const s = stats[r];
         const avg = s.count > 0 ? (s.points / s.count).toFixed(1) : 0;
         const density = Math.min(10, Math.round(avg / 10));
-        const densityRibbon = `\`[${'�'.repeat(density)}${'�'.repeat(10 - density)}]\``;
+        const densityRibbon = `\`[${'█'.repeat(density)}${'█'.repeat(10 - density)}]\``;
 
         return {
           name: `??? ${r.toUpperCase()} Hierarchy`,
@@ -68,16 +68,16 @@ module.exports = {
           { name: '?? Global Grid', value: '`CONNECTED`', inline: true },
           { name: '?? Performance', value: '`ELITE S-RANK`', inline: true }
         ],
-        footer: 'Hierarchical Efficiency Matrix � V6 Enterprise Hyper-Apex Suite',
+        footer: 'Hierarchical Efficiency Matrix • V6 Enterprise Hyper-Apex Suite',
         color: 'premium'
       });
 
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_role_efficiency').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_role_efficiency').setLabel('•🔄 Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
     } catch (error) {
       console.error('Enterprise Role Efficiency Error:', error);
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_role_efficiency').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_role_efficiency').setLabel('•🔄 Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('Enterprise Matrix failure: Unable to compute hierarchical synergy curves.')], components: [row] });
     }
   }

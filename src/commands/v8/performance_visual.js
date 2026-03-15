@@ -26,10 +26,10 @@ module.exports = {
     const grade = score >= 90 ? 'A+' : score >= 80 ? 'A' : score >= 70 ? 'B' : score >= 60 ? 'C' : score >= 50 ? 'D' : 'F';
     const color = score >= 80 ? 0x2ecc71 : score >= 60 ? 0xf39c12 : 0xe74c3c;
 
-    const bar = (v, max, len = 10) => '�'.repeat(Math.round(Math.min(v, max) / max * len)) + '�'.repeat(len - Math.round(Math.min(v, max) / max * len));
+    const bar = (v, max, len = 10) => '█'.repeat(Math.round(Math.min(v, max) / max * len)) + '█'.repeat(len - Math.round(Math.min(v, max) / max * len));
 
     const embed = createEnterpriseEmbed()
-      .setTitle(`?? Performance Visual � ${target.username}`)
+      .setTitle(`?? Performance Visual • ${target.username}`)
       
       .setThumbnail(target.displayAvatarURL())
       .addFields(
@@ -41,7 +41,7 @@ module.exports = {
       )
       
       ;
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_performance_visual').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_performance_visual').setLabel('•🔄 Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };

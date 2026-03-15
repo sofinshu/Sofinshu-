@@ -51,18 +51,18 @@ module.exports = {
           { name: '?? Serialization', value: `\`${filename}\``, inline: false },
           { name: '?? Export Status', value: '`?? READY` | `Executive V5 Standard`', inline: true }
         ],
-        footer: 'Data Distribution Authenticated � V5 Executive Suite',
+        footer: 'Data Distribution Authenticated • V5 Executive Suite',
         color: 'enterprise'
       });
 
       // Note: In a real bot, we'd attach the file here. 
       // For this environment, we're providing the high-fidelity UI response.
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_analytics_export').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_analytics_export').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
     } catch (error) {
       console.error('Analytics Export Error:', error);
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_analytics_export').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_analytics_export').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('Export Intelligence failure: Unable to serialize sector data streams.')], components: [row] });
     }
   }

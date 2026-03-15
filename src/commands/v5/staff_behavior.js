@@ -31,7 +31,7 @@ module.exports = {
       ]);
 
       if (!user || !user.staff) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_staff_behavior').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_staff_behavior').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed(`No behavioral trace found. <@${targetUser.id}> is unmapped.`)], components: [row] });
       }
 
@@ -47,8 +47,8 @@ module.exports = {
 
       // Reliability Bar
       const barLength = 15;
-      const filled = '�'.repeat(Math.round((reliabilityScore / 100) * barLength));
-      const empty = '�'.repeat(barLength - filled.length);
+      const filled = '█'.repeat(Math.round((reliabilityScore / 100) * barLength));
+      const empty = '░'.repeat(barLength - filled.length);
       const reliabilityViz = `\`[${filled}${empty}]\` **${reliabilityScore.toFixed(1)}% STABILITY**`;
 
       const embed = await createCustomEmbed(interaction, {
@@ -63,16 +63,16 @@ module.exports = {
           { name: '??? Status Rating', value: reliabilityScore > 80 ? '`S-RANK STABLE`' : (reliabilityScore > 50 ? '`B-RANK NOMINAL`' : '`F-RANK CRITICAL`'), inline: true },
           { name: '?? Trajectory', value: reliabilityScore > 70 ? '`UPWARD`' : '`DECAYING`', inline: true }
         ],
-        footer: 'AI Behavioral Modeling � V5 Executive Apex Suite',
+        footer: 'AI Behavioral Modeling • V5 Executive Apex Suite',
         color: reliabilityScore > 75 ? 'success' : 'premium'
       });
 
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_staff_behavior').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_staff_behavior').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
     } catch (error) {
       console.error('Enterprise Staff Behavior Error:', error);
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_staff_behavior').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_staff_behavior').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('Behavioral Intelligence failure: Unable to compute reliability matrices.')], components: [row] });
     }
   }

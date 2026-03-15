@@ -6,7 +6,7 @@ const { Activity } = require('../../database/mongo');
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('server_heatmap')
-    .setDescription('??? Visual server activity heatmap � hour-by-hour real data over 30 days'),
+    .setDescription('??? Visual server activity heatmap • hour-by-hour real data over 30 days'),
 
   async execute(interaction) {
     try {
@@ -23,7 +23,7 @@ module.exports = {
       const activities = await Activity.find({ guildId, createdAt: { $gte: thirtyDaysAgo } }).lean();
 
       if (activities.length === 0) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_server_heatmap').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_server_heatmap').setLabel('•🔄 Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('No activity data available yet. Use commands to start building your heatmap!')], components: [row] });
       }
 
@@ -37,7 +37,7 @@ module.exports = {
       const maxVal = Math.max(...hourCounts, 1);
 
       // 4-row ASCII heatmap (intensity levels)
-      const levels = ['?', '?', '?', '�'];
+      const levels = ['?', '?', '?', '░'];
       const heatRows = [3, 2, 1, 0].map(level =>
         hourCounts.map(c => {
           const intensity = Math.floor((c / maxVal) * 4);
@@ -56,7 +56,7 @@ module.exports = {
       const maxDay = Math.max(...dayCounts, 1);
       const dayBar = dayCounts.map((c, i) => {
         const bars = Math.round((c / maxDay) * 6);
-        return `${dayNames[i]}: ${'�'.repeat(bars)}${'�'.repeat(6 - bars)} ${c}`;
+        return `${dayNames[i]}: ${'█'.repeat(bars)}${'█'.repeat(6 - bars)} ${c}`;
       }).join('\n');
 
       const peakHour = hourCounts.indexOf(maxVal);
@@ -64,25 +64,25 @@ module.exports = {
       const peakDay = dayNames[dayCounts.indexOf(Math.max(...dayCounts))];
 
       const embed = await createCustomEmbed(interaction, {
-        title: `??? Server Heatmap � ${interaction.guild.name}`,
+        title: `??? Server Heatmap • ${interaction.guild.name}`,
         thumbnail: interaction.guild.iconURL({ dynamic: true }),
-        description: `Real activity heatmap from **${activities.length.toLocaleString()}** events over **30 days**.\n\`\`\`\n${heatmapDisplay}\`\`\`\n*???� = Low ? Peak activity*`,
+        description: `Real activity heatmap from **${activities.length.toLocaleString()}** events over **30 days**.\n\`\`\`\n${heatmapDisplay}\`\`\`\n*???• = Low ? Peak activity*`,
         fields: [
-          { name: '? Peak Hour', value: `\`${String(peakHour).padStart(2, '0')}:00\` � \`${maxVal}\` events`, inline: true },
+          { name: '? Peak Hour', value: `\`${String(peakHour).padStart(2, '0')}:00\` • \`${maxVal}\` events`, inline: true },
           { name: '?? Quiet Hour', value: `\`${String(quietHour).padStart(2, '0')}:00\``, inline: true },
           { name: '?? Busiest Day', value: `\`${peakDay}\``, inline: true },
           { name: '?? Day-of-Week Breakdown', value: `\`\`\`\n${dayBar}\`\`\``, inline: false }
         ],
         color: 'enterprise',
-        footer: 'uwu-chan � Enterprise Visual Heatmap � Real DB Data'
+        footer: 'uwu-chan • Enterprise Visual Heatmap • Real DB Data'
       });
 
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_server_heatmap').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_server_heatmap').setLabel('•🔄 Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
     } catch (error) {
       console.error('[server_heatmap] Error:', error);
       const errEmbed = createErrorEmbed('Failed to generate server heatmap.');
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_server_heatmap').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary)); if (interaction.deferred || interaction.replied) {
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_server_heatmap').setLabel('•🔄 Sync Enterprise Data').setStyle(ButtonStyle.Secondary)); if (interaction.deferred || interaction.replied) {
             return await interaction.editReply({ embeds: [errEmbed], components: [row] }); } else await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
     }
   }

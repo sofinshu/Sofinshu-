@@ -21,7 +21,7 @@ module.exports = {
     const medals = ['??', '??', '??'];
     const rows = users.map((u, i) => {
       const pts = u.staff?.points || 0;
-      const bar = '�'.repeat(Math.round(pts / maxPts * 10)).padEnd(10, '�');
+      const bar = '█'.repeat(Math.round(pts / maxPts * 10)).padEnd(10, '░');
       const medal = medals[i] || `\`${String(i + 1).padStart(2)}\``;
       return `${medal} **${u.username || '?'}** [${u.staff?.rank || '?'}] \`${bar}\` **${pts}**`;
     }).join('\n');
@@ -31,7 +31,7 @@ module.exports = {
       .setDescription(rows)
       
       ;
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_visual_leaderboard').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_visual_leaderboard').setLabel('•🔄 Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };

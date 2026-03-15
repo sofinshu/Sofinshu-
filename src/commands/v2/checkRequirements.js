@@ -72,7 +72,7 @@ module.exports = {
       const getBar = (current, target) => {
         const percent = Math.min(100, Math.floor((current / target) * 100));
         const filled = Math.floor(percent / 10);
-        return `\`${'�'.repeat(filled)}${'?'.repeat(10 - filled)}\` **${percent}%**`;
+        return `\`${'█'.repeat(filled)}${'?'.repeat(10 - filled)}\` **${percent}%**`;
       };
 
       const embed = await createCustomEmbed(interaction, {

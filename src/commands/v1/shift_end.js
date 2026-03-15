@@ -44,7 +44,7 @@ module.exports = {
           { name: '🕒 Ended At', value: `<t:${Math.floor(Date.now() / 1000)}:f>`, inline: true }
         ],
         color: 'success',
-        footer: 'uwu-chan � Keep up the great work!'
+        footer: 'uwu-chan • Keep up the great work!'
       });
 
       await interaction.editReply({ embeds: [embed] });

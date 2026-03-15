@@ -25,10 +25,10 @@ module.exports = {
     ]);
 
     const promotions = acts.filter(a => a.type === 'promotion').length;
-    const top = users.map((u, i) => `${['??', '??', '??'][i]} **${u.username || '?'}** � ${u.staff?.points || 0} pts`).join('\n');
+    const top = users.map((u, i) => `${['??', '??', '??'][i]} **${u.username || '?'}** • ${u.staff?.points || 0} pts`).join('\n');
 
     const embed = createEnterpriseEmbed()
-      .setTitle(`${season} Season Summary � ${now.getFullYear()}`)
+      .setTitle(`${season} Season Summary • ${now.getFullYear()}`)
       
       .addFields(
         { name: '?? Season', value: season, inline: true },
@@ -39,7 +39,7 @@ module.exports = {
       )
       
       ;
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_season_summary').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_season_summary').setLabel('•🔄 Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };

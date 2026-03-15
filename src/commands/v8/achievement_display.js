@@ -23,11 +23,11 @@ module.exports = {
 
     const rankEmojis = { owner: '??', admin: '??', manager: '??', senior: '??', staff: '?', trial: '??', member: '??' };
     const achieveDisplay = achievements.length
-      ? achievements.map(a => `� ${a}`).join('\n')
-      : '*No achievements yet � keep contributing!*';
+      ? achievements.map(a => `• ${a}`).join('\n')
+      : '*No achievements yet • keep contributing!*';
 
     const embed = createEnterpriseEmbed()
-      .setTitle(`?? Achievement Showcase � ${target.username}`)
+      .setTitle(`?? Achievement Showcase • ${target.username}`)
       
       .setThumbnail(target.displayAvatarURL({ size: 256 }))
       .setDescription(achieveDisplay)
@@ -39,7 +39,7 @@ module.exports = {
       
       ;
 
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_achievement_display').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_achievement_display').setLabel('•🔄 Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };

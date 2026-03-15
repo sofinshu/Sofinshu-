@@ -21,7 +21,7 @@ module.exports = {
       const activities = await Activity.find({ guildId, createdAt: { $gte: thirtyDaysAgo } }).lean();
 
       if (activities.length < 10) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_forecast').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_forecast').setLabel('•🔄 Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('Not enough data for forecasting (minimum 10 events needed). Start using commands to build your dataset!')], components: [row] });
       }
 
@@ -65,7 +65,7 @@ module.exports = {
       const growthArrow = parseFloat(forecastGrowth) >= 0 ? '??' : '??';
 
       const embed = await createCustomEmbed(interaction, {
-        title: `?? 30-Day Forecast � ${interaction.guild.name}`,
+        title: `?? 30-Day Forecast • ${interaction.guild.name}`,
         thumbnail: interaction.guild.iconURL({ dynamic: true }),
         description: `Activity forecast using **linear regression** on the last **${activities.length}** real events.\n\n**Trend Line:** \`${trendLine}\``,
         fields: [
@@ -77,15 +77,15 @@ module.exports = {
           { name: '?? Engagement Bar', value: `\`${createProgressBar(Math.min(100, Math.round((currentTotal / Math.max(interaction.guild.memberCount, 1)) * 100 * 2)))} \``, inline: false }
         ],
         color: growthColor,
-        footer: 'uwu-chan � Enterprise Forecast � Linear Regression on Real Data'
+        footer: 'uwu-chan • Enterprise Forecast • Linear Regression on Real Data'
       });
 
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_forecast').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_forecast').setLabel('•🔄 Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
     } catch (error) {
       console.error('[forecast] Error:', error);
       const errEmbed = createErrorEmbed('Failed to generate forecast. Please try again.');
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_forecast').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary)); if (interaction.deferred || interaction.replied) {
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_forecast').setLabel('•🔄 Sync Enterprise Data').setStyle(ButtonStyle.Secondary)); if (interaction.deferred || interaction.replied) {
             return await interaction.editReply({ embeds: [errEmbed], components: [row] }); } else await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
     }
   }

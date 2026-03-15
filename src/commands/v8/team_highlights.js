@@ -23,12 +23,12 @@ module.exports = {
     ]);
 
     const medals = ['??', '??', '??'];
-    const topList = topStaff.map((u, i) => `${medals[i]} **${u.username || '?'}** � ${u.staff?.points || 0} pts`).join('\n') || 'No data.';
+    const topList = topStaff.map((u, i) => `${medals[i]} **${u.username || '?'}** • ${u.staff?.points || 0} pts`).join('\n') || 'No data.';
     const activeCount = [...new Set(weekActs.map(a => a.userId))].length;
     const promotions = weekActs.filter(a => a.type === 'promotion').length;
 
     const embed = createEnterpriseEmbed()
-      .setTitle(`? Team Highlights � Week of ${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`)
+      .setTitle(`? Team Highlights • Week of ${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`)
       
       .addFields(
         { name: '?? Active Staff (7d)', value: activeCount.toString(), inline: true },
@@ -38,7 +38,7 @@ module.exports = {
       )
       
       ;
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_team_highlights').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_team_highlights').setLabel('•🔄 Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };

@@ -44,7 +44,7 @@ module.exports = {
 
     const maxCount = Math.max(...dayCounts, 1);
     const chart = dayLabels.map((d, i) => {
-      const bar = '�'.repeat(Math.round((dayCounts[i] / maxCount) * 8)) + '�'.repeat(8 - Math.round((dayCounts[i] / maxCount) * 8));
+      const bar = '█'.repeat(Math.round((dayCounts[i] / maxCount) * 8)) + '█'.repeat(8 - Math.round((dayCounts[i] / maxCount) * 8));
       return `${d}: ${bar} ${dayCounts[i]}`;
     }).join('\n');
 
@@ -66,7 +66,7 @@ module.exports = {
       
       ;
 
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_analytics_trend').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_analytics_trend').setLabel('•🔄 Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };

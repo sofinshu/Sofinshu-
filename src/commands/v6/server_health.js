@@ -5,7 +5,7 @@ const { Activity, Warning, Shift, User } = require('../../database/mongo');
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('server_health')
-    .setDescription('?? Enterprise server health score � calculated from real retention, safety, and engagement data'),
+    .setDescription('?? Enterprise server health score • calculated from real retention, safety, and engagement data'),
 
   async execute(interaction) {
     try {
@@ -61,7 +61,7 @@ module.exports = {
       const healthColor = healthScore >= 80 ? '#43b581' : healthScore >= 60 ? '#faa61a' : healthScore >= 40 ? '#ff7043' : '#f04747';
 
       const embed = await createCustomEmbed(interaction, {
-        title: `?? Server Health � ${interaction.guild.name}`,
+        title: `?? Server Health • ${interaction.guild.name}`,
         thumbnail: interaction.guild.iconURL({ dynamic: true }),
         description: `**Overall Health Score:** ${healthLabel}\n\`${createProgressBar(healthScore)}\` **${healthScore}/100**`,
         fields: [
@@ -73,15 +73,15 @@ module.exports = {
           { name: '?? Total Members', value: `\`${memberCount.toLocaleString()}\``, inline: true }
         ],
         color: healthColor,
-        footer: 'uwu-chan � Enterprise Server Health � Real Data'
+        footer: 'uwu-chan • Enterprise Server Health • Real Data'
       });
 
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_server_health').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_server_health').setLabel('•🔄 Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
     } catch (error) {
       console.error('[server_health] Error:', error);
       const errEmbed = createErrorEmbed('Failed to calculate server health score.');
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_server_health').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary)); if (interaction.deferred || interaction.replied) {
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_server_health').setLabel('•🔄 Sync Enterprise Data').setStyle(ButtonStyle.Secondary)); if (interaction.deferred || interaction.replied) {
             return await interaction.editReply({ embeds: [errEmbed], components: [row] }); } else await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
     }
   }

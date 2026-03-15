@@ -25,10 +25,10 @@ module.exports = {
     const nextRank = RANK_ORDER[RANK_ORDER.indexOf(rank) + 1];
     const nextThresh = nextRank ? THRESHOLDS[nextRank] : null;
     const pct = nextThresh ? Math.min(100, Math.round((pts / nextThresh) * 100)) : 100;
-    const bar = '�'.repeat(Math.round(pct / 10)) + '�'.repeat(10 - Math.round(pct / 10));
+    const bar = '█'.repeat(Math.round(pct / 10)) + '█'.repeat(10 - Math.round(pct / 10));
     const steps = RANK_ORDER.map(r => `${r === rank ? `**? ${rankEmojis[r]} ${r.toUpperCase()}** ?` : `${rankEmojis[r]} ${r}`}`).join(' | ');
     const embed = createEnterpriseEmbed()
-      .setTitle(`?? Rank Animation � ${target.username}`)
+      .setTitle(`?? Rank Animation • ${target.username}`)
       
       .setThumbnail(target.displayAvatarURL())
       .addFields(
@@ -39,7 +39,7 @@ module.exports = {
       )
       
       ;
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_rank_animation').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_rank_animation').setLabel('•🔄 Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };

@@ -27,8 +27,8 @@ module.exports = {
 
     const growth = joined > 0 ? Math.round((joined / Math.max(memberCount, 1)) * 100) : 0;
     const engRate = Math.round(([...new Set(acts.map(a => a.userId))].length / Math.max(memberCount, 1)) * 100);
-    const gBar = '�'.repeat(Math.round(growth / 10)) + '�'.repeat(10 - Math.round(growth / 10));
-    const eBar = '�'.repeat(Math.round(engRate / 10)) + '�'.repeat(10 - Math.round(engRate / 10));
+    const gBar = '█'.repeat(Math.round(growth / 10)) + '█'.repeat(10 - Math.round(growth / 10));
+    const eBar = '█'.repeat(Math.round(engRate / 10)) + '█'.repeat(10 - Math.round(engRate / 10));
 
     const embed = createEnterpriseEmbed()
       .setTitle('?? Growth Visuals')
@@ -45,7 +45,7 @@ module.exports = {
       
       ;
 
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_growth_visuals').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_growth_visuals').setLabel('•🔄 Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };

@@ -4,7 +4,7 @@ const { Activity } = require('../../database/mongo');
 
 function progressBar(value, max, len = 10) {
   const filled = Math.round((value / Math.max(max, 1)) * len);
-  return '�'.repeat(filled) + '�'.repeat(len - filled);
+  return '█'.repeat(filled) + '█'.repeat(len - filled);
 }
 
 module.exports = {
@@ -51,7 +51,7 @@ module.exports = {
       .sort((a, b) => b.count - a.count)
       .slice(0, 3);
 
-    const topHoursText = topHours.map(h => `\`${String(h.hour).padStart(2,'0')}:00\` � ${h.count} actions`).join('\n');
+    const topHoursText = topHours.map(h => `\`${String(h.hour).padStart(2,'0')}:00\` • ${h.count} actions`).join('\n');
 
     // Day breakdown
     const dayBreakdown = dayNames.map((name, i) => {
@@ -60,7 +60,7 @@ module.exports = {
     }).join('\n');
 
     const embed = createEnterpriseEmbed()
-      .setTitle('?? Activity Insights � Last 7 Days')
+      .setTitle('?? Activity Insights • Last 7 Days')
       
       .setThumbnail(interaction.guild.iconURL())
       .addFields(
@@ -76,7 +76,7 @@ module.exports = {
       
       ;
 
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_activity_insights').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_activity_insights').setLabel('•🔄 Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };

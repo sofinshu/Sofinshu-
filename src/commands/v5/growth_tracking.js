@@ -26,7 +26,7 @@ module.exports = {
         .sort({ createdAt: 1 }).lean();
 
       if (activities.length === 0) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_growth_tracking').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_growth_tracking').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('Not enough activity data for growth tracking. Start using commands!')], components: [row] });
       }
 
@@ -66,7 +66,7 @@ module.exports = {
       const retentionPct = Math.min(100, Math.round((activeUsers / Math.max(memberCount, 1)) * 100));
 
       const embed = await createCustomEmbed(interaction, {
-        title: `?? Growth Tracking � ${interaction.guild.name}`,
+        title: `?? Growth Tracking • ${interaction.guild.name}`,
         thumbnail: interaction.guild.iconURL({ dynamic: true }),
         description: `Real activity growth over the last **30 days** across **4 weeks**.`,
         fields: [
@@ -78,15 +78,15 @@ module.exports = {
           { name: '?? Active This Week', value: `\`${activeUsers}\` users`, inline: true }
         ],
         color: growthColor,
-        footer: 'uwu-chan � Premium Growth Tracking � 30-Day View'
+        footer: 'uwu-chan • Premium Growth Tracking • 30-Day View'
       });
 
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_growth_tracking').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_growth_tracking').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
     } catch (error) {
       console.error('[growth_tracking] Error:', error);
       const errEmbed = createErrorEmbed('Failed to load growth tracking data.');
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_growth_tracking').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary)); if (interaction.deferred || interaction.replied) {
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_growth_tracking').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary)); if (interaction.deferred || interaction.replied) {
             return await interaction.editReply({ embeds: [errEmbed], components: [row] }); } else await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
     }
   }

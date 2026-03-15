@@ -24,7 +24,7 @@ module.exports = {
     const max = Math.max(...entries.map(e => e[1]), 1);
 
     const graph = entries.map(([date, count]) => {
-      const bar = '�'.repeat(Math.round((count / max) * 12)).padEnd(12, '�');
+      const bar = '█'.repeat(Math.round((count / max) * 12)).padEnd(12, '░');
       const d = new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
       return `${d}: ${bar} ${count}`;
     }).join('\n') || 'No activity data.';
@@ -41,7 +41,7 @@ module.exports = {
       
       ;
 
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_activity_graph').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_activity_graph').setLabel('•🔄 Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };
