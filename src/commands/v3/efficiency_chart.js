@@ -43,7 +43,7 @@ module.exports = {
       ]);
 
       if (!user || !user.staff) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_efficiency_chart').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_efficiency_chart').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed(`No analytics found. <@${targetUser.id}> is unmapped in this sector.`)], components: [row] });
       }
 
@@ -68,16 +68,16 @@ module.exports = {
           { name: '?? Honorific Rating', value: `\`Rank [${getGrade(efficiencyScore)}]\``, inline: true },
           { name: '?? Intelligence Tier', value: '`PLATINUM (APEX)`', inline: true }
         ],
-        footer: 'Spectral Yield Visualization � V3 Strategic Apex Suite',
+        footer: 'Spectral Yield Visualization • V3 Strategic Apex Suite',
         color: efficiencyScore >= 80 ? 'success' : 'premium'
       });
 
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_efficiency_chart').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_efficiency_chart').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
     } catch (error) {
       console.error('Enterprise Efficiency Chart Error:', error);
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_efficiency_chart').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_efficiency_chart').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('Efficiency Analytics failure: Unable to synchronize spectral ribbons.')], components: [row] });
     }
   }
@@ -95,8 +95,8 @@ function calculateEfficiency(commands, warnings, messages, consistency) {
 function generateSpectralGauge(score) {
   const length = 15;
   const filledLength = Math.round((score / 100) * length);
-  const filled = '�'.repeat(filledLength);
-  const pattern = '�'.repeat(Math.max(0, length - filledLength));
+  const filled = '█'.repeat(filledLength);
+  const pattern = '█'.repeat(Math.max(0, length - filledLength));
   return `\`[${filled}${pattern}]\` **${score}% VELOCITY**`;
 }
 

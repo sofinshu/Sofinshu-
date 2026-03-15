@@ -42,13 +42,13 @@ module.exports = {
       
       .addFields(
         { name: '?? Auto-Assign Roles', value: roleList },
-        { name: '? Status', value: currentRoles.length > 0 ? `Active � ${currentRoles.length} role(s)` : 'Inactive', inline: true },
+        { name: '? Status', value: currentRoles.length > 0 ? `Active • ${currentRoles.length} role(s)` : 'Inactive', inline: true },
         { name: '?? How it works', value: 'Listed roles are automatically assigned to new members when they join.' }
       )
       
       ;
 
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_auto_assign').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_auto_assign').setLabel('•🔄 Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };

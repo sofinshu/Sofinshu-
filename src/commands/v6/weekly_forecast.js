@@ -42,7 +42,7 @@ module.exports = {
       const dow = day.getDay();
       const base = lastWeekByDay[dow];
       const predicted = Math.max(0, Math.round(base * (1 + parseFloat(growth) / 200)));
-      const bar = '�'.repeat(Math.min(8, Math.round(predicted / Math.max(...lastWeekByDay, 1) * 8)));
+      const bar = '█'.repeat(Math.min(8, Math.round(predicted / Math.max(...lastWeekByDay, 1) * 8)));
       nextWeekLines.push(`${dayNames[dow]} ${day.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}: ${bar.padEnd(8)} ~${predicted}`);
     }
 
@@ -58,7 +58,7 @@ module.exports = {
       
       ;
 
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_weekly_forecast').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_weekly_forecast').setLabel('•🔄 Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };

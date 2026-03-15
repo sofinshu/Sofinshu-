@@ -54,7 +54,7 @@ module.exports = {
     const avgCmds = activities.length / Math.max(Object.keys(cmdMap).length, 1);
 
     const leaderboard = productivity.length
-      ? productivity.map((p, i) => `\`${String(i + 1).padStart(2)}\` <@${p.uid}> � **${p.productivityScore}** cmds/h | ${p.hours}h, ${p.cmds} cmds`).join('\n')
+      ? productivity.map((p, i) => `\`${String(i + 1).padStart(2)}\` <@${p.uid}> • **${p.productivityScore}** cmds/h | ${p.hours}h, ${p.cmds} cmds`).join('\n')
       : 'No data.';
 
     const embed = createEnterpriseEmbed()
@@ -69,7 +69,7 @@ module.exports = {
       
       ;
 
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_productivity_analysis').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_productivity_analysis').setLabel('•🔄 Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };

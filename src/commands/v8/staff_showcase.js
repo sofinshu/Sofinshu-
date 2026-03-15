@@ -18,7 +18,7 @@ module.exports = {
     if (!users.length) return interaction.editReply('?? No staff data found yet.');
     const rankEmojis = { owner: '??', admin: '??', manager: '??', senior: '??', staff: '?', trial: '??', member: '??' };
     const fields = users.map(u => ({
-      name: `${rankEmojis[u.staff?.rank] || '??'} ${u.username || 'Unknown'} � ${u.staff?.rank || 'member'}`,
+      name: `${rankEmojis[u.staff?.rank] || '??'} ${u.username || 'Unknown'} • ${u.staff?.rank || 'member'}`,
       value: `? ${u.staff?.points || 0} pts | ?? ${u.staff?.consistency || 100}% | ?? ${u.staff?.achievements?.length || 0} achievements`,
       inline: false
     }));
@@ -29,7 +29,7 @@ module.exports = {
       .addFields(fields)
       
       ;
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_staff_showcase').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_staff_showcase').setLabel('•🔄 Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };

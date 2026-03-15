@@ -49,7 +49,7 @@ module.exports = {
     }
 
     const fields = predictions.map(p => {
-      const bar = '�'.repeat(Math.round(p.progress / 10)) + '�'.repeat(10 - Math.round(p.progress / 10));
+      const bar = '█'.repeat(Math.round(p.progress / 10)) + '█'.repeat(10 - Math.round(p.progress / 10));
       return {
         name: `${p.username} (${p.currentRank} ? ${p.nextRank})`,
         value: `\`${bar}\` **${p.progress}%** | ${p.points}/${p.threshold} pts | Need **${p.needed}** more`,
@@ -65,7 +65,7 @@ module.exports = {
       
       ;
 
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_staff_prediction').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_staff_prediction').setLabel('•🔄 Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };

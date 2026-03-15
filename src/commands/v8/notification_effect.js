@@ -22,7 +22,7 @@ module.exports = {
     const warnings = events.filter(e => e.type === 'warning').length;
     const latest = events.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 5);
     const latestText = latest.length
-      ? latest.map(e => `${e.type === 'promotion' ? '??' : '??'} <@${e.userId}> � <t:${Math.floor(new Date(e.createdAt).getTime() / 1000)}:R>`).join('\n')
+      ? latest.map(e => `${e.type === 'promotion' ? '??' : '??'} <@${e.userId}> • <t:${Math.floor(new Date(e.createdAt).getTime() / 1000)}:R>`).join('\n')
       : 'No notifications this week.';
 
     const embed = createEnterpriseEmbed()
@@ -35,7 +35,7 @@ module.exports = {
       )
       
       ;
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_notification_effect').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_notification_effect').setLabel('•🔄 Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };

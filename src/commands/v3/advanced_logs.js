@@ -33,7 +33,7 @@ module.exports = {
         .lean();
 
       if (logs.length === 0) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_advanced_logs').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_advanced_logs').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('No activity vectors flagged natively in this server partition yet.')], components: [row] });
       }
 
@@ -76,14 +76,14 @@ module.exports = {
         ]
       });
 
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_advanced_logs').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_advanced_logs').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
     } catch (error) {
       console.error('Advanced Logs Error:', error);
       const errEmbed = createErrorEmbed('A backend query error occurred reading the chronological ledger.');
             if (interaction.deferred || interaction.replied) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_advanced_logs').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_advanced_logs').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
             return await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {
         await interaction.editReply({ embeds: [errEmbed], ephemeral: true });

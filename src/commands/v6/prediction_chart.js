@@ -41,8 +41,8 @@ module.exports = {
     });
 
     const chartLines = entries.map(([date, count], i) => {
-      const bar = '�'.repeat(Math.round((count / max) * 10));
-      const rollBar = '�'.repeat(Math.round((rolling[i] / max) * 10));
+      const bar = '█'.repeat(Math.round((count / max) * 10));
+      const rollBar = '█'.repeat(Math.round((rolling[i] / max) * 10));
       const label = new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
       return `${label}: ${bar.padEnd(10)} ${count} (avg: ${rolling[i].toFixed(1)})`;
     }).join('\n');
@@ -50,7 +50,7 @@ module.exports = {
     const trend = rolling[rolling.length - 1] > rolling[0] ? '?? Upward' : rolling[rolling.length - 1] < rolling[0] ? '?? Downward' : '?? Flat';
 
     const embed = createEnterpriseEmbed()
-      .setTitle('?? Activity Prediction Chart � 14 Days')
+      .setTitle('?? Activity Prediction Chart • 14 Days')
       
       .setDescription(`\`\`\`${chartLines}\`\`\``)
       .addFields(
@@ -61,7 +61,7 @@ module.exports = {
       
       ;
 
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_prediction_chart').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_prediction_chart').setLabel('•🔄 Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };

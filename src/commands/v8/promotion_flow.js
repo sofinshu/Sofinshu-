@@ -59,7 +59,7 @@ module.exports = {
         else if (isCurrentRank) symbol = '??';
         else symbol = '?';
 
-        const emoji = RANK_EMOJIS[rank] || '�';
+        const emoji = RANK_EMOJIS[rank] || '░';
         const label = `${symbol} ${emoji} **${rank.toUpperCase()}**`;
 
         if (isPast || rank === 'member') return `${label}`;
@@ -106,7 +106,7 @@ module.exports = {
       }
 
       const embed = await createCustomEmbed(interaction, {
-        title: `?? Rank Progression � ${target.username}`,
+        title: `?? Rank Progression • ${target.username}`,
         thumbnail: target.displayAvatarURL({ dynamic: true }),
         description: ladder.join('\n\n'),
         fields: [
@@ -117,7 +117,7 @@ module.exports = {
           }
         ],
         color: currentRank === 'admin' ? '#f1c40f' : '#5865F2',
-        footer: `uwu-chan � Promotion Flow � Auto-checks every 15min if automation is enabled`
+        footer: `uwu-chan • Promotion Flow • Auto-checks every 15min if automation is enabled`
       });
 
       const row = new ActionRowBuilder().addComponents(

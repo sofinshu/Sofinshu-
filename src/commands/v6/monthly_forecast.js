@@ -23,7 +23,7 @@ module.exports = {
       const activities = await Activity.find({ guildId, createdAt: { $gte: sixtyDaysAgo } }).lean();
 
       if (activities.length < 30) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_monthly_forecast').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_monthly_forecast').setLabel('•🔄 Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('Insufficient historical telemetry signals (min 30 events) to generate a macroscopic 30-day trajectory.')], components: [row] });
       }
 
@@ -42,7 +42,7 @@ module.exports = {
 
       // 1. Growth Trajectory Wave (ASCII modeling)
       const trajectorySegments = 15;
-      const waveChars = [' ', '?', '?', '�', '?', '?'];
+      const waveChars = [' ', '?', '?', '░', '?', '?'];
       const trajectoryWave = Array.from({ length: trajectorySegments }, (_, i) => {
         const val = Math.sin((i / trajectorySegments) * Math.PI) * 4;
         return waveChars[Math.max(0, Math.min(5, Math.round(val + (growthFactor * 5))))];
@@ -54,7 +54,7 @@ module.exports = {
       const heatmap = Array.from({ length: 4 }, (_, row) => {
         return Array.from({ length: 8 }, () => {
           const val = Math.random() + (growthFactor * 0.5);
-          return val > 0.8 ? '�' : (val > 0.5 ? '�' : (val > 0.2 ? '�' : '�'));
+          return val > 0.8 ? '░' : (val > 0.5 ? '░' : (val > 0.2 ? '░' : '░'));
         }).join('');
       }).join('\n');
 
@@ -73,16 +73,16 @@ module.exports = {
           { name: '?? Omni-Sync', value: '`CONNECTED`', inline: true },
           { name: '?? Index Status', value: growthFactor > 0 ? '`?? EXPANDING`' : '`? STABLE`', inline: true }
         ],
-        footer: 'Metabolic Trajectory Modeling � V6 Enterprise Hyper-Apex Suite',
+        footer: 'Metabolic Trajectory Modeling • V6 Enterprise Hyper-Apex Suite',
         color: 'premium'
       });
 
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_monthly_forecast').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_monthly_forecast').setLabel('•🔄 Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
     } catch (error) {
       console.error('Enterprise Forecast Error:', error);
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_monthly_forecast').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_monthly_forecast').setLabel('•🔄 Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('Enterprise Intelligence failure: Unable to decode macroscopic metabolic waves.')], components: [row] });
     }
   }

@@ -27,7 +27,7 @@ module.exports = {
           const users = await User.find({ userId: { $exists: true }, 'staff.points': { $gt: 0 } })
             .sort({ 'staff.points': -1 }).limit(10).lean();
           const topList = users.length > 0
-            ? users.map((u, i) => `\`${String(i + 1).padStart(2, '0')}\` **${u.username || u.userId}** � \`${(u.staff?.points || 0).toLocaleString()} pts\``)
+            ? users.map((u, i) => `\`${String(i + 1).padStart(2, '0')}\` **${u.username || u.userId}** • \`${(u.staff?.points || 0).toLocaleString()} pts\``)
               .join('\n')
             : '`No staff data yet`';
           const avgConsistency = users.length > 0
@@ -35,7 +35,7 @@ module.exports = {
             : '100';
 
           return createCustomEmbed(interaction, {
-            title: `?? Staff Overview � ${interaction.guild.name}`,
+            title: `?? Staff Overview • ${interaction.guild.name}`,
             thumbnail: interaction.guild.iconURL({ dynamic: true }),
             description: `Top staff members and performance metrics.`,
             fields: [
@@ -44,7 +44,7 @@ module.exports = {
               { name: '?? Total Tracked Staff', value: `\`${users.length}\``, inline: true }
             ],
             color: 'enterprise',
-            footer: 'uwu-chan � Enterprise Staff Tab'
+            footer: 'uwu-chan • Enterprise Staff Tab'
           });
         }
 
@@ -58,7 +58,7 @@ module.exports = {
           const recentWarnUsers = [...new Set(weekWarnings.map(w => w.userId))];
 
           return createCustomEmbed(interaction, {
-            title: `??? Moderation Overview � ${interaction.guild.name}`,
+            title: `??? Moderation Overview • ${interaction.guild.name}`,
             thumbnail: interaction.guild.iconURL({ dynamic: true }),
             description: `Real-time moderation statistics for the server.`,
             fields: [
@@ -68,12 +68,12 @@ module.exports = {
               { name: '?? Total Warnings (All Time)', value: `\`${totalWarnings.length}\``, inline: true },
               {
                 name: '??? Server Verification',
-                value: `\`${interaction.guild.verificationLevel}\` � Explicit Filter: \`${interaction.guild.explicitContentFilter}\``,
+                value: `\`${interaction.guild.verificationLevel}\` • Explicit Filter: \`${interaction.guild.explicitContentFilter}\``,
                 inline: false
               }
             ],
             color: 'enterprise',
-            footer: 'uwu-chan � Enterprise Moderation Tab'
+            footer: 'uwu-chan • Enterprise Moderation Tab'
           });
         }
 
@@ -92,7 +92,7 @@ module.exports = {
         const cmds = guild?.stats?.commandsUsed || weekActs.filter(a => a.type === 'command').length;
 
         return createCustomEmbed(interaction, {
-          title: `?? Server Dashboard � ${interaction.guild.name}`,
+          title: `?? Server Dashboard • ${interaction.guild.name}`,
           thumbnail: interaction.guild.iconURL({ dynamic: true }),
           description: `Welcome to the Enterprise Interactive Dashboard. Navigate tabs below.`,
           fields: [
@@ -105,7 +105,7 @@ module.exports = {
             { name: '?? Server Created', value: `<t:${Math.floor(interaction.guild.createdTimestamp / 1000)}:D>`, inline: true }
           ],
           color: 'enterprise',
-          footer: 'uwu-chan � Enterprise Interactive Dashboard'
+          footer: 'uwu-chan • Enterprise Interactive Dashboard'
         });
       };
 

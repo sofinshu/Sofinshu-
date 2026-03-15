@@ -7,7 +7,7 @@ const RANK_EMOJIS = { trial: '??', staff: '?', senior: '??', manager: '??', admi
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('promotion_announce')
-    .setDescription('?? Manually promote a staff member � updates DB, assigns role, DMs user, posts announcement')
+    .setDescription('?? Manually promote a staff member • updates DB, assigns role, DMs user, posts announcement')
     .addUserOption(opt => opt.setName('user').setDescription('Staff member to promote').setRequired(true))
     .addStringOption(opt =>
       opt.setName('new_rank').setDescription('Rank to promote to').setRequired(true).addChoices(
@@ -31,7 +31,7 @@ module.exports = {
       }
 
       if (!interaction.member.permissions.has(PermissionFlagsBits.ManageRoles)) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_promotion_announce').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_promotion_announce').setLabel('•🔄 Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('You need the `Manage Roles` permission to promote staff.')], components: [row] });
       }
 
@@ -80,7 +80,7 @@ module.exports = {
           if (newRoleId) await member.roles.add(newRoleId, `Promoted to ${newRank}`);
           roleStatus = newRoleId ? `\`? Role assigned\`` : `\`?? No role for ${newRank}\``;
         } catch {
-          roleStatus = `\`? Role error � check bot permissions\``;
+          roleStatus = `\`? Role error • check bot permissions\``;
         }
       }
 
@@ -112,7 +112,7 @@ module.exports = {
           { name: '?? DM', value: `\`${dmStatus}\``, inline: true }
         ],
         color: '#f1c40f',
-        footer: 'uwu-chan � Promotion System'
+        footer: 'uwu-chan • Promotion System'
       });
 
       // Also send to promotion channel if configured
@@ -126,12 +126,12 @@ module.exports = {
         }
       }
 
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_promotion_announce').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_promotion_announce').setLabel('•🔄 Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [announceEmbed], components: [row] });
     } catch (error) {
       console.error('[promotion_announce] Error:', error);
       const errEmbed = createErrorEmbed('Failed to process promotion. Check bot permissions.');
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_promotion_announce').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary)); if (interaction.deferred || interaction.replied) {
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_promotion_announce').setLabel('•🔄 Sync Enterprise Data').setStyle(ButtonStyle.Secondary)); if (interaction.deferred || interaction.replied) {
             return await interaction.editReply({ embeds: [errEmbed], components: [row] }); } else await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
     }
   }

@@ -83,12 +83,12 @@ module.exports = {
                 footer: 'uwu-chan • Enterprise Automation Pulse • Real DB Config'
             });
 
-            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_automation_pulse').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_automation_pulse').setLabel('•🔄 Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
         } catch (error) {
             console.error('[automation_pulse] Error:', error);
             const errEmbed = createErrorEmbed('Failed to load automation pulse data.');
-            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_automation_pulse').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary)); if (interaction.deferred || interaction.replied) {
+            const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_automation_pulse').setLabel('•🔄 Sync Enterprise Data').setStyle(ButtonStyle.Secondary)); if (interaction.deferred || interaction.replied) {
             return await interaction.editReply({ embeds: [errEmbed], components: [row] }); } else await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
         }
     }

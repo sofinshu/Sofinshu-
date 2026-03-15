@@ -20,7 +20,7 @@ module.exports = {
     if (!users.length) return interaction.editReply('?? No staff data yet.');
     const top = users[0];
     const rankEmojis = { owner: '??', admin: '??', manager: '??', senior: '??', staff: '?', trial: '??', member: '??' };
-    const alt = users.slice(1, 3).map(u => `� **${u.username || '?'}** (${u.staff?.rank || 'member'}) � ${u.staff?.points || 0} pts`).join('\n');
+    const alt = users.slice(1, 3).map(u => `• **${u.username || '?'}** (${u.staff?.rank || 'member'}) • ${u.staff?.points || 0} pts`).join('\n');
     const embed = createEnterpriseEmbed()
       .setTitle('?? Smart Staff Recommendation')
       
@@ -32,7 +32,7 @@ module.exports = {
       )
       
       ;
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_smart_recommendation').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_smart_recommendation').setLabel('•🔄 Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };

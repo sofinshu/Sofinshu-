@@ -6,7 +6,7 @@ const { Warning } = require('../../database/mongo');
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('smart_alerts')
-    .setDescription('?? Real-time smart alert analysis � detect warning spikes and at-risk users from real data'),
+    .setDescription('?? Real-time smart alert analysis • detect warning spikes and at-risk users from real data'),
 
   async execute(interaction) {
     try {
@@ -47,11 +47,11 @@ module.exports = {
       const alertColor = isSpike ? 'error' : atRiskUsers.length > 0 ? 'warning' : 'success';
 
       const atRiskDisplay = atRiskUsers.length > 0
-        ? atRiskUsers.map(([uid, count]) => `� <@${uid}> � \`${count}\` warnings today`).join('\n')
+        ? atRiskUsers.map(([uid, count]) => `• <@${uid}> • \`${count}\` warnings today`).join('\n')
         : '`No at-risk users detected`';
 
       const embed = await createCustomEmbed(interaction, {
-        title: `?? Smart Alerts � ${interaction.guild.name}`,
+        title: `?? Smart Alerts • ${interaction.guild.name}`,
         thumbnail: interaction.guild.iconURL({ dynamic: true }),
         description: `Real-time warning analysis and spike detection.\n\n**Alert Level:** ${alertLevel}`,
         fields: [
@@ -62,20 +62,20 @@ module.exports = {
           { name: '?? At-Risk Users (2+ today)', value: atRiskDisplay, inline: false },
           {
             name: '?? Most Warned (7d)',
-            value: mostWarnedId ? `<@${mostWarnedId[0]}> � \`${mostWarnedId[1]}\` warnings` : '`None`',
+            value: mostWarnedId ? `<@${mostWarnedId[0]}> • \`${mostWarnedId[1]}\` warnings` : '`None`',
             inline: false
           }
         ],
         color: alertColor,
-        footer: 'uwu-chan � Enterprise Smart Alerts � Real Warning Data'
+        footer: 'uwu-chan • Enterprise Smart Alerts • Real Warning Data'
       });
 
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_smart_alerts').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_smart_alerts').setLabel('•🔄 Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
     } catch (error) {
       console.error('[smart_alerts] Error:', error);
       const errEmbed = createErrorEmbed('Failed to analyze smart alerts.');
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_smart_alerts').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary)); if (interaction.deferred || interaction.replied) {
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_smart_alerts').setLabel('•🔄 Sync Enterprise Data').setStyle(ButtonStyle.Secondary)); if (interaction.deferred || interaction.replied) {
             return await interaction.editReply({ embeds: [errEmbed], components: [row] }); } else await interaction.editReply({ embeds: [errEmbed], ephemeral: true });
     }
   }

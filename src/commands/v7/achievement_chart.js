@@ -34,8 +34,8 @@ module.exports = {
 
     const chart = sorted.length
       ? sorted.map(([name, count]) => {
-        const bar = '�'.repeat(Math.round((count / max) * 8)) + '�'.repeat(8 - Math.round((count / max) * 8));
-        return `\`${bar}\` **${count}x** � ${name}`;
+        const bar = '█'.repeat(Math.round((count / max) * 8)) + '█'.repeat(8 - Math.round((count / max) * 8));
+        return `\`${bar}\` **${count}x** • ${name}`;
       }).join('\n')
       : 'No achievements recorded.';
 
@@ -54,7 +54,7 @@ module.exports = {
       
       ;
 
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_achievement_chart').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_achievement_chart').setLabel('•🔄 Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };

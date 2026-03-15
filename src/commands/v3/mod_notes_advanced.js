@@ -40,10 +40,10 @@ module.exports = {
 
       if (notes.length === 0) {
         if (targetUser) {
-          const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_mod_notes_advanced').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+          const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_mod_notes_advanced').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed(`No moderation trace logs discovered for <@${targetUser.id}>.`)], components: [row] });
         }
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_mod_notes_advanced').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_mod_notes_advanced').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('No moderation logs have been recorded in this server yet.')], components: [row] });
       }
 
@@ -73,14 +73,14 @@ module.exports = {
         ]
       });
 
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_mod_notes_advanced').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_mod_notes_advanced').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
     } catch (error) {
       console.error('Mod Notes Advanced Error:', error);
       const errEmbed = createErrorEmbed('A database tracking error occurred iterating mod footprint history.');
             if (interaction.deferred || interaction.replied) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_mod_notes_advanced').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_mod_notes_advanced').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
             return await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {
         await interaction.editReply({ embeds: [errEmbed], ephemeral: true });

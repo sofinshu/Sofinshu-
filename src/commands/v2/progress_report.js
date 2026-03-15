@@ -22,7 +22,7 @@ module.exports = {
       ]);
 
       if (!userData || !userData.staff) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_progress_report').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_progress_report').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed(`No telemetry found for <@${targetUser.id}>.`)], components: [row] });
       }
 
@@ -33,8 +33,8 @@ module.exports = {
 
       // Metabolic Pulse ASCII (Heartbeat)
       const pulseSegments = 15;
-      const pulseFilled = '�'.repeat(Math.min(pulseSegments, Math.max(1, Math.round(ptsGainedLast7Days / 100))));
-      const pulseEmpty = '�'.repeat(pulseSegments - pulseFilled.length);
+      const pulseFilled = '█'.repeat(Math.min(pulseSegments, Math.max(1, Math.round(ptsGainedLast7Days / 100))));
+      const pulseEmpty = '█'.repeat(pulseSegments - pulseFilled.length);
       const metabolicPulse = `\`[${pulseFilled}${pulseEmpty}]\` **${momentum}**`;
 
       const embed = await createCustomEmbed(interaction, {
@@ -49,16 +49,16 @@ module.exports = {
           { name: '? Pulse Resonance', value: '`?? OPTIMAL`', inline: true },
           { name: '?? Global Benchmark', value: '`?? ELITE PERFORMANCE`', inline: true }
         ],
-        footer: 'Reports generated from 7d macroscopic telemetry � V2 Expansion Hyper-Apex',
+        footer: 'Reports generated from 7d macroscopic telemetry • V2 Expansion Hyper-Apex',
         color: 'premium'
       });
 
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_progress_report').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_progress_report').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
     } catch (error) {
       console.error('Progress Report Error:', error);
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_progress_report').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_progress_report').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('Yield failure: Unable to synchronize macroscopic performance report.')], components: [row] });
     }
   }

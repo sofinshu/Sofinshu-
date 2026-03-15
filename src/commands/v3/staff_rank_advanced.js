@@ -24,13 +24,13 @@ module.exports = {
 
       const user = await User.findOne({ userId: targetUser.id, guildId }).lean();
       if (!user || !user.staff) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_staff_rank_advanced').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_staff_rank_advanced').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed(`Missing target footprint. <@${targetUser.id}> is unregistered globally inside this server.`)], components: [row] });
       }
 
       const guild = await Guild.findOne({ guildId }).lean();
       if (!guild || !guild.promotionRequirements) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_staff_rank_advanced').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_staff_rank_advanced').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed(`Missing mapping. The active administrator has not setup backend /promo_setup values required to project ranking boundaries.`)], components: [row] });
       }
 
@@ -78,9 +78,9 @@ module.exports = {
         const progressRatio = Math.min(1, Math.max(0, currentProgress / deltaLimit));
         const pipCount = Math.round(progressRatio * 15); // Width
 
-        progressStr = `\`${'�'.repeat(pipCount)}${'�'.repeat(15 - pipCount)}\` ${points}/${pointsForNextRank}`;
+        progressStr = `\`${'█'.repeat(pipCount)}${'█'.repeat(15 - pipCount)}\` ${points}/${pointsForNextRank}`;
       } else {
-        progressStr = '`���������������` **MAXIMUM**';
+        progressStr = '`•••••••••••••••` **MAXIMUM**';
       }
 
       const embed = await createCustomEmbed(interaction, {
@@ -101,14 +101,14 @@ module.exports = {
         footer: 'Algorithms execute locally. They respect arbitrary parameters dynamically selected.'
       });
 
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_staff_rank_advanced').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_staff_rank_advanced').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
     } catch (error) {
       console.error('Rank Advanced Error:', error);
       const errEmbed = createErrorEmbed('A database error occurred generating overlapping requirement boundaries.');
             if (interaction.deferred || interaction.replied) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_staff_rank_advanced').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_staff_rank_advanced').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
             return await interaction.editReply({ embeds: [errEmbed], components: [row] });
       } else {
         await interaction.editReply({ embeds: [errEmbed], ephemeral: true });

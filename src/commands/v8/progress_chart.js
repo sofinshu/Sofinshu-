@@ -22,9 +22,9 @@ module.exports = {
       const rank = u.staff?.rank || 'trial';
       const pts = u.staff?.points || 0;
       const nextRank = RANK_ORDER[RANK_ORDER.indexOf(rank) + 1];
-      if (!nextRank) return `?? **${u.username || '?'}** � MAX`;
+      if (!nextRank) return `?? **${u.username || '?'}** • MAX`;
       const pct = Math.min(100, Math.round((pts / THRESHOLDS[nextRank]) * 100));
-      const bar = '�'.repeat(Math.round(pct / 10)) + '�'.repeat(10 - Math.round(pct / 10));
+      const bar = '█'.repeat(Math.round(pct / 10)) + '█'.repeat(10 - Math.round(pct / 10));
       return `**${u.username || '?'}**: \`${bar}\` ${pct}% ? ${nextRank}`;
     }).join('\n');
     const embed = createEnterpriseEmbed()
@@ -33,7 +33,7 @@ module.exports = {
       .setDescription(lines)
       
       ;
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_progress_chart').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_progress_chart').setLabel('•🔄 Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };

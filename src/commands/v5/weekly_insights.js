@@ -53,16 +53,16 @@ module.exports = {
           { name: '?? Security Incidents', value: `\`${curr.warning}\` | **${getTrajectory(curr.warning, prev.warning)}**`, inline: false },
           { name: '?? Active Operatives', value: `\`${curr.activeUsers}\` | **${getTrajectory(curr.activeUsers, prev.activeUsers)}**`, inline: false }
         ],
-        footer: 'Periodic Intelligence Comparison � V5 Executive Suite',
+        footer: 'Periodic Intelligence Comparison • V5 Executive Suite',
         color: 'enterprise'
       });
 
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_weekly_insights').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_weekly_insights').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
     } catch (error) {
       console.error('Weekly Insights Error:', error);
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_weekly_insights').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_weekly_insights').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('Periodic Intelligence failure: Unable to synchronize comparison matrices.')], components: [row] });
     }
   }

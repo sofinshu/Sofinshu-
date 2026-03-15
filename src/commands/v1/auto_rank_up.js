@@ -39,7 +39,7 @@ module.exports = {
       }
 
       const listText = eligible.map((e, i) =>
-        `\`${String(i + 1).padStart(2)}\` **${e.username}** � \`${e.currentRank.toUpperCase()}\` ? **\`${e.nextRank.toUpperCase()}\`** (${e.points}/${e.threshold} pts ?)`
+        `\`${String(i + 1).padStart(2)}\` **${e.username}** • \`${e.currentRank.toUpperCase()}\` ? **\`${e.nextRank.toUpperCase()}\`** (${e.points}/${e.threshold} pts ?)`
       ).join('\n');
 
       const embed = await createCustomEmbed(interaction, {

@@ -50,7 +50,7 @@ module.exports = {
     const totalShifts = shifts.length;
 
     const leaderboard = efficiencies.map((e, i) =>
-      `\`${String(i + 1).padStart(2)}\` **${e.username || 'Unknown'}** � ${e.pts} pts / ${e.hours}h = **${e.efficiency} pts/h**`
+      `\`${String(i + 1).padStart(2)}\` **${e.username || 'Unknown'}** • ${e.pts} pts / ${e.hours}h = **${e.efficiency} pts/h**`
     ).join('\n') || 'No data available.';
 
     const embed = createEnterpriseEmbed()
@@ -65,7 +65,7 @@ module.exports = {
       
       ;
 
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_efficiency_analysis').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_efficiency_analysis').setLabel('•🔄 Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };

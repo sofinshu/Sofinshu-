@@ -53,7 +53,7 @@ module.exports = {
         else if (actionUpper.includes('MOD') || actionUpper.includes('WARN')) emoji = '🛡️';
         else if (actionUpper.includes('COMMAND')) emoji = '⚙️';
 
-        return `${emoji} **${action}** � ${userName} � <t:${Math.floor(new Date(a.createdAt).getTime() / 1000)}:R>`;
+        return `${emoji} **${action}** • ${userName} • <t:${Math.floor(new Date(a.createdAt).getTime() / 1000)}:R>`;
       }));
 
       // Generate Pie Chart

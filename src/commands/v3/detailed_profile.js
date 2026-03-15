@@ -28,7 +28,7 @@ module.exports = {
       const user = await User.findOne({ userId: targetUser.id, guildId }).lean();
 
       if (!user || !user.staff) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_detailed_profile').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_detailed_profile').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed(`No high-fidelity personnel records found for <@${targetUser.id}>.`)], components: [row] });
       }
 
@@ -57,7 +57,7 @@ module.exports = {
           { name: '?? Peer Honorific', value: `\`${staff.honorific || 'COMMENDABLE'}\``, inline: true },
           { name: '??? Tactical Tagline', value: `*"${staff.tagline || 'Operational Personnel'}"*`, inline: false }
         ],
-        footer: 'Enterprise Identity Matrix � V3 Strategic Executive Suite',
+        footer: 'Enterprise Identity Matrix • V3 Strategic Executive Suite',
         color: 'enterprise'
       });
 
@@ -71,12 +71,12 @@ module.exports = {
         embed.addFields({ name: '?? Recent Ledger Footprints', value: activityList, inline: false });
       }
 
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_detailed_profile').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_detailed_profile').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
     } catch (error) {
       console.error('Enterprise Detailed Profile Error:', error);
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_detailed_profile').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_detailed_profile').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('Enterprise Identity failure: Unable to decode high-fidelity dossiers.')], components: [row] });
     }
   }

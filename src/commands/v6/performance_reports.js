@@ -34,7 +34,7 @@ module.exports = {
     const avgConsistency = (users.reduce((s, u) => s + (u.staff?.consistency || 100), 0) / users.length).toFixed(1);
 
     const top3 = users.sort((a, b) => (b.staff?.points || 0) - (a.staff?.points || 0)).slice(0, 3);
-    const topText = top3.map((u, i) => `\`${i + 1}\` **${u.username || 'Unknown'}** � ${u.staff?.points || 0} pts | ${u.staff?.rank || 'member'}`).join('\n');
+    const topText = top3.map((u, i) => `\`${i + 1}\` **${u.username || 'Unknown'}** • ${u.staff?.points || 0} pts | ${u.staff?.rank || 'member'}`).join('\n');
 
     const rankDist = {};
     users.forEach(u => { const r = u.staff?.rank || 'member'; rankDist[r] = (rankDist[r] || 0) + 1; });
@@ -57,7 +57,7 @@ module.exports = {
       
       ;
 
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_performance_reports').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_performance_reports').setLabel('•🔄 Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };

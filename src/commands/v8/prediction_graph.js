@@ -35,12 +35,12 @@ module.exports = {
     for (let i = 1; i <= 7; i++) {
       const d = new Date(now.getTime() + i * 86400000);
       const pred = Math.round(recentAvg * trendFactor * ((d.getDay() === 0 || d.getDay() === 6) ? 0.7 : 1.1));
-      const bar = '�'.repeat(Math.round(Math.min(pred, maxPred) / maxPred * 10)).padEnd(10, '�');
+      const bar = '█'.repeat(Math.round(Math.min(pred, maxPred) / maxPred * 10)).padEnd(10, '░');
       lines.push(`${dayNames[d.getDay()]}: ${bar} ~${pred}`);
     }
 
     const embed = createEnterpriseEmbed()
-      .setTitle('?? Prediction Graph � Next 7 Days')
+      .setTitle('?? Prediction Graph • Next 7 Days')
       
       .setDescription(`\`\`\`${lines.join('\n')}\`\`\``)
       .addFields(
@@ -49,7 +49,7 @@ module.exports = {
       )
       
       ;
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_prediction_graph').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_prediction_graph').setLabel('•🔄 Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };

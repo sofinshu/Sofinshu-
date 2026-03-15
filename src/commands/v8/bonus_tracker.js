@@ -23,12 +23,12 @@ module.exports = {
     const nextTier = TIERS.find(t => points < t) || TIERS[TIERS.length - 1];
     const prevTier = TIERS.filter(t => points >= t).pop() || 0;
     const progress = Math.min(100, Math.round(((points - prevTier) / (nextTier - prevTier)) * 100));
-    const bar = '�'.repeat(Math.round(progress / 10)) + '�'.repeat(10 - Math.round(progress / 10));
+    const bar = '█'.repeat(Math.round(progress / 10)) + '█'.repeat(10 - Math.round(progress / 10));
 
     const tiersDisplay = TIERS.map(t => `${points >= t ? '?' : '??'} **${t} pts**`).join('  ?  ');
 
     const embed = createEnterpriseEmbed()
-      .setTitle(`?? Bonus Tracker � ${target.username}`)
+      .setTitle(`?? Bonus Tracker • ${target.username}`)
       
       .setThumbnail(target.displayAvatarURL())
       .addFields(
@@ -40,7 +40,7 @@ module.exports = {
       
       ;
 
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_bonus_tracker').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_bonus_tracker').setLabel('•🔄 Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };

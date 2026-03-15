@@ -35,7 +35,7 @@ module.exports = {
           { name: '?? Alert Severity', value: '`MAXIMUM`', inline: true },
           { name: '?? Action Terminal', value: 'Authorized via Enterprise Console', inline: false }
         ],
-        footer: 'Emergency Dispatch Active � V4 Guard Suite',
+        footer: 'Emergency Dispatch Active • V4 Guard Suite',
         color: 'premium'
       });
 

@@ -20,9 +20,9 @@ module.exports = {
     const year = now.getFullYear();
     const top = await User.find({ 'staff.points': { $gt: 0 } }).sort({ 'staff.points': -1 }).limit(3).lean();
     const medals = ['??', '??', '??'];
-    const list = top.map((u, i) => `${medals[i]} **${u.username || '?'}** � ${u.staff?.points || 0} pts`).join('\n') || 'No data yet.';
+    const list = top.map((u, i) => `${medals[i]} **${u.username || '?'}** • ${u.staff?.points || 0} pts`).join('\n') || 'No data yet.';
     const embed = createEnterpriseEmbed()
-      .setTitle(`${season} Season Rewards � ${year}`)
+      .setTitle(`${season} Season Rewards • ${year}`)
       
       .addFields(
         { name: '??? Current Season', value: season, inline: true },
@@ -32,7 +32,7 @@ module.exports = {
       )
       
       ;
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_season_rewards').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_season_rewards').setLabel('•🔄 Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };

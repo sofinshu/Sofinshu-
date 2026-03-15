@@ -106,10 +106,10 @@ async function generateDashboard(interaction, guildId, period) {
   });
   const topUserId = Object.entries(cmdByUser).sort((a, b) => b[1] - a[1])[0]?.[0];
   const topUserObj = topUserId ? await interaction.client.users.fetch(topUserId).catch(() => null) : null;
-  const topUserStr = topUserObj ? `**${topUserObj.username}** � \`${cmdByUser[topUserId]} cmds\`` : '`No data yet`';
+  const topUserStr = topUserObj ? `**${topUserObj.username}** • \`${cmdByUser[topUserId]} cmds\`` : '`No data yet`';
 
   return createCustomEmbed(interaction, {
-    title: `?? Analytics Dashboard � ${periodLabel}`,
+    title: `?? Analytics Dashboard • ${periodLabel}`,
     thumbnail: interaction.guild.iconURL({ dynamic: true }),
     description: `Real-time analytics for **${interaction.guild.name}**.`,
     fields: [
@@ -122,7 +122,7 @@ async function generateDashboard(interaction, guildId, period) {
       { name: '?? Top User', value: topUserStr, inline: false }
     ],
     color: 'premium',
-    footer: `uwu-chan � Premium Analytics � ${periodLabel}`
+    footer: `uwu-chan • Premium Analytics • ${periodLabel}`
   });
 }
 

@@ -18,11 +18,11 @@ module.exports = {
       const guild = await Guild.findOne({ guildId: guildId }).lean();
 
       if (!userData || !userData.staff) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_promotion_predict').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_promotion_predict').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed(`No staff records found for <@${targetUser.id}> in this sector.`)], components: [row] });
       }
       if (!guild || !guild.promotionRequirements) {
-        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_promotion_predict').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_promotion_predict').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('No promotion requirements established in this sector.')], components: [row] });
       }
 
@@ -54,8 +54,8 @@ module.exports = {
 
       // 2. Arrival Ribbon
       const barLength = 12;
-      const filled = '�'.repeat(Math.round((pointsProgress / 100) * barLength));
-      const empty = '�'.repeat(barLength - filled.length);
+      const filled = '█'.repeat(Math.round((pointsProgress / 100) * barLength));
+      const empty = '░'.repeat(barLength - filled.length);
       const arrivalRibbon = `\`[${filled}${empty}]\` **${pointsProgress.toFixed(1)}% ELIGIBILITY**`;
 
       const embed = await createCustomEmbed(interaction, {
@@ -70,16 +70,16 @@ module.exports = {
           { name: '?? Data Fidelity', value: '`99.8% [Enterprise-AI]`', inline: true },
           { name: '? Intelligence Tier', value: '`PLATINUM [HYPER-APEX]`', inline: true }
         ],
-        footer: 'Career Trajectory Modeling � V2 Expansion Hyper-Apex Suite',
+        footer: 'Career Trajectory Modeling • V2 Expansion Hyper-Apex Suite',
         color: 'premium'
       });
 
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_promotion_predict').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_promotion_predict').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
     } catch (error) {
       console.error('Enterprise Promotion Predict Error:', error);
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_promotion_predict').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_btn_promotion_predict').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('Career Modeling failure: Unable to synchronized promotion trajectories.')], components: [row] });
     }
   }

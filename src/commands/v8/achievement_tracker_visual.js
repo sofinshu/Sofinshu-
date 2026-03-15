@@ -29,10 +29,10 @@ module.exports = {
     }).join('\n');
 
     const pct = Math.round((earned.length / ALL_ACHIEVEMENTS.length) * 100);
-    const bar = '�'.repeat(Math.round(pct / 10)) + '�'.repeat(10 - Math.round(pct / 10));
+    const bar = '█'.repeat(Math.round(pct / 10)) + '█'.repeat(10 - Math.round(pct / 10));
 
     const embed = createEnterpriseEmbed()
-      .setTitle(`?? Achievement Tracker � ${target.username}`)
+      .setTitle(`?? Achievement Tracker • ${target.username}`)
       
       .setThumbnail(target.displayAvatarURL())
       .addFields(
@@ -44,7 +44,7 @@ module.exports = {
       
       ;
 
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_achievement_tracker_visual').setLabel('�� Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_ent_achievement_tracker_visual').setLabel('•🔄 Sync Enterprise Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };

@@ -46,7 +46,7 @@ module.exports = {
       const allUnlocked = !nextTier;
       const trajectory = allUnlocked
         ? '?? All reward tiers unlocked! Maximum merit achieved.'
-        : `Next: **${nextTier.label}** � \`${nextTier.threshold - points}\` more points needed`;
+        : `Next: **${nextTier.label}** • \`${nextTier.threshold - points}\` more points needed`;
 
       const embed = await createCustomEmbed(interaction, {
         title: `?? Merit Reward Tiers: ${target.username}`,
@@ -54,7 +54,7 @@ module.exports = {
         description: `**Current Merit:** \`${points.toLocaleString()} points\`\n\n${trajectory}`,
         fields: [...tierFields],
         color: 'enterprise',
-        footer: 'uwu-chan � Enterprise Auto-Rewards System'
+        footer: 'uwu-chan • Enterprise Auto-Rewards System'
       });
 
       // Add claim button if next tier is achievable

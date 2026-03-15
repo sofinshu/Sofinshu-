@@ -43,7 +43,7 @@ module.exports = {
       .setDescription(sortedMonths.slice(0, 6).map(([month, count]) => `${month}: ${count} events`).join('\n'))
       ;
 
-    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_event_summary').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v5_event_summary').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
   }
 };

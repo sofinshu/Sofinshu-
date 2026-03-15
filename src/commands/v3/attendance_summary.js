@@ -41,7 +41,7 @@ module.exports = {
 
       const maxDensity = Math.max(...heatmap, 1);
       const heatmapViz = heatmap.map((count, i) => {
-        const intensity = '����'[Math.min(3, Math.floor((count / maxDensity) * 3))];
+        const intensity = '••••'[Math.min(3, Math.floor((count / maxDensity) * 3))];
         return `\`${dayLabels[i]}\` ${intensity.repeat(5)} \`[${count}]\``;
       }).join('\n');
 
@@ -60,16 +60,16 @@ module.exports = {
           { name: '?? Trajectory', value: `\`${attendanceRate}%\``, inline: true },
           { name: '?? Sector Health', value: attendanceRate >= 80 ? '`STABLE`' : '`DEGRADED`', inline: true }
         ],
-        footer: 'Presence Density Visualization � V3 Strategic Apex Suite',
+        footer: 'Presence Density Visualization • V3 Strategic Apex Suite',
         color: attendanceRate >= 80 ? 'success' : 'premium'
       });
 
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_attendance_summary').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_attendance_summary').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [embed], components: [row] });
 
     } catch (error) {
       console.error('Enterprise Attendance Error:', error);
-      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_attendance_summary').setLabel('� Sync Live Data').setStyle(ButtonStyle.Secondary));
+      const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('auto_v3_attendance_summary').setLabel('🔄 Sync Live Data').setStyle(ButtonStyle.Secondary));
             await interaction.editReply({ embeds: [createErrorEmbed('Presence Analytics failure: Unable to decode metabolic heatmaps.')], components: [row] });
     }
   }
