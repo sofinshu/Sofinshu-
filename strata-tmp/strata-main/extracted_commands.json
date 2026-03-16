@@ -1,0 +1,21 @@
+[
+    { "name": "buy", "desc": "View shop and buy items", "tier": "Free" },
+    { "name": "premium", "desc": "View Premium tier benefits and upgrade", "tier": "Premium" },
+    { "name": "activity_chart", "desc": "View activity chart", "tier": "Premium" },
+    { "name": "activity_log", "desc": "View recent activity log", "tier": "Premium" },
+    { "name": "apply_blacklist", "desc": "Manage application blacklist", "tier": "Premium" },
+    { "name": "apply_panel", "desc": "Create application panel", "tier": "Premium" },
+    { "name": "apply_questions", "desc": "Customize application questions", "tier": "Premium" },
+    { "name": "apply_setup", "desc": "Setup application system for Staff or Helpers", "tier": "Premium" },
+    { "name": "apply_stats", "desc": "View application statistics", "tier": "Premium" },
+    { "name": "apply_status", "desc": "Check your application status", "tier": "Premium" },
+    { "name": "auto_promotion", "desc": "View auto-promotion settings and point thresholds", "tier": "Premium" },
+    { "name": "auto_rank_up", "desc": "Show all staff who qualify for an automatic rank-up", "tier": "Premium" },
+    { "name": "check_points", "desc": "Check user points", "tier": "Free" },
+    { "name": "check_activity", "desc": "Check staff member activity status", "tier": "Premium" },
+    { "name": "daily_summary", "desc": "Get daily activity summary report", "tier": "Premium" },
+    { "name": "demote", "desc": "Manually demote a staff member", "tier": "Premium" },
+    { "name": "help", "desc": "Get help and command list", "tier": "Free" },
+    { "name": "invite_link", "desc": "Get the server invite link", "tier": "Free" },
+    { "name": "leaderboard", "desc": "Staff activity leaderboard rankings", "tier": "Free" }
+]

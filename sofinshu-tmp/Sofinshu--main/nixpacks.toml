@@ -1,0 +1,15 @@
+[providers]
+  node = {}
+
+[phases.setup]
+  nixPkgs = ["nodejs"]
+
+[variables]
+  NIXPACKS_NODE_VERSION = "20"
+  NODE_ENV = "production"
+
+[phases.build]
+  cmds = ["npm install"]
+
+[start]
+  cmd = "node src/index.js"
