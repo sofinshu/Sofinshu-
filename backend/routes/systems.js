@@ -91,21 +91,27 @@ router.patch('/systems/:system', verifyDiscordToken, async (req, res) => {
                     const channel = await guild.channels.fetch(config.panelChannelId).catch(() => null);
                     if (channel) {
                         const embed = new EmbedBuilder()
-                            .setTitle('Support Tickets')
-                            .setDescription(config.openMessage || 'Click the button below to open a support ticket.')
+                            .setAuthor({ name: 'ULTRA-SUPPORT PROTOCOL', iconURL: 'https://i.imgur.com/vH9YkYm.png' })
+                            .setTitle('🛡️ SECURE SERVICE PORTAL')
+                            .setDescription(config.openMessage || 'Our specialized support team is ready to assist. Click the button below to initialize a secure connection.')
+                            .addFields(
+                                { name: '⚡ Response Time', value: '`< 5 Minutes`', inline: true },
+                                { name: '🔒 Security', value: '`Encrypted`', inline: true }
+                            )
                             .setColor(0x6c63ff)
-                            .setFooter({ text: 'Powered by Strata' });
+                            .setImage('https://i.imgur.com/vH9YkYm.png')
+                            .setFooter({ text: 'STRATA TICKET CORE • SYSTEM READY', iconURL: client.user.displayAvatarURL() });
 
                         const row = new ActionRowBuilder().addComponents(
                             new ButtonBuilder()
                                 .setCustomId('open_ticket')
-                                .setLabel('Open Ticket')
+                                .setLabel('Initialize Ticket')
                                 .setEmoji('🎫')
                                 .setStyle(ButtonStyle.Primary)
                         );
 
                         await channel.send({ embeds: [embed], components: [row] });
-                        actionMessage = `✅ ${system} saved and panel posted to #${channel.name}!`;
+                        actionMessage = `✅ **Ticket System Synchronized!** Panel posted to #${channel.name}.`;
                     }
                 }
 
@@ -120,13 +126,16 @@ router.patch('/systems/:system', verifyDiscordToken, async (req, res) => {
                             .replace(/{membercount}/g, guild.memberCount);
 
                         const embed = new EmbedBuilder()
-                            .setTitle('🎉 New Member (Test)')
-                            .setDescription(welcomeMsg)
-                            .setColor(0x2ecc71)
-                            .setFooter({ text: 'System Active - This is a test message' });
+                            .setAuthor({ name: 'ENTRY DETECTED • PROTOCOL TEST', iconURL: guild.iconURL({ dynamic: true }) })
+                            .setTitle('WELCOME TO THE NEON DOMAIN')
+                            .setDescription(`**CONFIG PREVIEW:**\n${welcomeMsg}`)
+                            .setColor(0x6c63ff)
+                            .setImage('https://i.imgur.com/vH9YkYm.png')
+                            .setFooter({ text: 'PREVIEW MODE: System Active & Verified' })
+                            .setTimestamp();
 
-                        await channel.send({ embeds: [embed] });
-                        actionMessage = `✅ ${system} saved and test message sent to #${channel.name}!`;
+                        await channel.send({ content: `👋 **Test Arrival Logic Processed.**`, embeds: [embed] });
+                        actionMessage = `✅ **Welcome Flow Verified!** Preview sent to #${channel.name}.`;
                     }
                 }
 
@@ -141,13 +150,14 @@ router.patch('/systems/:system', verifyDiscordToken, async (req, res) => {
                             .replace(/{membercount}/g, guild.memberCount);
 
                         const embed = new EmbedBuilder()
-                            .setTitle('👋 Member Left (Test)')
-                            .setDescription(goodbyeMsg)
-                            .setColor(0xe74c3c)
-                            .setFooter({ text: 'System Active - This is a test message' });
+                            .setAuthor({ name: 'DISCONNECTION DETECTED • PROTOCOL TEST', iconURL: guild.iconURL() })
+                            .setTitle(`A VIBE HAS LEFT THE SERVER`)
+                            .setDescription(`**CONFIG PREVIEW:**\n${goodbyeMsg}`)
+                            .setColor(0xff4757)
+                            .setFooter({ text: 'PREVIEW MODE: System Active & Verified' });
 
                         await channel.send({ embeds: [embed] });
-                        actionMessage = `✅ ${system} saved and test message sent to #${channel.name}!`;
+                        actionMessage = `✅ **Goodbye Flow Verified!** Preview sent to #${channel.name}.`;
                     }
                 }
 

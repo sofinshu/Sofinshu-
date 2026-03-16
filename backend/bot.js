@@ -62,30 +62,31 @@ client.on('guildMemberAdd', async (member) => {
                 .replace(/{membercount}/g, member.guild.memberCount);
 
             const embed = new EmbedBuilder()
-                .setAuthor({ name: `New Member Joined!`, iconURL: member.guild.iconURL() })
-                .setTitle(`Welcome to the Community!`)
+                .setAuthor({ name: `ENTRY DETECTED • ${member.guild.name}`, iconURL: member.guild.iconURL({ dynamic: true }) })
+                .setTitle(`WELCOME TO THE NEON DOMAIN`)
                 .setDescription(welcomeMsg)
-                .setColor(0x6c63ff) // Brand Purple
-                .setThumbnail(member.user.displayAvatarURL({ dynamic: true, size: 256 }))
+                .setColor(0x6c63ff) 
+                .setThumbnail(member.user.displayAvatarURL({ dynamic: true, size: 512 }))
                 .addFields(
-                    { name: '👤 Username', value: member.user.tag, inline: true },
-                    { name: '🔢 Member #', value: member.guild.memberCount.toString(), inline: true }
+                    { name: '🆔 User Identity', value: `\`${member.user.tag}\``, inline: true },
+                    { name: '📊 Server Capacity', value: `\`${member.guild.memberCount}\` Members`, inline: true },
+                    { name: '⏳ Account Born', value: `<t:${Math.floor(member.user.createdTimestamp / 1000)}:R>`, inline: false }
                 )
-                .setImage('https://i.imgur.com/vH9YkYm.png') // Generic elegant welcome banner
-                .setFooter({ text: `Strata Security • ${member.guild.name}`, iconURL: client.user.displayAvatarURL() })
+                .setImage('https://i.imgur.com/vH9YkYm.png') // High-fidelity banner
+                .setFooter({ text: `STRATA PROTOCOL • SECURITY VERIFIED`, iconURL: client.user.displayAvatarURL() })
                 .setTimestamp();
 
             if (welcome.channelId) {
                 const channel = await client.channels.fetch(welcome.channelId).catch(() => null);
-                if (channel) await channel.send({ content: `Hey ${member.user}! 👋`, embeds: [embed] }).catch(() => null);
+                if (channel) await channel.send({ content: `👋 **Attention ${member.user}!** A new connection has been established.`, embeds: [embed] }).catch(() => null);
             }
 
             if (welcome.dmEnabled) {
                 const dmEmbed = new EmbedBuilder()
-                    .setTitle(`Welcome to ${member.guild.name}`)
+                    .setTitle(`CONNECTION ESTABLISHED: ${member.guild.name}`)
                     .setDescription(welcome.dmMessage || welcomeMsg)
                     .setColor(0x6c63ff)
-                    .setFooter({ text: 'Powered by Strata Management' });
+                    .setFooter({ text: 'STRATA CORE SYSTEM' });
                 await member.send({ embeds: [dmEmbed] }).catch(() => null);
             }
         }
@@ -134,12 +135,16 @@ client.on('guildMemberRemove', async (member) => {
                 .replace(/{membercount}/g, member.guild.memberCount);
 
             const embed = new EmbedBuilder()
-                .setAuthor({ name: 'Member Left', iconURL: member.guild.iconURL() })
-                .setTitle(`Farewell, ${member.user.username}`)
+                .setAuthor({ name: 'DISCONNECTION DETECTED', iconURL: member.guild.iconURL() })
+                .setTitle(`A VIBE HAS LEFT THE SERVER`)
                 .setDescription(goodbyeMsg)
-                .setColor(0xff4757) // Brand Red
+                .setColor(0xff4757) 
                 .setThumbnail(member.user.displayAvatarURL())
-                .setFooter({ text: 'Strata Analytics' });
+                .addFields(
+                    { name: '👤 Identity', value: `\`${member.user.tag}\``, inline: true },
+                    { name: '📉 Remaining', value: `\`${member.guild.memberCount}\` Members`, inline: true }
+                )
+                .setFooter({ text: 'STRATA DISCONNECT LOG' });
 
             const channel = await client.channels.fetch(goodbye.channelId).catch(() => null);
             if (channel) await channel.send({ embeds: [embed] }).catch(() => null);
@@ -256,21 +261,26 @@ client.on('messageCreate', async (message) => {
                 const newLevel = Math.floor(Math.sqrt(newPoints / 100));
 
                 if (newLevel > oldLevel && newLevel > 0) {
+                    const nextLevelXp = (newLevel + 1) * (newLevel + 1) * 100;
+                    const progress = Math.min(Math.floor((newPoints / nextLevelXp) * 10), 10);
+                    const progressBar = '▓'.repeat(progress) + '░'.repeat(10 - progress);
+
                     const levelMsg = (leveling.message || 'GG {user}, you just leveled up to **Level {level}**!')
                         .replace(/{user}/g, message.author.toString())
                         .replace(/{level}/g, newLevel);
                     
                     const embed = new EmbedBuilder()
-                        .setAuthor({ name: 'Level Up!', iconURL: 'https://i.imgur.com/vH9YkYm.png' })
-                        .setTitle('✨ New Milestone Reached')
+                        .setAuthor({ name: 'LEVEL UP ACHIEVED!', iconURL: 'https://i.imgur.com/vH9YkYm.png' })
+                        .setTitle('✨ STRATA EVOLUTION SYSTEM')
                         .setDescription(levelMsg)
                         .setThumbnail(message.author.displayAvatarURL({ dynamic: true }))
                         .addFields(
-                            { name: 'Current Level', value: `\`${newLevel}\``, inline: true },
-                            { name: 'Total XP', value: `\`${newPoints}\``, inline: true }
+                            { name: '🏆 Milestone', value: `\`Rank: ELITE\``, inline: true },
+                            { name: '⭐ New Level', value: `\`${newLevel}\``, inline: true },
+                            { name: '📈 Evolution Progress', value: `\`[${progressBar}]\` (${newPoints}/${nextLevelXp} XP)`, inline: false }
                         )
                         .setColor(0xf1c40f)
-                        .setFooter({ text: 'Keep chatting to climb the leaderboard!' });
+                        .setFooter({ text: 'Powered by Strata Engagement Engine' });
                     
                     await message.channel.send({ embeds: [embed] }).catch(() => null);
                 }
@@ -317,14 +327,15 @@ client.on('messageDelete', async (message) => {
     if (!message.guild || message.author?.bot) return;
     const { EmbedBuilder } = require('discord.js');
     const embed = new EmbedBuilder()
-        .setAuthor({ name: 'Message Deleted', iconURL: message.author.displayAvatarURL() })
-        .setTitle('🗑️ Content Removed')
+        .setAuthor({ name: 'SECURITY ALERT: CONTENT DESTRUCTION', iconURL: 'https://i.imgur.com/8S7X7f5.png' })
+        .setTitle('🚨 DATA BREACH PREVENTED')
         .addFields(
-            { name: 'User', value: `${message.author.tag} (${message.id})`, inline: true },
-            { name: 'Channel', value: message.channel.toString(), inline: true },
-            { name: 'Content', value: `\`\`\`${message.content?.substring(0, 800) || '[No Content/Embed]'}\`\`\`` }
+            { name: '👤 Operator', value: `${message.author.tag}`, inline: true },
+            { name: '📍 Sector', value: message.channel.toString(), inline: true },
+            { name: '📝 Recovered Data', value: `\`\`\`${message.content?.substring(0, 800) || '[ENCRYPTED/EMPTY]'}\`\`\`` }
         )
         .setColor(0xff4757)
+        .setFooter({ text: 'STRATA NEURAL LOG • INCIDENT RECORDED' })
         .setTimestamp();
     await sendLog(message.guild, 'message', embed);
 });
@@ -333,14 +344,15 @@ client.on('messageUpdate', async (oldM, newM) => {
     if (!oldM.guild || oldM.author?.bot || oldM.content === newM.content) return;
     const { EmbedBuilder } = require('discord.js');
     const embed = new EmbedBuilder()
-        .setAuthor({ name: 'Message Edited', iconURL: oldM.author.displayAvatarURL() })
-        .setTitle('📝 Content Modified')
-        .setDescription(`[Jump to Message](${newM.url})`)
+        .setAuthor({ name: 'SECURITY ALERT: CONTENT MODIFICATION', iconURL: 'https://i.imgur.com/8S7X7f5.png' })
+        .setTitle('📝 DATA TRACE DETECTED')
+        .setDescription(`[Jump to Incident Point](${newM.url})`)
         .addFields(
-            { name: 'Before', value: `\`\`\`${oldM.content?.substring(0, 450) || '[No Content]'}\`\`\`` },
-            { name: 'After', value: `\`\`\`${newM.content?.substring(0, 450) || '[No Content]'}\`\`\`` }
+            { name: '⏪ Previous State', value: `\`\`\`${oldM.content?.substring(0, 450) || '[EMPTY]'}\`\`\`` },
+            { name: '⏩ Current State', value: `\`\`\`${newM.content?.substring(0, 450) || '[EMPTY]'}\`\`\`` }
         )
         .setColor(0x3498db)
+        .setFooter({ text: 'STRATA NEURAL LOG • MODIFICATION TRACKED' })
         .setTimestamp();
     await sendLog(oldM.guild, 'message', embed);
 });
@@ -350,14 +362,15 @@ client.on('guildMemberUpdate', async (oldMember, newMember) => {
     const { EmbedBuilder } = require('discord.js');
     if (oldMember.nickname !== newMember.nickname) {
         const embed = new EmbedBuilder()
-            .setAuthor({ name: 'Nickname Updated', iconURL: newMember.user.displayAvatarURL() })
-            .setTitle('👤 Profile Correction')
+            .setAuthor({ name: 'IDENTITY CORRECTION', iconURL: 'https://i.imgur.com/8S7X7f5.png' })
+            .setTitle('👤 PROFILE ATTRIBUTE UPDATED')
             .addFields(
-                { name: 'Member', value: `${newMember.user.tag}`, inline: true },
-                { name: 'From', value: `\`${oldMember.nickname || 'None'}\``, inline: true },
-                { name: 'To', value: `\`${newMember.nickname || 'None'}\``, inline: true }
+                { name: 'Member Identity', value: `${newMember.user.tag}`, inline: true },
+                { name: 'Old Alias', value: `\`${oldMember.nickname || 'None'}\``, inline: true },
+                { name: 'New Alias', value: `\`${newMember.nickname || 'None'}\``, inline: true }
             )
             .setColor(0x6c63ff)
+            .setFooter({ text: 'STRATA SECURITY • IDENTITY VERIFIED' })
             .setTimestamp();
         await sendLog(newMember.guild, 'member', embed);
     }
@@ -370,7 +383,7 @@ client.on('interactionCreate', async (interaction) => {
 
     // Handle Button Interactions (e.g., Tickets, Giveaways)
     if (interaction.isButton()) {
-        const { EmbedBuilder } = require('discord.js');
+        const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 
         // TICKETS
         if (interaction.customId === 'open_ticket') {
@@ -384,7 +397,7 @@ client.on('interactionCreate', async (interaction) => {
                 
                 // Create the ticket channel
                 const channel = await interaction.guild.channels.create({
-                    name: `ticket-${interaction.user.username}`,
+                    name: `🎫-${interaction.user.username}`,
                     type: 0, // GuildText
                     parent: config.categoryId || null,
                     permissionOverwrites: [
@@ -395,17 +408,41 @@ client.on('interactionCreate', async (interaction) => {
                 });
 
                 const welcomeEmbed = new EmbedBuilder()
-                    .setAuthor({ name: 'Support Request', iconURL: interaction.user.displayAvatarURL() })
-                    .setTitle('Ticket Created Successfully')
-                    .setDescription(`${interaction.user.toString()}, ${config.openMessage || 'A staff member will be with you shortly.'}`)
+                    .setAuthor({ name: 'ULTRA-SUPPORT PROTOCOL', iconURL: 'https://i.imgur.com/vH9YkYm.png' })
+                    .setTitle('🚀 NEW TICKET INITIALIZED')
+                    .setDescription(`Greetings **${interaction.user.tag}**,\n\n${config.openMessage || 'A specialized support agent will assist you shortly.'}`)
+                    .addFields(
+                        { name: '👤 Originator', value: interaction.user.toString(), inline: true },
+                        { name: '🛡️ Support Tier', value: `<@&${config.supportRoleId || 'Support'}>`, inline: true },
+                        { name: '📂 Subject', value: 'Server Query', inline: true }
+                    )
                     .setColor(0x6c63ff)
-                    .setFooter({ text: 'Use the button below to close this ticket if resolved.' });
+                    .setImage('https://i.imgur.com/vH9YkYm.png') // Branded banner
+                    .setFooter({ text: 'STRATA TICKET CORE • PLEASE WAIT FOR STAFF RESPONSE', iconURL: client.user.displayAvatarURL() });
 
-                await channel.send({ content: `${interaction.user.toString()} | <@&${config.supportRoleId || ''}>`, embeds: [welcomeEmbed] });
-                await interaction.editReply(`✅ Ticket created: ${channel.toString()}`);
+                const row = new ActionRowBuilder().addComponents(
+                    new ButtonBuilder()
+                        .setCustomId('close_ticket')
+                        .setLabel('Close Connection')
+                        .setEmoji('🔒')
+                        .setStyle(ButtonStyle.Danger)
+                );
+
+                await channel.send({ content: `${interaction.user.toString()} | <@&${config.supportRoleId || ''}>`, embeds: [welcomeEmbed], components: [row] });
+                await interaction.editReply(`✅ **Secure connection established:** ${channel.toString()}`);
             } catch (error) {
                 console.error('[Bot] Error creating ticket:', error);
                 await interaction.editReply('❌ Failed to create ticket. Verify bot permissions.');
+            }
+        }
+
+        // CLOSE TICKET
+        if (interaction.customId === 'close_ticket') {
+            try {
+                await interaction.reply({ content: '⚠️ **Closing protocol initiated...** This channel will be purged in 5 seconds.', ephemeral: false });
+                setTimeout(() => interaction.channel.delete().catch(() => null), 5000);
+            } catch (e) {
+                console.error('[Bot] Ticket Close Error:', e);
             }
         }
 
