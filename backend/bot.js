@@ -31,6 +31,7 @@ client.on('guildMemberAdd', async (member) => {
                     let welcomeMessage = (settings.message || 'Welcome {user} to {server}!')
                         .replace(/{user}/g, member.user.toString())
                         .replace(/{server}/g, member.guild.name)
+                        .replace(/{count}/g, member.guild.memberCount)
                         .replace(/{membercount}/g, member.guild.memberCount);
 
                     const embed = new EmbedBuilder()

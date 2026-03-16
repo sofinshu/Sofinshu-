@@ -1458,10 +1458,14 @@ async function saveSystem(system, payload) {
             headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
         });
-        if (!res.ok) throw new Error(`${res.status}`);
-        toast(`✅ ${system.charAt(0).toUpperCase() + system.slice(1)} settings saved — bot will apply changes immediately.`);
+        
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || res.status);
+        
+        // Show the message from the server (which might contain warnings like "Bot not in server")
+        toast(data.message || `✅ ${system.charAt(0).toUpperCase() + system.slice(1)} settings saved.`);
     } catch (e) {
-        toast(`Failed to save. Make sure the bot is properly authorized.`);
+        toast(`Failed to save: ${e.message}`);
         console.error(e);
     }
 }
