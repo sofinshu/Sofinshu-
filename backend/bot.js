@@ -162,13 +162,21 @@ client.on('guildDelete', (guild) => {
     // }
 });
 
+console.log('[Bot] Starting boot process...');
 const token = process.env.DISCORD_TOKEN;
 if (token) {
-    client.login(token).catch(err => {
-        console.error('[Bot] Failed to login:', err.message);
+    console.log('[Bot] Token found, attempting login...');
+    client.login(token).then(() => {
+        console.log('[Bot] Discord login trigger successful');
+    }).catch(err => {
+        console.error('[Bot] CRITICAL: Failed to login:', err.message);
+        if (err.message.includes('TOKEN_INVALID')) {
+            console.error('[Bot] The DISCORD_TOKEN in your Railway variables is INCORRECT!');
+        }
     });
 } else {
-    console.warn('[Bot] DISCORD_TOKEN not set - bot will not connect to Discord');
+    console.error('[Bot] ERROR: DISCORD_TOKEN is missing from environment variables!');
+    console.warn('[Bot] Bot will remain OFFLINE until you add the token in Railway settings.');
 }
 
 // Export client for use in other modules
