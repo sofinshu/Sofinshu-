@@ -1,10 +1,11 @@
 {
-  "name": "sofinshu-strata-unified",
+  "name": "strata-unified-dashboard",
   "version": "1.0.0",
-  "description": "Unified Discord Bot and Dashboard",
-  "main": "server.js",
+  "description": "Integrated Discord Bot and Dashboard",
+  "main": "backend/server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node backend/server.js",
+    "dev": "nodemon backend/server.js"
   },
   "dependencies": {
     "axios": "^1.8.2",
@@ -29,6 +30,9 @@
     "uuid": "^9.0.1",
     "winston": "^3.17.0",
     "ws": "^8.16.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.3"
   },
   "engines": {
     "node": ">=20.0.0"
