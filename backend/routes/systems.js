@@ -70,6 +70,7 @@ router.patch('/systems/:system', verifyDiscordToken, async (req, res) => {
         `);
 
         stmt.run(guildId, system, JSON.stringify(config), enabled ? 1 : 0);
+        console.log(`[Systems] ${guildId}: Saved ${system} (Enabled: ${enabled}). Config:`, JSON.stringify(config));
 
         // Sync to Bot API removed - Bot and Dashboard are now unified/single-process.
         // The bot instance running in this same process reads directly from the shared SQLite database.
