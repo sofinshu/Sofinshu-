@@ -54,37 +54,69 @@ client.on('guildMemberAdd', async (member) => {
     }
 });
 
-// --- TICKET INTERACTION HANDLER ---
+// --- CENTRAL INTERACTION HANDLER ---
 client.on('interactionCreate', async (interaction) => {
-    if (!interaction.isButton()) return;
+    // Log every interaction received to help debug "application did not respond"
+    console.log(`[Bot] Received interaction: ${interaction.type} (${interaction.commandName || interaction.customId}) from ${interaction.user.tag}`);
 
-    if (interaction.customId === 'open_ticket') {
+    // Handle Button Interactions (e.g., Tickets)
+    if (interaction.isButton()) {
+        if (interaction.customId === 'open_ticket') {
+            try {
+                await interaction.deferReply({ ephemeral: true });
+
+                const settings = db.prepare('SELECT config_json FROM system_configs WHERE guild_id = ? AND system_type = ?').get(interaction.guild.id, 'tickets');
+                if (!settings) return interaction.editReply('Ticket system is not configured in the dashboard.');
+
+                const config = JSON.parse(settings.config_json);
+                
+                // Create the ticket channel
+                const channel = await interaction.guild.channels.create({
+                    name: `ticket-${interaction.user.username}`,
+                    type: 0, // GuildText
+                    parent: config.categoryId || null,
+                    permissionOverwrites: [
+                        { id: interaction.guild.id, deny: ['ViewChannel'] },
+                        { id: interaction.user.id, allow: ['ViewChannel', 'SendMessages'] },
+                        { id: config.supportRoleId, allow: ['ViewChannel', 'SendMessages'] }
+                    ].filter(o => o.id)
+                });
+
+                await channel.send({ content: `${interaction.user.toString()}, ${config.openMessage || 'Welcome to your ticket!'}` });
+                await interaction.editReply(`Ticket created: ${channel.toString()}`);
+                console.log(`[Bot] Created ticket channel for ${interaction.user.tag}`);
+            } catch (error) {
+                console.error('[Bot] Error creating ticket:', error);
+                await interaction.editReply('Failed to create ticket. Make sure the bot has "Manage Channels" permission.');
+            }
+        }
+    }
+
+    // Handle Slash Commands (Chat Input)
+    if (interaction.isChatInputCommand()) {
+        const { commandName } = interaction;
+        console.log(`[Bot] Executing slash command: /${commandName}`);
+
         try {
-            await interaction.deferReply({ ephemeral: true });
-
-            const settings = db.prepare('SELECT config_json FROM system_configs WHERE guild_id = ? AND system_type = ?').get(interaction.guild.id, 'tickets');
-            if (!settings) return interaction.editReply('Ticket system is not configured.');
-
-            const config = JSON.parse(settings.config_json);
-            
-            // Create the ticket channel
-            const channel = await interaction.guild.channels.create({
-                name: `ticket-${interaction.user.username}`,
-                type: 0, // GuildText
-                parent: config.categoryId || null,
-                permissionOverwrites: [
-                    { id: interaction.guild.id, deny: ['ViewChannel'] },
-                    { id: interaction.user.id, allow: ['ViewChannel', 'SendMessages'] },
-                    { id: config.supportRoleId, allow: ['ViewChannel', 'SendMessages'] }
-                ].filter(o => o.id)
-            });
-
-            await channel.send({ content: `${interaction.user.toString()}, ${config.openMessage || 'Welcome to your ticket!'}` });
-            await interaction.editReply(`Ticket created: ${channel.toString()}`);
-            console.log(`[Bot] Created ticket channel for ${interaction.user.tag}`);
+            if (commandName === 'ping') {
+                await interaction.reply(`🏓 Pong! Latency is ${Math.round(client.ws.ping)}ms.`);
+            } else if (commandName === 'help') {
+                await interaction.reply({
+                    content: '👋 **Strata Staff Management Bot**\n\n- Use the dashboard to configure systems like Welcome, Tickets, and Moderation.\n- Visit your dashboard here: `https://strata-oksu.vercel.app` (or your Railway URL)\n\nAvailable commands: `/ping`, `/help` (more coming soon!)',
+                    ephemeral: true
+                });
+            } else {
+                // Generic response for unknown commands that might still be registered from a previous version
+                await interaction.reply({
+                    content: `The command \`/${commandName}\` is registered but not yet implemented in this unified version. Please use the dashboard for management!`,
+                    ephemeral: true
+                });
+            }
         } catch (error) {
-            console.error('[Bot] Error creating ticket:', error);
-            await interaction.editReply('Failed to create ticket. Please contact an administrator.');
+            console.error(`[Bot] Error executing /${commandName}:`, error);
+            if (!interaction.replied && !interaction.deferred) {
+                await interaction.reply({ content: 'There was an error executing this command!', ephemeral: true });
+            }
         }
     }
 });
