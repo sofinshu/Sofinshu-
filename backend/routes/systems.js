@@ -3,6 +3,8 @@ const axios = require('axios');
 const db = require('../database/connection');
 const { verifyDiscordToken } = require('./auth');
 const { getBotApiConfig } = require('../utils/config');
+const { client } = require('../bot');
+const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 
 const router = express.Router({ mergeParams: true });
 
@@ -76,6 +78,35 @@ router.patch('/systems/:system', verifyDiscordToken, async (req, res) => {
 
         // Log activity
         logActivity(guildId, req.discordUser?.id, `${system}_updated`, { enabled });
+
+        // --- UNIFIED BOT ACTIONS ---
+        // If "Tickets" is updated and enabled, post the panel immediately
+        if (system === 'tickets' && enabled && config.panelChannelId) {
+            try {
+                const channel = await client.channels.fetch(config.panelChannelId);
+                if (channel) {
+                    const embed = new EmbedBuilder()
+                        .setTitle('Support Tickets')
+                        .setDescription(config.openMessage || 'Click the button below to open a support ticket.')
+                        .setColor(0x6c63ff)
+                        .setFooter({ text: 'Powered by Strata' });
+
+                    const row = new ActionRowBuilder().addComponents(
+                        new ButtonBuilder()
+                            .setCustomId('open_ticket')
+                            .setLabel('Open Ticket')
+                            .setEmoji('🎫')
+                            .setStyle(ButtonStyle.Primary)
+                    );
+
+                    await channel.send({ embeds: [embed], components: [row] });
+                    console.log(`[Bot] Posted ticket panel to channel ${config.panelChannelId}`);
+                }
+            } catch (botErr) {
+                console.error('[Bot] Failed to post ticket panel:', botErr.message);
+                // We don't return 500 here because the save to DB was successful.
+            }
+        }
 
         res.json({ success: true, message: `${system} configuration saved` });
     } catch (error) {

@@ -60,7 +60,41 @@ client.on('guildMemberAdd', async (member) => {
     }
 });
 
-client.once('ready', () => { // Changed from clientReady to ready (standard discord.js)
+// --- TICKET INTERACTION HANDLER ---
+client.on('interactionCreate', async (interaction) => {
+    if (!interaction.isButton()) return;
+
+    if (interaction.customId === 'open_ticket') {
+        try {
+            await interaction.deferReply({ ephemeral: true });
+
+            const settings = db.prepare('SELECT config_json FROM system_configs WHERE guild_id = ? AND system_type = ?').get(interaction.guild.id, 'tickets');
+            if (!settings) return interaction.editReply('Ticket system is not configured.');
+
+            const config = JSON.parse(settings.config_json);
+            
+            // Create the ticket channel
+            const channel = await interaction.guild.channels.create({
+                name: `ticket-${interaction.user.username}`,
+                type: 0, // GuildText
+                parent: config.categoryId || null,
+                permissionOverwrites: [
+                    { id: interaction.guild.id, deny: ['ViewChannel'] },
+                    { id: interaction.user.id, allow: ['ViewChannel', 'SendMessages'] },
+                    { id: config.supportRoleId, allow: ['ViewChannel', 'SendMessages'] }
+                ].filter(o => o.id)
+            });
+
+            await channel.send({ content: `${interaction.user.toString()}, ${config.openMessage || 'Welcome to your ticket!'}` });
+            await interaction.editReply(`Ticket created: ${channel.toString()}`);
+            console.log(`[Bot] Created ticket channel for ${interaction.user.tag}`);
+        } catch (error) {
+            console.error('[Bot] Error creating ticket:', error);
+            await interaction.editReply('Failed to create ticket. Please contact an administrator.');
+        }
+    }
+});
+client.once('ready', () => {
     console.log(`[Bot] Logged in as ${client.user.tag}`);
     console.log(`[Bot] Serving ${client.guilds.cache.size} guilds`);
     client.user.setActivity('staff management', { type: ActivityType.Watching });
