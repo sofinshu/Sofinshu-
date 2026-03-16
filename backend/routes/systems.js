@@ -52,6 +52,9 @@ router.patch('/systems/:system', verifyDiscordToken, async (req, res) => {
             return res.status(404).json({ error: 'Unknown system' });
         }
 
+        // Normalize guildId to string for consistent storage and lookup
+        const normalizedGuildId = String(guildId);
+        
         // The frontend sends the payload exactly how it should be stored in the DB
         // For systems without an explicit 'enabled' toggle in the UI payload, assume they are enabled when configured (e.g., automod, autorole, logging)
         const enabled = data.enabled !== undefined ? data.enabled : true;
@@ -69,8 +72,8 @@ router.patch('/systems/:system', verifyDiscordToken, async (req, res) => {
                 updated_at = CURRENT_TIMESTAMP
         `);
 
-        stmt.run(guildId, system, JSON.stringify(config), enabled ? 1 : 0);
-        console.log(`[Systems] ${guildId}: Saved ${system} (Enabled: ${enabled}). Config:`, JSON.stringify(config));
+        stmt.run(normalizedGuildId, system, JSON.stringify(config), enabled ? 1 : 0);
+        console.log(`[Systems] ${normalizedGuildId}: Saved ${system} (Enabled: ${enabled}). Config:`, JSON.stringify(config));
 
         // Sync to Bot API removed - Bot and Dashboard are now unified/single-process.
         // The bot instance running in this same process reads directly from the shared SQLite database.
@@ -78,11 +81,18 @@ router.patch('/systems/:system', verifyDiscordToken, async (req, res) => {
 
 
         // Log activity
-        logActivity(guildId, req.discordUser?.id, `${system}_updated`, { enabled });
+        logActivity(normalizedGuildId, req.discordUser?.id, `${system}_updated`, { enabled });
 
         // --- UNIFIED BOT ACTIONS (IMMEDIATE FEEDBACK) ---
         let actionMessage = `${system} configuration saved`;
-        const guild = client.guilds.cache.get(guildId);
+        
+        // Use fetch instead of cache.get to ensure guild exists even if not in cache
+        let guild = null;
+        try {
+            guild = await client.guilds.fetch(normalizedGuildId).catch(() => null);
+        } catch (fetchErr) {
+            console.error(`[Systems] Error fetching guild ${normalizedGuildId}:`, fetchErr.message);
+        }
         
         if (enabled && guild && client.isReady()) {
             try {
@@ -189,8 +199,75 @@ router.patch('/systems/:system', verifyDiscordToken, async (req, res) => {
                     }
                 }
 
+                // AUTOMOD CONFIRMATION
+                else if (system === 'automod') {
+                    const logChannel = config.logChannel ? await guild.channels.fetch(config.logChannel).catch(() => null) : null;
+                    if (logChannel) {
+                        await logChannel.send({ 
+                            embeds: [new EmbedBuilder()
+                                .setAuthor({ name: 'Shield System', iconURL: 'https://i.imgur.com/8S7X7f5.png' })
+                                .setTitle('🛡️ Auto-Mod Configuration')
+                                .setDescription('Auto-Mod system has been updated and is now active.')
+                                .addFields(
+                                    { name: '🔗 Links', value: config.blockLinks ? '`Blocked`' : '`Allowed`', inline: true },
+                                    { name: '�Invite', value: config.blockInvites ? '`Blocked`' : '`Allowed`', inline: true },
+                                    { name: '📣 Mentions', value: config.antiMentionSpam ? `\`Max ${config.maxMentions}\`` : '`Disabled`', inline: true }
+                                )
+                                .setColor(0x6c63ff)
+                                .setTimestamp()]
+                        });
+                    }
+                    actionMessage = `✅ Auto-Mod saved and ${logChannel ? `confirmed in #${logChannel.name}` : 'ready to use'}!`;
+                }
+
+                // AUTOROLE CONFIRMATION
+                else if (system === 'autorole') {
+                    const joinRole = config.joinRoleId ? guild.roles.cache.get(config.joinRoleId) : null;
+                    const botRole = config.botRoleId ? guild.roles.cache.get(config.botRoleId) : null;
+                    
+                    actionMessage = `✅ Auto-Role configured! Members: ${joinRole ? `will get ${joinRole.name}` : 'none'}, Bots: ${botRole ? `will get ${botRole.name}` : 'none'}.`;
+                }
+
+                // ANTISPAM CONFIRMATION
+                else if (system === 'antispam') {
+                    const logChannel = config.logChannel ? await guild.channels.fetch(config.logChannel).catch(() => null) : null;
+                    if (logChannel) {
+                        await logChannel.send({ 
+                            embeds: [new EmbedBuilder()
+                                .setTitle('🛡️ Anti-Spam Shield Active')
+                                .setDescription(`Maximum ${config.maxMessagesPerWindow} messages per 2 seconds allowed.`)
+                                .setColor(0xff4757)
+                                .setTimestamp()]
+                        });
+                    }
+                    actionMessage = `✅ Anti-Spam saved and ${logChannel ? `active` : 'ready'}!`;
+                }
+
+                // ECONOMY CONFIRMATION
+                else if (system === 'economy') {
+                    actionMessage = `✅ Economy system enabled! Currency: ${config.currencySymbol} ${config.currencyName}.`;
+                }
+
+                // GIVEAWAYS CONFIRMATION
+                else if (system === 'giveaways') {
+                    const announceChannel = config.announcementChannelId ? await guild.channels.fetch(config.announcementChannelId).catch(() => null) : null;
+                    if (announceChannel) {
+                        await announceChannel.send({ 
+                            embeds: [new EmbedBuilder()
+                                .setTitle('🎉 Giveaway System Ready')
+                                .setDescription('The giveaway system has been configured and is ready to use!')
+                                .addFields(
+                                    { name: '⏱️ Default Duration', value: `\`${config.defaultDurationMinutes} minutes\``, inline: true }
+                                )
+                                .setColor(0x9b59b6)
+                                .setTimestamp()]
+                        });
+                    }
+                    actionMessage = `✅ Giveaways configured and ${announceChannel ? `ready in #${announceChannel.name}` : 'ready to use'}!`;
+                }
+
             } catch (botErr) {
-                console.error(`[Bot] ${guildId}: Discord action error:`, botErr.message);
+                console.error(`[Bot] ${normalizedGuildId}: Discord action error:`, botErr.message);
                 actionMessage = `⚠️ ${system} saved, but bot action failed: ${botErr.message}`;
             }
         } else if (enabled && !guild) {
