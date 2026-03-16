@@ -544,7 +544,7 @@ async function searchMembersToHire() {
             }
 
             resultsDiv.innerHTML = data.members.map(m => `
-                <div class="search-item" onclick="selectMemberToHire('${m.id}', '${escHtml(m.username)}')">
+                <div class="search-item" onclick="selectMemberToHire('${m.id}', '${escHtml(m.username)}', this)">
                     <img src="${m.avatar ? `https://cdn.discordapp.com/avatars/${m.id}/${m.avatar}.png` : `https://cdn.discordapp.com/embed/avatars/${Number(m.id)%5}.png`}" class="member-avatar-sm">
                     <div style="font-weight:600">${escHtml(m.username)}</div>
                     <div style="font-size:11px;color:#5c5c78;margin-left:auto">${m.id}</div>
@@ -560,12 +560,12 @@ async function searchMembersToHire() {
 let selectedMemberId = null;
 let selectedMemberName = null;
 
-function selectMemberToHire(id, name) {
+function selectMemberToHire(id, name, element) {
     selectedMemberId = id;
     selectedMemberName = name;
     
     document.querySelectorAll('.search-item').forEach(el => el.classList.remove('selected'));
-    event.currentTarget.classList.add('selected');
+    if (element) element.classList.add('selected');
     
     document.getElementById('addStaffForm').style.display = 'block';
 }
