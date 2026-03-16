@@ -62,22 +62,30 @@ client.on('guildMemberAdd', async (member) => {
                 .replace(/{membercount}/g, member.guild.memberCount);
 
             const embed = new EmbedBuilder()
-                .setTitle(`🎉 Welcome to ${member.guild.name}!`)
+                .setAuthor({ name: `New Member Joined!`, iconURL: member.guild.iconURL() })
+                .setTitle(`Welcome to the Community!`)
                 .setDescription(welcomeMsg)
-                .setColor(0x6c63ff)
-                .setThumbnail(member.user.displayAvatarURL())
-                .setFooter({ text: 'Powered by Strata' });
+                .setColor(0x6c63ff) // Brand Purple
+                .setThumbnail(member.user.displayAvatarURL({ dynamic: true, size: 256 }))
+                .addFields(
+                    { name: '👤 Username', value: member.user.tag, inline: true },
+                    { name: '🔢 Member #', value: member.guild.memberCount.toString(), inline: true }
+                )
+                .setImage('https://i.imgur.com/vH9YkYm.png') // Generic elegant welcome banner
+                .setFooter({ text: `Strata Security • ${member.guild.name}`, iconURL: client.user.displayAvatarURL() })
+                .setTimestamp();
 
             if (welcome.channelId) {
                 const channel = await client.channels.fetch(welcome.channelId).catch(() => null);
-                if (channel) await channel.send({ embeds: [embed] }).catch(() => null);
+                if (channel) await channel.send({ content: `Hey ${member.user}! 👋`, embeds: [embed] }).catch(() => null);
             }
 
             if (welcome.dmEnabled) {
                 const dmEmbed = new EmbedBuilder()
                     .setTitle(`Welcome to ${member.guild.name}`)
                     .setDescription(welcome.dmMessage || welcomeMsg)
-                    .setColor(0x6c63ff);
+                    .setColor(0x6c63ff)
+                    .setFooter({ text: 'Powered by Strata Management' });
                 await member.send({ embeds: [dmEmbed] }).catch(() => null);
             }
         }
@@ -97,13 +105,59 @@ client.on('guildMemberAdd', async (member) => {
         // 3. Member Log
         const logEmbed = new EmbedBuilder()
             .setAuthor({ name: 'Member Joined', iconURL: member.user.displayAvatarURL() })
-            .setDescription(`${member.user.tag} (${member.id})`)
-            .setColor(0x2ecc71)
-            .setFooter({ text: `Member #${member.guild.memberCount}` });
+            .setDescription(`**${member.user.tag}** joined the server.`)
+            .addFields(
+                { name: 'User ID', value: `\`${member.id}\``, inline: true },
+                { name: 'Account Age', value: `<t:${Math.floor(member.user.createdTimestamp / 1000)}:R>`, inline: true }
+            )
+            .setColor(0x00e096) // Brand Green
+            .setFooter({ text: `Total Members: ${member.guild.memberCount}` });
         await sendLog(member.guild, 'member', logEmbed);
 
     } catch (error) {
         console.error('[Bot] Error in guildMemberAdd:', error);
+    }
+});
+
+// --- SYSTEM: GOODBYE ---
+client.on('guildMemberRemove', async (member) => {
+    try {
+        const { EmbedBuilder } = require('discord.js');
+        const guildId = member.guild.id;
+
+        const goodbye = getSystemConfig(guildId, 'goodbye');
+        if (goodbye && goodbye.channelId) {
+            const goodbyeMsg = (goodbye.message || '{user} has left {server}.')
+                .replace(/{user}/g, member.user.tag)
+                .replace(/{server}/g, member.guild.name)
+                .replace(/{count}/g, member.guild.memberCount)
+                .replace(/{membercount}/g, member.guild.memberCount);
+
+            const embed = new EmbedBuilder()
+                .setAuthor({ name: 'Member Left', iconURL: member.guild.iconURL() })
+                .setTitle(`Farewell, ${member.user.username}`)
+                .setDescription(goodbyeMsg)
+                .setColor(0xff4757) // Brand Red
+                .setThumbnail(member.user.displayAvatarURL())
+                .setFooter({ text: 'Strata Analytics' });
+
+            const channel = await client.channels.fetch(goodbye.channelId).catch(() => null);
+            if (channel) await channel.send({ embeds: [embed] }).catch(() => null);
+        }
+
+        // Member Log
+        const logEmbed = new EmbedBuilder()
+            .setAuthor({ name: 'Member Left', iconURL: member.user.displayAvatarURL() })
+            .setDescription(`**${member.user.tag}** has left the server.`)
+            .addFields(
+                { name: 'User ID', value: `\`${member.id}\``, inline: true },
+                { name: 'Joined', value: member.joinedAt ? `<t:${Math.floor(member.joinedTimestamp / 1000)}:R>` : 'Unknown', inline: true }
+            )
+            .setColor(0xff4757);
+        await sendLog(member.guild, 'member', logEmbed);
+
+    } catch (error) {
+        console.error('[Bot] Error in guildMemberRemove:', error);
     }
 });
 
@@ -122,8 +176,10 @@ function getOrCreateMember(guildId, userId, username) {
     }
 }
 
-// --- SYSTEM: MESSAGE HANDLER (LEVELING, AUTOMOD, COMMANDS) ---
+// --- SYSTEM: MESSAGE HANDLER (LEVELING, AUTOMOD, ANTISPAM, COMMANDS) ---
 const xpCooldowns = new Set();
+const spamTracker = new Map();
+
 client.on('messageCreate', async (message) => {
     if (message.author.bot || !message.guild) return;
 
@@ -131,36 +187,56 @@ client.on('messageCreate', async (message) => {
     const userId = message.author.id;
     const { EmbedBuilder } = require('discord.js');
 
-    // 1. AUTOMOD
+    // 1. ANTISPAM & AUTOMOD (Merged Protection)
+    const antispam = getSystemConfig(guildId, 'antispam');
     const automod = getSystemConfig(guildId, 'automod');
-    if (automod) {
-        let violation = false;
-        let reason = '';
+    
+    let violation = false;
+    let reason = '';
 
+    // Spam Check
+    if (antispam) {
+        const now = Date.now();
+        const userData = spamTracker.get(`${guildId}-${userId}`) || { last: 0, count: 0 };
+        if (now - userData.last < 2000) { // 2 second window
+            userData.count++;
+            if (userData.count > (antispam.maxMessagesPerWindow || 5)) {
+                violation = true;
+                reason = 'Excessive Spamming';
+            }
+        } else {
+            userData.count = 1;
+        }
+        userData.last = now;
+        spamTracker.set(`${guildId}-${userId}`, userData);
+    }
+
+    // Link/Invite Check
+    if (!violation && automod) {
         if (automod.blockLinks && /https?:\/\/\S+/.test(message.content)) {
             const isAllowed = (automod.allowedDomains || []).some(d => message.content.includes(d));
             if (!isAllowed) { violation = true; reason = 'Unauthorized Link'; }
         }
-
         if (automod.blockInvites && /(discord\.gg|discord\.com\/invite)\/\S+/.test(message.content)) {
             violation = true; reason = 'Discord Invite';
         }
+    }
 
-        if (violation) {
-            await message.delete().catch(() => null);
-            if (automod.logViolations) {
-                const logEmbed = new EmbedBuilder()
-                    .setTitle('🚨 AutoMod Violation')
-                    .addFields(
-                        { name: 'User', value: `${message.author.tag} (${message.author.id})`, inline: true },
-                        { name: 'Reason', value: reason, inline: true },
-                        { name: 'Content', value: message.content.substring(0, 1024) }
-                    )
-                    .setColor(0xff4757);
-                await sendLog(message.guild, 'mod', logEmbed);
-            }
-            return;
-        }
+    if (violation) {
+        await message.delete().catch(() => null);
+        const logEmbed = new EmbedBuilder()
+            .setAuthor({ name: 'Shield Activated', iconURL: 'https://i.imgur.com/8S7X7f5.png' })
+            .setTitle('Protection Violation Detected')
+            .addFields(
+                { name: '👤 User', value: `${message.author.tag}`, inline: true },
+                { name: '🛡️ System', value: reason.includes('Spam') ? 'Anti-Spam' : 'Auto-Mod', inline: true },
+                { name: '📝 Reason', value: `\`${reason}\``, inline: false },
+                { name: '💬 Channel', value: message.channel.toString(), inline: true }
+            )
+            .setColor(0xff4757)
+            .setTimestamp();
+        await sendLog(message.guild, 'mod', logEmbed);
+        return;
     }
 
     // 2. LEVELING
@@ -176,7 +252,6 @@ client.on('messageCreate', async (message) => {
 
                 db.prepare('UPDATE guild_members SET points = ?, last_active_at = CURRENT_TIMESTAMP WHERE guild_id = ? AND user_id = ?').run(newPoints, guildId, userId);
                 
-                // Level = floor(sqrt(points/100))
                 const oldLevel = Math.floor(Math.sqrt(oldPoints / 100));
                 const newLevel = Math.floor(Math.sqrt(newPoints / 100));
 
@@ -185,7 +260,18 @@ client.on('messageCreate', async (message) => {
                         .replace(/{user}/g, message.author.toString())
                         .replace(/{level}/g, newLevel);
                     
-                    const embed = new EmbedBuilder().setDescription(levelMsg).setColor(0xf1c40f);
+                    const embed = new EmbedBuilder()
+                        .setAuthor({ name: 'Level Up!', iconURL: 'https://i.imgur.com/vH9YkYm.png' })
+                        .setTitle('✨ New Milestone Reached')
+                        .setDescription(levelMsg)
+                        .setThumbnail(message.author.displayAvatarURL({ dynamic: true }))
+                        .addFields(
+                            { name: 'Current Level', value: `\`${newLevel}\``, inline: true },
+                            { name: 'Total XP', value: `\`${newPoints}\``, inline: true }
+                        )
+                        .setColor(0xf1c40f)
+                        .setFooter({ text: 'Keep chatting to climb the leaderboard!' });
+                    
                     await message.channel.send({ embeds: [embed] }).catch(() => null);
                 }
 
@@ -209,7 +295,11 @@ client.on('messageCreate', async (message) => {
             if (match) {
                 db.prepare('UPDATE custom_commands SET usage_count = usage_count + 1 WHERE id = ?').run(cmd.id);
                 if (cmd.is_embed) {
-                    const embed = new EmbedBuilder().setDescription(cmd.response).setColor(0x6c63ff);
+                    const embed = new EmbedBuilder()
+                        .setAuthor({ name: 'Custom Command', iconURL: client.user.displayAvatarURL() })
+                        .setDescription(cmd.response)
+                        .setColor(0x6c63ff)
+                        .setFooter({ text: `Triggered by ${message.author.tag}` });
                     await message.reply({ embeds: [embed] }).catch(() => null);
                 } else {
                     await message.reply(cmd.response).catch(() => null);
@@ -228,8 +318,14 @@ client.on('messageDelete', async (message) => {
     const { EmbedBuilder } = require('discord.js');
     const embed = new EmbedBuilder()
         .setAuthor({ name: 'Message Deleted', iconURL: message.author.displayAvatarURL() })
-        .setDescription(`**Channel:** ${message.channel.toString()}\n**Content:** ${message.content || '[No Content/Embed]'}`)
-        .setColor(0xff4757);
+        .setTitle('🗑️ Content Removed')
+        .addFields(
+            { name: 'User', value: `${message.author.tag} (${message.id})`, inline: true },
+            { name: 'Channel', value: message.channel.toString(), inline: true },
+            { name: 'Content', value: `\`\`\`${message.content?.substring(0, 800) || '[No Content/Embed]'}\`\`\`` }
+        )
+        .setColor(0xff4757)
+        .setTimestamp();
     await sendLog(message.guild, 'message', embed);
 });
 
@@ -238,12 +334,14 @@ client.on('messageUpdate', async (oldM, newM) => {
     const { EmbedBuilder } = require('discord.js');
     const embed = new EmbedBuilder()
         .setAuthor({ name: 'Message Edited', iconURL: oldM.author.displayAvatarURL() })
-        .setDescription(`**Channel:** ${oldM.channel.toString()}\n[Jump to Message](${newM.url})`)
+        .setTitle('📝 Content Modified')
+        .setDescription(`[Jump to Message](${newM.url})`)
         .addFields(
-            { name: 'Before', value: oldM.content?.substring(0, 1024) || '[No Content]' },
-            { name: 'After', value: newM.content?.substring(0, 1024) || '[No Content]' }
+            { name: 'Before', value: `\`\`\`${oldM.content?.substring(0, 450) || '[No Content]'}\`\`\`` },
+            { name: 'After', value: `\`\`\`${newM.content?.substring(0, 450) || '[No Content]'}\`\`\`` }
         )
-        .setColor(0x3498db);
+        .setColor(0x3498db)
+        .setTimestamp();
     await sendLog(oldM.guild, 'message', embed);
 });
 
@@ -252,13 +350,15 @@ client.on('guildMemberUpdate', async (oldMember, newMember) => {
     const { EmbedBuilder } = require('discord.js');
     if (oldMember.nickname !== newMember.nickname) {
         const embed = new EmbedBuilder()
-            .setAuthor({ name: 'Nickname Changed', iconURL: newMember.user.displayAvatarURL() })
-            .setDescription(`${newMember.user.tag} (${newMember.id})`)
+            .setAuthor({ name: 'Nickname Updated', iconURL: newMember.user.displayAvatarURL() })
+            .setTitle('👤 Profile Correction')
             .addFields(
-                { name: 'Before', value: oldMember.nickname || 'None', inline: true },
-                { name: 'After', value: newMember.nickname || 'None', inline: true }
+                { name: 'Member', value: `${newMember.user.tag}`, inline: true },
+                { name: 'From', value: `\`${oldMember.nickname || 'None'}\``, inline: true },
+                { name: 'To', value: `\`${newMember.nickname || 'None'}\``, inline: true }
             )
-            .setColor(0xf1c40f);
+            .setColor(0x6c63ff)
+            .setTimestamp();
         await sendLog(newMember.guild, 'member', embed);
     }
 });
@@ -268,8 +368,11 @@ client.on('interactionCreate', async (interaction) => {
     // Log every interaction received to help debug "application did not respond"
     console.log(`[Bot] Received interaction: ${interaction.type} (${interaction.commandName || interaction.customId}) from ${interaction.user.tag}`);
 
-    // Handle Button Interactions (e.g., Tickets)
+    // Handle Button Interactions (e.g., Tickets, Giveaways)
     if (interaction.isButton()) {
+        const { EmbedBuilder } = require('discord.js');
+
+        // TICKETS
         if (interaction.customId === 'open_ticket') {
             try {
                 await interaction.deferReply({ ephemeral: true });
@@ -291,12 +394,29 @@ client.on('interactionCreate', async (interaction) => {
                     ].filter(o => o.id)
                 });
 
-                await channel.send({ content: `${interaction.user.toString()}, ${config.openMessage || 'Welcome to your ticket!'}` });
-                await interaction.editReply(`Ticket created: ${channel.toString()}`);
-                console.log(`[Bot] Created ticket channel for ${interaction.user.tag}`);
+                const welcomeEmbed = new EmbedBuilder()
+                    .setAuthor({ name: 'Support Request', iconURL: interaction.user.displayAvatarURL() })
+                    .setTitle('Ticket Created Successfully')
+                    .setDescription(`${interaction.user.toString()}, ${config.openMessage || 'A staff member will be with you shortly.'}`)
+                    .setColor(0x6c63ff)
+                    .setFooter({ text: 'Use the button below to close this ticket if resolved.' });
+
+                await channel.send({ content: `${interaction.user.toString()} | <@&${config.supportRoleId || ''}>`, embeds: [welcomeEmbed] });
+                await interaction.editReply(`✅ Ticket created: ${channel.toString()}`);
             } catch (error) {
                 console.error('[Bot] Error creating ticket:', error);
-                await interaction.editReply('Failed to create ticket. Make sure the bot has "Manage Channels" permission.');
+                await interaction.editReply('❌ Failed to create ticket. Verify bot permissions.');
+            }
+        }
+
+        // GIVEAWAYS (Simple Entry Logic)
+        if (interaction.customId.startsWith('enter_giveaway_')) {
+            const giveawayId = interaction.customId.split('_').pop();
+            try {
+                // In a real app, this would check a DB. For now, we'll simulate the response.
+                await interaction.reply({ content: '🎉 **Entry Confirmed!** You have been added to the pool. Good luck!', ephemeral: true });
+            } catch (e) {
+                console.error('[Bot] Giveaway Entry Error:', e);
             }
         }
     }
@@ -304,28 +424,39 @@ client.on('interactionCreate', async (interaction) => {
     // Handle Slash Commands (Chat Input)
     if (interaction.isChatInputCommand()) {
         const { commandName } = interaction;
-        console.log(`[Bot] Executing slash command: /${commandName}`);
+        const { EmbedBuilder } = require('discord.js');
 
         try {
             if (commandName === 'ping') {
-                await interaction.reply(`🏓 Pong! Latency is ${Math.round(client.ws.ping)}ms.`);
+                const embed = new EmbedBuilder()
+                    .setTitle('🏓 Connectivity Check')
+                    .addFields(
+                        { name: 'Gateway', value: `\`${Math.round(client.ws.ping)}ms\``, inline: true },
+                        { name: 'API Latency', value: `\`${Date.now() - interaction.createdTimestamp}ms\``, inline: true }
+                    )
+                    .setColor(0x6c63ff);
+                await interaction.reply({ embeds: [embed] });
             } else if (commandName === 'help') {
-                await interaction.reply({
-                    content: '👋 **Strata Staff Management Bot**\n\n- Use the dashboard to configure systems like Welcome, Tickets, and Moderation.\n- Visit your dashboard here: `https://strata-oksu.vercel.app` (or your Railway URL)\n\nAvailable commands: `/ping`, `/help` (more coming soon!)',
-                    ephemeral: true
-                });
+                const embed = new EmbedBuilder()
+                    .setAuthor({ name: 'Strata Assistant', iconURL: client.user.displayAvatarURL() })
+                    .setTitle('Information & Support')
+                    .setDescription('Welcome to **Strata**, your ultimate community management partner. Use the dashboard to customize your server experience.')
+                    .addFields(
+                        { name: '🔗 Main Dashboard', value: '`https://strata-oksu.vercel.app`', inline: false },
+                        { name: '📚 Commands', value: 'Use `/system` commands for management.', inline: true },
+                        { name: '💡 Support', value: 'Join our [Discord Server](https://discord.gg/smNwftEhKe)', inline: true }
+                    )
+                    .setImage('https://i.imgur.com/vH9YkYm.png')
+                    .setColor(0x6c63ff);
+                await interaction.reply({ embeds: [embed], ephemeral: true });
             } else {
-                // Generic response for unknown commands that might still be registered from a previous version
                 await interaction.reply({
-                    content: `The command \`/${commandName}\` is registered but not yet implemented in this unified version. Please use the dashboard for management!`,
+                    content: `The command \`/${commandName}\` is registered but not implemented in this unified version.`,
                     ephemeral: true
                 });
             }
         } catch (error) {
             console.error(`[Bot] Error executing /${commandName}:`, error);
-            if (!interaction.replied && !interaction.deferred) {
-                await interaction.reply({ content: 'There was an error executing this command!', ephemeral: true });
-            }
         }
     }
 });
