@@ -178,6 +178,10 @@ app.listen(PORT, () => {
     console.log(`[Server] STRATA Dashboard API running on port ${PORT}`);
     console.log(`[Server] Environment: ${NODE_ENV}`);
     console.log(`[Server] Database: ${process.env.DB_PATH || './database/strata.db'}`);
+    
+    // Security check for Discord Token (Masked)
+    const tokenStatus = process.env.DISCORD_TOKEN ? `SET (starts with ${process.env.DISCORD_TOKEN.substring(0, 10)}...)` : 'NOT SET! (Bot will be offline)';
+    console.log(`[Server] DISCORD_TOKEN: ${tokenStatus}`);
 });
 
 module.exports = app;
