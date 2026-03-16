@@ -90,7 +90,9 @@ client.on('interactionCreate', async (interaction) => {
 });
 client.once('ready', () => {
     console.log(`[Bot] Logged in as ${client.user.tag}`);
-    console.log(`[Bot] Serving ${client.guilds.cache.size} guilds`);
+    console.log(`[Bot] Serving ${client.guilds.cache.size} guilds:`);
+    client.guilds.cache.forEach(g => console.log(` - ${g.name} (${g.id})`));
+    
     client.user.setActivity('staff management', { type: ActivityType.Watching });
 
     // Sync existing guilds to database on startup

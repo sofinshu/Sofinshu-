@@ -84,10 +84,17 @@ router.patch('/systems/:system', verifyDiscordToken, async (req, res) => {
         if (system === 'tickets' && enabled && config.panelChannelId) {
             try {
                 if (!client.isReady()) {
-                    console.warn('[Bot] Cannot post ticket panel: Bot is not ready/logged in yet.');
-                    return res.json({ success: true, message: `${system} saved, but bot is still connecting to Discord. Panel will NOT be posted automatically this time.` });
+                    console.warn(`[Bot] ${guildId}: Bot not ready. Save successful but Discord panel skipped.`);
+                    return res.json({ success: true, message: `${system} saved, but Discord is still connecting. Panel not posted.` });
                 }
-                const channel = await client.channels.fetch(config.panelChannelId);
+
+                const guild = client.guilds.cache.get(guildId);
+                if (!guild) {
+                    console.warn(`[Bot] ${guildId}: Bot is NOT in this server. Discord panel skipped.`);
+                    return res.json({ success: true, message: `${system} saved, but bot is NOT in this server! Invite the bot first.` });
+                }
+
+                const channel = await guild.channels.fetch(config.panelChannelId);
                 if (channel) {
                     const embed = new EmbedBuilder()
                         .setTitle('Support Tickets')
@@ -104,11 +111,12 @@ router.patch('/systems/:system', verifyDiscordToken, async (req, res) => {
                     );
 
                     await channel.send({ embeds: [embed], components: [row] });
-                    console.log(`[Bot] Posted ticket panel to channel ${config.panelChannelId}`);
+                    console.log(`[Bot] ${guildId}: Successfully posted ticket panel to #${channel.name}`);
+                } else {
+                    console.warn(`[Bot] ${guildId}: Channel ${config.panelChannelId} not found or inaccessible.`);
                 }
             } catch (botErr) {
-                console.error('[Bot] Failed to post ticket panel:', botErr.message);
-                // We don't return 500 here because the save to DB was successful.
+                console.error(`[Bot] ${guildId}: Discord error:`, botErr.message);
             }
         }
 
