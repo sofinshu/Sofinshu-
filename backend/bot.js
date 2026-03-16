@@ -39,9 +39,15 @@ client.on('guildMemberAdd', async (member) => {
                         .setColor(0x00FF00);
 
                     await channel.send({ embeds: [embed] });
-                    console.log(`[Bot] Sent welcome message to ${member.user.tag}`);
+                    console.log(`[Bot] Successfully sent welcome message to ${member.user.tag} in #${channel.name}`);
+                } else {
+                    console.warn(`[Bot] Could not find welcome channel ${settings.channelId} for guild ${member.guild.name}`);
                 }
+            } else {
+                console.warn(`[Bot] Welcome system enabled but no channelId set for guild ${member.guild.name}`);
             }
+        } else {
+            console.log(`[Bot] Welcome system disabled for guild ${member.guild.name}`);
         }
     } catch (error) {
         console.error('[Bot] Error in guildMemberAdd:', error);

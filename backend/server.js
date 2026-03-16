@@ -123,6 +123,21 @@ app.use('/api/dashboard/guild/:guildId', moderationRoutes);
 app.use('/api/dashboard/guild/:guildId', systemRoutes);
 
 // Serve static files (frontend) in production
+// Debug endpoint to check bot status
+app.get('/api/debug/bot', async (req, res) => {
+    try {
+        res.json({
+            ready: client.isReady(),
+            tag: client.user?.tag,
+            guilds: client.guilds.cache.size,
+            guildList: client.guilds.cache.map(g => ({ id: g.id, name: g.name })),
+            uptime: Math.floor(process.uptime())
+        });
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
+
 if (NODE_ENV === 'production') {
     app.use(express.static(path.join(__dirname, '..')));
 
