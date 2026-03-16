@@ -91,16 +91,7 @@ app.post('/api/send-embed', async (req, res) => {
     }
 });
 
-app.post('/api/settings/welcome', async (req, res) => {
-    try {
-        const { serverId, channelId, message, enabled } = req.body;
-        const stmt = db.prepare('INSERT OR REPLACE INTO welcome_settings (serverId, channelId, message, enabled) VALUES (?, ?, ?, ?)');
-        stmt.run(serverId, channelId, message, enabled ? 1 : 0);
-        res.json({ success: true });
-    } catch (error) {
-        res.status(500).json({ success: false, error: error.message });
-    }
-});
+// Redundant /api/settings/welcome removed - handled by systemRoutes
 
 app.get('/api/servers/:serverId/channels', async (req, res) => {
     try {

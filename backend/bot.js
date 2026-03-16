@@ -11,48 +11,36 @@ const client = new Client({
     ]
 });
 
-// Initialize database
-const dbPath = process.env.DB_PATH || './database/strata.db';
-let db;
-try {
-    db = new Database(dbPath);
-    console.log('[Bot] Database connected');
-    
-    // STEP 9: Initialize Welcome Settings table if it doesn't exist
-    db.exec(`
-        CREATE TABLE IF NOT EXISTS welcome_settings (
-            serverId TEXT PRIMARY KEY,
-            channelId TEXT,
-            message TEXT,
-            enabled INTEGER
-        )
-    `);
-} catch (err) {
-    console.error('[Bot] Database connection failed:', err.message);
-}
+// Use shared database connection
+const db = require('./database/connection');
 
 // STEP 9: Welcome Message Listener
 client.on('guildMemberAdd', async (member) => {
     try {
         if (!db) return;
-        const settings = db.prepare('SELECT * FROM welcome_settings WHERE serverId = ?').get(member.guild.id);
+        console.log(`[Bot] Member joined: ${member.user.tag} in ${member.guild.name}`);
 
-        if (settings && settings.enabled) {
-            const channel = await client.channels.fetch(settings.channelId);
-            if (channel) {
-                const { EmbedBuilder } = require('discord.js');
-                let welcomeMessage = settings.message
-                    .replace(/{user}/g, member.user.toString())
-                    .replace(/{server}/g, member.guild.name)
-                    .replace(/{membercount}/g, member.guild.memberCount);
+        const row = db.prepare('SELECT config_json, enabled FROM system_configs WHERE guild_id = ? AND system_type = ?').get(member.guild.id, 'welcome');
 
-                const embed = new EmbedBuilder()
-                    .setTitle(`Welcome to ${member.guild.name}!`)
-                    .setDescription(welcomeMessage)
-                    .setColor(0x00FF00);
+        if (row && row.enabled) {
+            const settings = JSON.parse(row.config_json);
+            if (settings.channelId) {
+                const channel = await client.channels.fetch(settings.channelId);
+                if (channel) {
+                    const { EmbedBuilder } = require('discord.js');
+                    let welcomeMessage = (settings.message || 'Welcome {user} to {server}!')
+                        .replace(/{user}/g, member.user.toString())
+                        .replace(/{server}/g, member.guild.name)
+                        .replace(/{membercount}/g, member.guild.memberCount);
 
-                await channel.send({ embeds: [embed] });
-                console.log(`[Bot] Sent welcome message to ${member.user.tag}`);
+                    const embed = new EmbedBuilder()
+                        .setTitle(`Welcome to ${member.guild.name}!`)
+                        .setDescription(welcomeMessage)
+                        .setColor(0x00FF00);
+
+                    await channel.send({ embeds: [embed] });
+                    console.log(`[Bot] Sent welcome message to ${member.user.tag}`);
+                }
             }
         }
     } catch (error) {
