@@ -5,17 +5,16 @@
 
 // Backend API Configuration
 // Set to '' to use local backend, or use production URL
-const LOCAL_API = '';
-const PRODUCTION_API = '';
+const LOCAL_API = 'http://localhost:3000';
+const PRODUCTION_API = 'https://impartial-sparkle-production-ffde.up.railway.app';
 
 // Real bot API (MongoDB) — used to enrich dashboard with live data
-// Falls back to PRODUCTION_API if unavailable
-const REAL_BOT_API = '';
+const REAL_BOT_API = 'https://impartial-sparkle-production-ffde.up.railway.app';
 
 const CONFIG = {
     CLIENT_ID: '1473264644910088213',
-    // Always use relative paths for the unified backend
-    API_BASE: '',
+    // Use the Railway URL when on Vercel, relative path when on localhost
+    API_BASE: window.location.hostname === 'localhost' ? LOCAL_API : PRODUCTION_API,
     get REDIRECT_URI() {
         return encodeURIComponent(window.location.origin + window.location.pathname);
     },
