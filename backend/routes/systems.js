@@ -69,25 +69,10 @@ router.patch('/systems/:system', verifyDiscordToken, async (req, res) => {
 
         stmt.run(guildId, system, JSON.stringify(config), enabled ? 1 : 0);
 
-        const { BOT_API, BOT_API_KEY } = getBotApiConfig('systems');
-        if (!BOT_API) {
-            // Skip sync if BOT_API is not configured (Unified single-process mode)
-            console.log(`[Systems] Local bot detected or API sync disabled for ${system}. skipping HTTP sync.`);
-        } else {
-            try {
-                const apiUrl = `${BOT_API}/api/dashboard/guild/${guildId}/systems/${system}`;
-                console.log('[Systems] Syncing to Bot API:', apiUrl);
-                await axios.patch(apiUrl, data, {
-                    headers: {
-                        'Authorization': `Bearer ${BOT_API_KEY}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
-            } catch (botErr) {
-                console.error(`[Systems] Failed to sync ${system} config to Bot API:`, botErr.message);
-                return res.status(500).json({ success: false, error: 'Failed to sync ' + system + ' config to bot: ' + botErr.message });
-            }
-        }
+        // Sync to Bot API removed - Bot and Dashboard are now unified/single-process.
+        // The bot instance running in this same process reads directly from the shared SQLite database.
+        console.log(`[Systems] Adjusted ${system} config in database. Bot will pick up changes on next relevant event.`);
+
 
         // Log activity
         logActivity(guildId, req.discordUser?.id, `${system}_updated`, { enabled });

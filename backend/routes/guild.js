@@ -76,21 +76,9 @@ router.patch('/settings', verifyDiscordToken, async (req, res) => {
         // Log the change
         logActivity(guildId, req.discordUser?.id, 'settings_updated', { fields: Object.keys(req.body) });
 
-        const { BOT_API, BOT_API_KEY } = getBotApiConfig('guild');
-        if (!BOT_API || !BOT_API_KEY) {
-        } else {
-            try {
-                await axios.patch(`${BOT_API}/api/dashboard/guild/${guildId}/settings`, req.body, {
-                    headers: {
-                        'Authorization': `Bearer ${BOT_API_KEY}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
-            } catch (botErr) {
-                console.error('[Guild] Failed to sync settings to Bot API:', botErr.message, botErr.response?.data);
-                return res.status(500).json({ success: false, error: 'Failed to sync settings to bot: ' + botErr.message });
-            }
-        }
+        // Unified mode: Skip HTTP sync. Bot shares memory/DB.
+        console.log('[Guild] Settings updated in database.');
+
 
         res.json({ success: true, message: 'Settings updated' });
     } catch (error) {
@@ -222,21 +210,9 @@ router.patch('/promotion-requirements', verifyDiscordToken, async (req, res) => 
 
         logActivity(guildId, req.discordUser?.id, 'promotion_requirements_updated', { ranks: Object.keys(requirements || {}) });
 
-        const { BOT_API, BOT_API_KEY } = getBotApiConfig('guild');
-        if (!BOT_API || !BOT_API_KEY) {
-        } else {
-            try {
-                await axios.patch(`${BOT_API}/api/dashboard/guild/${guildId}/promotion-requirements`, req.body, {
-                    headers: {
-                        'Authorization': `Bearer ${BOT_API_KEY}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
-            } catch (botErr) {
-                console.error('[Guild] Failed to sync promotion requirements to Bot API:', botErr.message, botErr.response?.data);
-                return res.status(500).json({ success: false, error: 'Failed to sync promotion requirements to bot: ' + botErr.message });
-            }
-        }
+        // Unified mode: Skip HTTP sync.
+        console.log('[Guild] Promotion requirements updated in database.');
+
 
         res.json({ success: true, message: 'Promotion requirements updated' });
     } catch (error) {
@@ -300,21 +276,9 @@ router.patch('/custom-commands', verifyDiscordToken, async (req, res) => {
 
         logActivity(guildId, req.discordUser?.id, 'custom_commands_updated', { count: commands?.length || 0 });
 
-        const { BOT_API, BOT_API_KEY } = getBotApiConfig('guild');
-        if (!BOT_API || !BOT_API_KEY) {
-        } else {
-            try {
-                await axios.patch(`${BOT_API}/api/dashboard/guild/${guildId}/custom-commands`, req.body, {
-                    headers: {
-                        'Authorization': `Bearer ${BOT_API_KEY}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
-            } catch (botErr) {
-                console.error('[Guild] Failed to sync custom commands to Bot API:', botErr.message, botErr.response?.data);
-                return res.status(500).json({ success: false, error: 'Failed to sync custom commands to bot: ' + botErr.message });
-            }
-        }
+        // Unified mode: Skip HTTP sync.
+        console.log('[Guild] Custom commands updated in database.');
+
 
         res.json({ success: true, message: 'Custom commands updated' });
     } catch (error) {
@@ -425,21 +389,9 @@ router.patch('/staff-rewards', verifyDiscordToken, async (req, res) => {
             roleRewards: roleRewards?.length || 0
         });
 
-        const { BOT_API, BOT_API_KEY } = getBotApiConfig('guild');
-        if (!BOT_API || !BOT_API_KEY) {
-        } else {
-            try {
-                await axios.patch(`${BOT_API}/api/dashboard/guild/${guildId}/staff-rewards`, req.body, {
-                    headers: {
-                        'Authorization': `Bearer ${BOT_API_KEY}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
-            } catch (botErr) {
-                console.error('[Guild] Failed to sync staff rewards to Bot API:', botErr.message, botErr.response?.data);
-                return res.status(500).json({ success: false, error: 'Failed to sync staff rewards to bot: ' + botErr.message });
-            }
-        }
+        // Unified mode: Skip HTTP sync.
+        console.log('[Guild] Staff rewards updated in database.');
+
 
         res.json({ success: true, message: 'Staff rewards updated' });
     } catch (error) {
@@ -515,21 +467,9 @@ async function updateSystemConfig(guildId, systemType, data, userId, res) {
 
         logActivity(guildId, userId, `${systemType}_updated`, { enabled });
 
-        const { BOT_API, BOT_API_KEY } = getBotApiConfig('guild');
-        if (!BOT_API || !BOT_API_KEY) {
-        } else {
-            try {
-                await axios.patch(`${BOT_API}/api/dashboard/guild/${guildId}/${systemType}`, data, {
-                    headers: {
-                        'Authorization': `Bearer ${BOT_API_KEY}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
-            } catch (botErr) {
-                console.error(`[Guild] Failed to sync ${systemType} to Bot API:`, botErr.message, botErr.response?.data);
-                return res.status(500).json({ success: false, error: `Failed to sync ${systemType} to bot: ` + botErr.message });
-            }
-        }
+        // Unified mode: Skip HTTP sync.
+        console.log(`[Guild] ${systemType} config updated in database.`);
+
 
         res.json({ success: true, message: 'Configuration updated' });
     } catch (error) {
