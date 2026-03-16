@@ -124,7 +124,13 @@ router.patch('/systems/:system', verifyDiscordToken, async (req, res) => {
             }
         }
 
-        res.json({ success: true, message: `${system} configuration saved` });
+        // Final response
+        const debugInfo = `(System: ${system}, Enabled: ${enabled}, HasChannel: ${!!config.panelChannelId})`;
+        res.json({ 
+            success: true, 
+            message: `${system} configuration saved ${debugInfo}`,
+            debug: { system, enabled, hasChannel: !!config.panelChannelId, config }
+        });
     } catch (error) {
         console.error(`[Systems] Update ${req.params.system} error:`, error);
         res.status(500).json({ error: 'Failed to update system configuration' });
