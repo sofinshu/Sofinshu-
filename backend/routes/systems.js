@@ -99,7 +99,7 @@ router.patch('/systems/:system', verifyDiscordToken, async (req, res) => {
                                 { name: '🔒 Security', value: '`Encrypted`', inline: true }
                             )
                             .setColor(0x6c63ff)
-                            .setImage('https://i.imgur.com/vH9YkYm.png')
+                            .setImage('https://i.imgur.com/Atu9E8I.png')
                             .setFooter({ text: 'STRATA TICKET CORE • SYSTEM READY', iconURL: client.user.displayAvatarURL() });
 
                         const row = new ActionRowBuilder().addComponents(
@@ -130,7 +130,7 @@ router.patch('/systems/:system', verifyDiscordToken, async (req, res) => {
                             .setTitle('WELCOME TO THE NEON DOMAIN')
                             .setDescription(`**CONFIG PREVIEW:**\n${welcomeMsg}`)
                             .setColor(0x6c63ff)
-                            .setImage('https://i.imgur.com/vH9YkYm.png')
+                            .setImage('https://i.imgur.com/Atu9E8I.png')
                             .setFooter({ text: 'PREVIEW MODE: System Active & Verified' })
                             .setTimestamp();
 

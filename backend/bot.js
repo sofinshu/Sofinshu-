@@ -72,7 +72,7 @@ client.on('guildMemberAdd', async (member) => {
                     { name: '📊 Server Capacity', value: `\`${member.guild.memberCount}\` Members`, inline: true },
                     { name: '⏳ Account Born', value: `<t:${Math.floor(member.user.createdTimestamp / 1000)}:R>`, inline: false }
                 )
-                .setImage('https://i.imgur.com/vH9YkYm.png') // High-fidelity banner
+                .setImage('https://i.imgur.com/Atu9E8I.png') // Fixed Purple Banner
                 .setFooter({ text: `STRATA PROTOCOL • SECURITY VERIFIED`, iconURL: client.user.displayAvatarURL() })
                 .setTimestamp();
 
@@ -390,8 +390,14 @@ client.on('interactionCreate', async (interaction) => {
             try {
                 await interaction.deferReply({ ephemeral: true });
 
-                const settings = db.prepare('SELECT config_json FROM system_configs WHERE guild_id = ? AND system_type = ?').get(interaction.guild.id, 'tickets');
-                if (!settings) return interaction.editReply('Ticket system is not configured in the dashboard.');
+                const settings = db.prepare('SELECT config_json FROM system_configs WHERE guild_id = ? AND system_type = ?').get(interaction.guild.id.toString(), 'tickets');
+                if (!settings) {
+                    console.error(`[Bot] Ticket config missing for guild ${interaction.guild.id}`);
+                    // Debug: list what guilds ARE in the DB
+                    const existing = db.prepare('SELECT guild_id FROM system_configs WHERE system_type = ?').all('tickets');
+                    console.log(`[Bot] Available ticket configs for guilds:`, existing.map(e => e.guild_id));
+                    return interaction.editReply('❌ Ticket system is not configured in the dashboard for this server.');
+                }
 
                 const config = JSON.parse(settings.config_json);
                 
@@ -417,7 +423,7 @@ client.on('interactionCreate', async (interaction) => {
                         { name: '📂 Subject', value: 'Server Query', inline: true }
                     )
                     .setColor(0x6c63ff)
-                    .setImage('https://i.imgur.com/vH9YkYm.png') // Branded banner
+                    .setImage('https://i.imgur.com/Atu9E8I.png') // Fixed Purple Banner
                     .setFooter({ text: 'STRATA TICKET CORE • PLEASE WAIT FOR STAFF RESPONSE', iconURL: client.user.displayAvatarURL() });
 
                 const row = new ActionRowBuilder().addComponents(
