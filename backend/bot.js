@@ -14,44 +14,252 @@ const client = new Client({
 // Use shared database connection
 const db = require('./database/connection');
 
-// STEP 9: Welcome Message Listener
+// --- HELPER: GET SYSTEM CONFIG ---
+function getSystemConfig(guildId, systemType) {
+    try {
+        const row = db.prepare('SELECT config_json, enabled FROM system_configs WHERE guild_id = ? AND system_type = ?').get(guildId, systemType);
+        if (row && row.enabled) {
+            return JSON.parse(row.config_json);
+        }
+    } catch (e) {
+        console.error(`[Bot] Error fetching ${systemType} config:`, e);
+    }
+    return null;
+}
+
+// --- HELPER: SEND LOG ---
+async function sendLog(guild, type, embed) {
+    const config = getSystemConfig(guild.id, 'logging');
+    if (!config) return;
+
+    let channelId = '';
+    if (type === 'member' && config.memberLog) channelId = config.memberLogChannel;
+    if (type === 'message' && config.messageLog) channelId = config.messageLogChannel;
+    if (type === 'mod' && config.modLog) channelId = config.modLogChannel;
+
+    if (channelId) {
+        const channel = await guild.channels.fetch(channelId).catch(() => null);
+        if (channel) {
+            embed.setTimestamp();
+            await channel.send({ embeds: [embed] }).catch(() => null);
+        }
+    }
+}
+
+// --- SYSTEM: WELCOME & AUTO-ROLE ---
 client.on('guildMemberAdd', async (member) => {
     try {
-        if (!db) return;
-        console.log(`[Bot] Member joined: ${member.user.tag} in ${member.guild.name}`);
+        const { EmbedBuilder } = require('discord.js');
+        const guildId = member.guild.id;
 
-        const row = db.prepare('SELECT config_json, enabled FROM system_configs WHERE guild_id = ? AND system_type = ?').get(member.guild.id, 'welcome');
+        // 1. Welcome System
+        const welcome = getSystemConfig(guildId, 'welcome');
+        if (welcome) {
+            const welcomeMsg = (welcome.message || 'Welcome {user} to {server}!')
+                .replace(/{user}/g, member.user.toString())
+                .replace(/{server}/g, member.guild.name)
+                .replace(/{count}/g, member.guild.memberCount)
+                .replace(/{membercount}/g, member.guild.memberCount);
 
-        if (row && row.enabled) {
-            const settings = JSON.parse(row.config_json);
-            if (settings.channelId) {
-                const channel = await client.channels.fetch(settings.channelId);
-                if (channel) {
-                    const { EmbedBuilder } = require('discord.js');
-                    let welcomeMessage = (settings.message || 'Welcome {user} to {server}!')
-                        .replace(/{user}/g, member.user.toString())
-                        .replace(/{server}/g, member.guild.name)
-                        .replace(/{count}/g, member.guild.memberCount)
-                        .replace(/{membercount}/g, member.guild.memberCount);
+            const embed = new EmbedBuilder()
+                .setTitle(`🎉 Welcome to ${member.guild.name}!`)
+                .setDescription(welcomeMsg)
+                .setColor(0x6c63ff)
+                .setThumbnail(member.user.displayAvatarURL())
+                .setFooter({ text: 'Powered by Strata' });
 
-                    const embed = new EmbedBuilder()
-                        .setTitle(`Welcome to ${member.guild.name}!`)
-                        .setDescription(welcomeMessage)
-                        .setColor(0x00FF00);
-
-                    await channel.send({ embeds: [embed] });
-                    console.log(`[Bot] Successfully sent welcome message to ${member.user.tag} in #${channel.name}`);
-                } else {
-                    console.warn(`[Bot] Could not find welcome channel ${settings.channelId} for guild ${member.guild.name}`);
-                }
-            } else {
-                console.warn(`[Bot] Welcome system enabled but no channelId set for guild ${member.guild.name}`);
+            if (welcome.channelId) {
+                const channel = await client.channels.fetch(welcome.channelId).catch(() => null);
+                if (channel) await channel.send({ embeds: [embed] }).catch(() => null);
             }
-        } else {
-            console.log(`[Bot] Welcome system disabled for guild ${member.guild.name}`);
+
+            if (welcome.dmEnabled) {
+                const dmEmbed = new EmbedBuilder()
+                    .setTitle(`Welcome to ${member.guild.name}`)
+                    .setDescription(welcome.dmMessage || welcomeMsg)
+                    .setColor(0x6c63ff);
+                await member.send({ embeds: [dmEmbed] }).catch(() => null);
+            }
         }
+
+        // 2. Auto-Role System
+        const autorole = getSystemConfig(guildId, 'autorole');
+        if (autorole) {
+            const roleId = member.user.bot ? autorole.botRoleId : autorole.joinRoleId;
+            const enabled = member.user.bot ? autorole.botEnabled : autorole.joinEnabled;
+            
+            if (enabled && roleId) {
+                const role = member.guild.roles.cache.get(roleId);
+                if (role) await member.roles.add(role).catch(() => null);
+            }
+        }
+
+        // 3. Member Log
+        const logEmbed = new EmbedBuilder()
+            .setAuthor({ name: 'Member Joined', iconURL: member.user.displayAvatarURL() })
+            .setDescription(`${member.user.tag} (${member.id})`)
+            .setColor(0x2ecc71)
+            .setFooter({ text: `Member #${member.guild.memberCount}` });
+        await sendLog(member.guild, 'member', logEmbed);
+
     } catch (error) {
         console.error('[Bot] Error in guildMemberAdd:', error);
+    }
+});
+
+// --- HELPER: GET OR CREATE MEMBER ---
+function getOrCreateMember(guildId, userId, username) {
+    try {
+        let member = db.prepare('SELECT points FROM guild_members WHERE guild_id = ? AND user_id = ?').get(guildId, userId);
+        if (!member) {
+            db.prepare('INSERT INTO guild_members (guild_id, user_id, username) VALUES (?, ?, ?)').run(guildId, userId, username);
+            return { points: 0 };
+        }
+        return member;
+    } catch (e) {
+        console.error('[Bot] DB Error in getOrCreateMember:', e);
+        return { points: 0 };
+    }
+}
+
+// --- SYSTEM: MESSAGE HANDLER (LEVELING, AUTOMOD, COMMANDS) ---
+const xpCooldowns = new Set();
+client.on('messageCreate', async (message) => {
+    if (message.author.bot || !message.guild) return;
+
+    const guildId = message.guild.id;
+    const userId = message.author.id;
+    const { EmbedBuilder } = require('discord.js');
+
+    // 1. AUTOMOD
+    const automod = getSystemConfig(guildId, 'automod');
+    if (automod) {
+        let violation = false;
+        let reason = '';
+
+        if (automod.blockLinks && /https?:\/\/\S+/.test(message.content)) {
+            const isAllowed = (automod.allowedDomains || []).some(d => message.content.includes(d));
+            if (!isAllowed) { violation = true; reason = 'Unauthorized Link'; }
+        }
+
+        if (automod.blockInvites && /(discord\.gg|discord\.com\/invite)\/\S+/.test(message.content)) {
+            violation = true; reason = 'Discord Invite';
+        }
+
+        if (violation) {
+            await message.delete().catch(() => null);
+            if (automod.logViolations) {
+                const logEmbed = new EmbedBuilder()
+                    .setTitle('🚨 AutoMod Violation')
+                    .addFields(
+                        { name: 'User', value: `${message.author.tag} (${message.author.id})`, inline: true },
+                        { name: 'Reason', value: reason, inline: true },
+                        { name: 'Content', value: message.content.substring(0, 1024) }
+                    )
+                    .setColor(0xff4757);
+                await sendLog(message.guild, 'mod', logEmbed);
+            }
+            return;
+        }
+    }
+
+    // 2. LEVELING
+    const leveling = getSystemConfig(guildId, 'leveling');
+    if (leveling && !leveling.excludedChannels?.includes(message.channel.id)) {
+        const cooldownKey = `${guildId}-${userId}`;
+        if (!xpCooldowns.has(cooldownKey)) {
+            const xpToAdd = Math.floor(Math.random() * (leveling.maxXp - leveling.minXp + 1)) + leveling.minXp;
+            try {
+                const member = getOrCreateMember(guildId, userId, message.author.username);
+                const oldPoints = member.points;
+                const newPoints = oldPoints + xpToAdd;
+
+                db.prepare('UPDATE guild_members SET points = ?, last_active_at = CURRENT_TIMESTAMP WHERE guild_id = ? AND user_id = ?').run(newPoints, guildId, userId);
+                
+                // Level = floor(sqrt(points/100))
+                const oldLevel = Math.floor(Math.sqrt(oldPoints / 100));
+                const newLevel = Math.floor(Math.sqrt(newPoints / 100));
+
+                if (newLevel > oldLevel && newLevel > 0) {
+                    const levelMsg = (leveling.message || 'GG {user}, you just leveled up to **Level {level}**!')
+                        .replace(/{user}/g, message.author.toString())
+                        .replace(/{level}/g, newLevel);
+                    
+                    const embed = new EmbedBuilder().setDescription(levelMsg).setColor(0xf1c40f);
+                    await message.channel.send({ embeds: [embed] }).catch(() => null);
+                }
+
+                xpCooldowns.add(cooldownKey);
+                setTimeout(() => xpCooldowns.delete(cooldownKey), (leveling.cooldown || 60) * 1000);
+            } catch (e) {
+                console.error('[Bot] Leveling DB Error:', e);
+            }
+        }
+    }
+
+    // 3. CUSTOM COMMANDS
+    try {
+        const commands = db.prepare('SELECT * FROM custom_commands WHERE guild_id = ? AND enabled = 1').all(guildId);
+        for (const cmd of commands) {
+            let match = false;
+            if (cmd.match_type === 'exact' && message.content.toLowerCase() === cmd.trigger.toLowerCase()) match = true;
+            if (cmd.match_type === 'starts' && message.content.toLowerCase().startsWith(cmd.trigger.toLowerCase())) match = true;
+            if (cmd.match_type === 'contains' && message.content.toLowerCase().includes(cmd.trigger.toLowerCase())) match = true;
+
+            if (match) {
+                db.prepare('UPDATE custom_commands SET usage_count = usage_count + 1 WHERE id = ?').run(cmd.id);
+                if (cmd.is_embed) {
+                    const embed = new EmbedBuilder().setDescription(cmd.response).setColor(0x6c63ff);
+                    await message.reply({ embeds: [embed] }).catch(() => null);
+                } else {
+                    await message.reply(cmd.response).catch(() => null);
+                }
+                break;
+            }
+        }
+    } catch (e) {
+        console.error('[Bot] Custom Commands Error:', e);
+    }
+});
+
+// --- SYSTEM: LOGGING (MESSAGE EVENTS) ---
+client.on('messageDelete', async (message) => {
+    if (!message.guild || message.author?.bot) return;
+    const { EmbedBuilder } = require('discord.js');
+    const embed = new EmbedBuilder()
+        .setAuthor({ name: 'Message Deleted', iconURL: message.author.displayAvatarURL() })
+        .setDescription(`**Channel:** ${message.channel.toString()}\n**Content:** ${message.content || '[No Content/Embed]'}`)
+        .setColor(0xff4757);
+    await sendLog(message.guild, 'message', embed);
+});
+
+client.on('messageUpdate', async (oldM, newM) => {
+    if (!oldM.guild || oldM.author?.bot || oldM.content === newM.content) return;
+    const { EmbedBuilder } = require('discord.js');
+    const embed = new EmbedBuilder()
+        .setAuthor({ name: 'Message Edited', iconURL: oldM.author.displayAvatarURL() })
+        .setDescription(`**Channel:** ${oldM.channel.toString()}\n[Jump to Message](${newM.url})`)
+        .addFields(
+            { name: 'Before', value: oldM.content?.substring(0, 1024) || '[No Content]' },
+            { name: 'After', value: newM.content?.substring(0, 1024) || '[No Content]' }
+        )
+        .setColor(0x3498db);
+    await sendLog(oldM.guild, 'message', embed);
+});
+
+// --- SYSTEM: LOGGING (MEMBER EVENTS) ---
+client.on('guildMemberUpdate', async (oldMember, newMember) => {
+    const { EmbedBuilder } = require('discord.js');
+    if (oldMember.nickname !== newMember.nickname) {
+        const embed = new EmbedBuilder()
+            .setAuthor({ name: 'Nickname Changed', iconURL: newMember.user.displayAvatarURL() })
+            .setDescription(`${newMember.user.tag} (${newMember.id})`)
+            .addFields(
+                { name: 'Before', value: oldMember.nickname || 'None', inline: true },
+                { name: 'After', value: newMember.nickname || 'None', inline: true }
+            )
+            .setColor(0xf1c40f);
+        await sendLog(newMember.guild, 'member', embed);
     }
 });
 
