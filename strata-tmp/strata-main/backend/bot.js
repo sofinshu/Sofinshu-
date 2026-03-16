@@ -17,11 +17,50 @@ let db;
 try {
     db = new Database(dbPath);
     console.log('[Bot] Database connected');
+    
+    // STEP 9: Initialize Welcome Settings table if it doesn't exist
+    db.exec(`
+        CREATE TABLE IF NOT EXISTS welcome_settings (
+            serverId TEXT PRIMARY KEY,
+            channelId TEXT,
+            message TEXT,
+            enabled INTEGER
+        )
+    `);
 } catch (err) {
     console.error('[Bot] Database connection failed:', err.message);
 }
 
-client.once('clientReady', () => {
+// STEP 9: Welcome Message Listener
+client.on('guildMemberAdd', async (member) => {
+    try {
+        if (!db) return;
+        const settings = db.prepare('SELECT * FROM welcome_settings WHERE serverId = ?').get(member.guild.id);
+
+        if (settings && settings.enabled) {
+            const channel = await client.channels.fetch(settings.channelId);
+            if (channel) {
+                const { EmbedBuilder } = require('discord.js');
+                let welcomeMessage = settings.message
+                    .replace(/{user}/g, member.user.toString())
+                    .replace(/{server}/g, member.guild.name)
+                    .replace(/{membercount}/g, member.guild.memberCount);
+
+                const embed = new EmbedBuilder()
+                    .setTitle(`Welcome to ${member.guild.name}!`)
+                    .setDescription(welcomeMessage)
+                    .setColor(0x00FF00);
+
+                await channel.send({ embeds: [embed] });
+                console.log(`[Bot] Sent welcome message to ${member.user.tag}`);
+            }
+        }
+    } catch (error) {
+        console.error('[Bot] Error in guildMemberAdd:', error);
+    }
+});
+
+client.once('ready', () => { // Changed from clientReady to ready (standard discord.js)
     console.log(`[Bot] Logged in as ${client.user.tag}`);
     console.log(`[Bot] Serving ${client.guilds.cache.size} guilds`);
     client.user.setActivity('staff management', { type: ActivityType.Watching });

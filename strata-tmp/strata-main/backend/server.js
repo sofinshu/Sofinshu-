@@ -66,6 +66,64 @@ app.get('/health', (req, res) => {
     });
 });
 
+// STEP 9: Integrated Connection Routes
+const { EmbedBuilder } = require('discord.js');
+const { client } = require('./bot');
+
+app.post('/api/send-embed', async (req, res) => {
+    try {
+        const { channelId, title, description, color } = req.body;
+        if (!channelId || !title || !description) {
+            return res.status(400).json({ success: false, error: "Missing data" });
+        }
+        const channel = await client.channels.fetch(channelId);
+        if (!channel) return res.status(404).json({ success: false, error: "Channel not found" });
+
+        const embed = new EmbedBuilder()
+            .setTitle(title)
+            .setDescription(description)
+            .setColor(color || 0x5865F2);
+
+        await channel.send({ embeds: [embed] });
+        res.json({ success: true });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+app.post('/api/settings/welcome', async (req, res) => {
+    try {
+        const { serverId, channelId, message, enabled } = req.body;
+        const stmt = db.prepare('INSERT OR REPLACE INTO welcome_settings (serverId, channelId, message, enabled) VALUES (?, ?, ?, ?)');
+        stmt.run(serverId, channelId, message, enabled ? 1 : 0);
+        res.json({ success: true });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+app.get('/api/servers/:serverId/channels', async (req, res) => {
+    try {
+        const guild = await client.guilds.fetch(req.params.serverId);
+        const channels = guild.channels.cache
+            .filter(c => c.type === 0)
+            .map(c => ({ id: c.id, name: c.name }));
+        res.json(channels);
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+app.get('/api/servers/:serverId/roles', async (req, res) => {
+    try {
+        const guild = await client.guilds.fetch(req.params.serverId);
+        const roles = guild.roles.cache.map(r => ({ id: r.id, name: r.name, color: r.hexColor }));
+        res.json(roles);
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
 // API Routes
 app.use('/auth', authRoutes.router);
 app.use('/api/dashboard', dashboardRoutes);

@@ -2,12 +2,17 @@ const Database = require('better-sqlite3');
 const path = require('path');
 const fs = require('fs');
 
-const DB_PATH = process.env.DB_PATH || path.join(__dirname, 'strata.db');
+const DB_PATH = process.env.DB_PATH || path.resolve(__dirname, '..', 'database', 'strata.db');
 
 // Ensure database directory exists
 const dbDir = path.dirname(DB_PATH);
-if (!fs.existsSync(dbDir)) {
-    fs.mkdirSync(dbDir, { recursive: true });
+try {
+    if (!fs.existsSync(dbDir)) {
+        fs.mkdirSync(dbDir, { recursive: true });
+        console.log('[Database] Created directory:', dbDir);
+    }
+} catch (err) {
+    console.warn('[Database] Failed to create directory, will try fallback.');
 }
 
 // Create database connection
@@ -17,8 +22,8 @@ try {
     console.log('[Database] Connected to:', DB_PATH);
 } catch (error) {
     console.warn(`[Database] Failed to open database at ${DB_PATH}:`, error.message);
-    const FALLBACK_PATH = path.join(__dirname, 'strata.db');
-    console.log('[Database] Falling back to local database:', FALLBACK_PATH);
+    const FALLBACK_PATH = '/tmp/strata.db'; // Common writable path on Railway/Nixpacks
+    console.log('[Database] Falling back to temporary database:', FALLBACK_PATH);
     db = new Database(FALLBACK_PATH);
 }
 
