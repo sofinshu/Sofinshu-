@@ -17,12 +17,19 @@ const db = require('./database/connection');
 // --- HELPER: GET SYSTEM CONFIG ---
 function getSystemConfig(guildId, systemType) {
     try {
-        const row = db.prepare('SELECT config_json, enabled FROM system_configs WHERE guild_id = ? AND system_type = ?').get(guildId, systemType);
+        const guildIdStr = String(guildId);
+        let row = db.prepare('SELECT config_json, enabled FROM system_configs WHERE guild_id = ? AND system_type = ?').get(guildIdStr, systemType);
+        
+        // If not found as string, try as number (for compatibility)
+        if (!row) {
+            row = db.prepare('SELECT config_json, enabled FROM system_configs WHERE guild_id = ? AND system_type = ?').get(guildId, systemType);
+        }
+        
         if (row && row.enabled) {
             return JSON.parse(row.config_json);
         }
     } catch (e) {
-        console.error(`[Bot] Error fetching ${systemType} config:`, e);
+        console.error(`[Bot] Error fetching ${systemType} config for guild ${guildId}:`, e);
     }
     return null;
 }
@@ -390,9 +397,20 @@ client.on('interactionCreate', async (interaction) => {
             try {
                 await interaction.deferReply({ ephemeral: true });
 
-                const settings = db.prepare('SELECT config_json FROM system_configs WHERE guild_id = ? AND system_type = ?').get(interaction.guild.id.toString(), 'tickets');
+                const guildId = interaction.guild.id.toString();
+                console.log(`[Bot] Ticket button clicked in guild: ${guildId}`);
+                
+                // Try to find the config - check both string and number formats for compatibility
+                let settings = db.prepare('SELECT config_json FROM system_configs WHERE guild_id = ? AND system_type = ?').get(guildId, 'tickets');
+                
+                // If not found, try with just the ID (in case it was stored differently)
                 if (!settings) {
-                    console.error(`[Bot] Ticket config missing for guild ${interaction.guild.id}`);
+                    settings = db.prepare('SELECT config_json FROM system_configs WHERE guild_id = ? AND system_type = ?').get(interaction.guild.id, 'tickets');
+                }
+                
+                // Debug: log what's being queried
+                if (!settings) {
+                    console.error(`[Bot] Ticket config missing for guild ${guildId}`);
                     // Debug: list what guilds ARE in the DB
                     const existing = db.prepare('SELECT guild_id FROM system_configs WHERE system_type = ?').all('tickets');
                     console.log(`[Bot] Available ticket configs for guilds:`, existing.map(e => e.guild_id));
