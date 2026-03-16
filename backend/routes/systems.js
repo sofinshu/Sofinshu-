@@ -113,11 +113,14 @@ router.patch('/systems/:system', verifyDiscordToken, async (req, res) => {
 
                     await channel.send({ embeds: [embed], components: [row] });
                     console.log(`[Bot] ${guildId}: Successfully posted ticket panel to #${channel.name}`);
+                    return res.json({ success: true, message: `✅ ${system} saved and panel posted to #${channel.name}!` });
                 } else {
                     console.warn(`[Bot] ${guildId}: Channel ${config.panelChannelId} not found or inaccessible.`);
+                    return res.json({ success: true, message: `✅ ${system} saved, but channel ${config.panelChannelId} was not found!` });
                 }
             } catch (botErr) {
                 console.error(`[Bot] ${guildId}: Discord error:`, botErr.message);
+                return res.json({ success: true, message: `⚠️ ${system} saved, but the bot failed to post the panel: ${botErr.message}` });
             }
         }
 
