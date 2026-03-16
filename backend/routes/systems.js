@@ -80,56 +80,120 @@ router.patch('/systems/:system', verifyDiscordToken, async (req, res) => {
         // Log activity
         logActivity(guildId, req.discordUser?.id, `${system}_updated`, { enabled });
 
-        // --- UNIFIED BOT ACTIONS ---
-        // If "Tickets" is updated and enabled, post the panel immediately
-        if (system === 'tickets' && enabled && config.panelChannelId) {
+        // --- UNIFIED BOT ACTIONS (IMMEDIATE FEEDBACK) ---
+        let actionMessage = `${system} configuration saved`;
+        const guild = client.guilds.cache.get(guildId);
+        
+        if (enabled && guild && client.isReady()) {
             try {
-                if (!client.isReady()) {
-                    console.warn(`[Bot] ${guildId}: Bot not ready. Save successful but Discord panel skipped.`);
-                    return res.json({ success: true, message: `${system} saved, but Discord is still connecting. Panel not posted.` });
+                // TICKET PANEL
+                if (system === 'tickets' && config.panelChannelId) {
+                    const channel = await guild.channels.fetch(config.panelChannelId).catch(() => null);
+                    if (channel) {
+                        const embed = new EmbedBuilder()
+                            .setTitle('Support Tickets')
+                            .setDescription(config.openMessage || 'Click the button below to open a support ticket.')
+                            .setColor(0x6c63ff)
+                            .setFooter({ text: 'Powered by Strata' });
+
+                        const row = new ActionRowBuilder().addComponents(
+                            new ButtonBuilder()
+                                .setCustomId('open_ticket')
+                                .setLabel('Open Ticket')
+                                .setEmoji('🎫')
+                                .setStyle(ButtonStyle.Primary)
+                        );
+
+                        await channel.send({ embeds: [embed], components: [row] });
+                        actionMessage = `✅ ${system} saved and panel posted to #${channel.name}!`;
+                    }
                 }
 
-                const guild = client.guilds.cache.get(guildId);
-                if (!guild) {
-                    console.warn(`[Bot] ${guildId}: Bot is NOT in this server. Discord panel skipped.`);
-                    return res.json({ success: true, message: `${system} saved, but bot is NOT in this server! Invite the bot first.` });
+                // WELCOME PREVIEW
+                else if (system === 'welcome' && config.channelId) {
+                    const channel = await guild.channels.fetch(config.channelId).catch(() => null);
+                    if (channel) {
+                        const welcomeMsg = (config.message || 'Welcome {user} to {server}!')
+                            .replace(/{user}/g, req.discordUser?.username || 'User')
+                            .replace(/{server}/g, guild.name)
+                            .replace(/{count}/g, guild.memberCount)
+                            .replace(/{membercount}/g, guild.memberCount);
+
+                        const embed = new EmbedBuilder()
+                            .setTitle('🎉 New Member (Test)')
+                            .setDescription(welcomeMsg)
+                            .setColor(0x2ecc71)
+                            .setFooter({ text: 'System Active - This is a test message' });
+
+                        await channel.send({ embeds: [embed] });
+                        actionMessage = `✅ ${system} saved and test message sent to #${channel.name}!`;
+                    }
                 }
 
-                const channel = await guild.channels.fetch(config.panelChannelId);
-                if (channel) {
-                    const embed = new EmbedBuilder()
-                        .setTitle('Support Tickets')
-                        .setDescription(config.openMessage || 'Click the button below to open a support ticket.')
-                        .setColor(0x6c63ff)
-                        .setFooter({ text: 'Powered by Strata' });
+                // GOODBYE PREVIEW
+                else if (system === 'goodbye' && config.channelId) {
+                    const channel = await guild.channels.fetch(config.channelId).catch(() => null);
+                    if (channel) {
+                        const goodbyeMsg = (config.message || '{user} has left {server}.')
+                            .replace(/{user}/g, req.discordUser?.username || 'User')
+                            .replace(/{server}/g, guild.name)
+                            .replace(/{count}/g, guild.memberCount)
+                            .replace(/{membercount}/g, guild.memberCount);
 
-                    const row = new ActionRowBuilder().addComponents(
-                        new ButtonBuilder()
-                            .setCustomId('open_ticket')
-                            .setLabel('Open Ticket')
-                            .setEmoji('🎫')
-                            .setStyle(ButtonStyle.Primary)
-                    );
+                        const embed = new EmbedBuilder()
+                            .setTitle('👋 Member Left (Test)')
+                            .setDescription(goodbyeMsg)
+                            .setColor(0xe74c3c)
+                            .setFooter({ text: 'System Active - This is a test message' });
 
-                    await channel.send({ embeds: [embed], components: [row] });
-                    console.log(`[Bot] ${guildId}: Successfully posted ticket panel to #${channel.name}`);
-                    return res.json({ success: true, message: `✅ ${system} saved and panel posted to #${channel.name}!` });
-                } else {
-                    console.warn(`[Bot] ${guildId}: Channel ${config.panelChannelId} not found or inaccessible.`);
-                    return res.json({ success: true, message: `✅ ${system} saved, but channel ${config.panelChannelId} was not found!` });
+                        await channel.send({ embeds: [embed] });
+                        actionMessage = `✅ ${system} saved and test message sent to #${channel.name}!`;
+                    }
                 }
+
+                // LOGGING INITIALIZATION
+                else if (system === 'logging') {
+                    const channels = [config.memberLogChannel, config.messageLogChannel, config.modLogChannel].filter(Boolean);
+                    for (const chId of channels) {
+                        const channel = await guild.channels.fetch(chId).catch(() => null);
+                        if (channel) {
+                            await channel.send({ 
+                                embeds: [new EmbedBuilder().setDescription(`📑 **Logging system updated and active.**`).setColor(0x5865F2)] 
+                            }).catch(() => null);
+                        }
+                    }
+                    actionMessage = `✅ Logging settings saved and test logs sent.`;
+                }
+
+                // LEVELING ANNOUNCEMENT
+                else if (system === 'leveling' && config.channelId) {
+                    const channel = await guild.channels.fetch(config.channelId).catch(() => null);
+                    if (channel) {
+                        await channel.send({ 
+                            embeds: [new EmbedBuilder()
+                                .setTitle('✨ Leveling Active')
+                                .setDescription(`The leveling system has been enabled!\n**Preview:** ${config.message || 'GG {user}, you leveled up!'}`)
+                                .setColor(0xf1c40f)] 
+                        });
+                        actionMessage = `✅ Leveling saved and announced in #${channel.name}!`;
+                    }
+                }
+
             } catch (botErr) {
-                console.error(`[Bot] ${guildId}: Discord error:`, botErr.message);
-                return res.json({ success: true, message: `⚠️ ${system} saved, but the bot failed to post the panel: ${botErr.message}` });
+                console.error(`[Bot] ${guildId}: Discord action error:`, botErr.message);
+                actionMessage = `⚠️ ${system} saved, but bot action failed: ${botErr.message}`;
             }
+        } else if (enabled && !guild) {
+            actionMessage = `⚠️ ${system} saved, but bot is NOT in this server! Invite it first.`;
+        } else if (enabled && !client.isReady()) {
+            actionMessage = `⚠️ ${system} saved, but Discord is connecting. Bot will sync shortly.`;
         }
 
-        // Final response
-        const debugInfo = `(System: ${system}, Enabled: ${enabled}, HasChannel: ${!!config.panelChannelId})`;
+        const debugInfo = `(System: ${system}, Enabled: ${enabled}, HasChannel: ${!!(config.panelChannelId || config.channelId)})`;
         res.json({ 
             success: true, 
-            message: `${system} configuration saved ${debugInfo}`,
-            debug: { system, enabled, hasChannel: !!config.panelChannelId, config }
+            message: `${actionMessage} ${debugInfo}`,
+            debug: { system, enabled, actionMessage }
         });
     } catch (error) {
         console.error(`[Systems] Update ${req.params.system} error:`, error);
