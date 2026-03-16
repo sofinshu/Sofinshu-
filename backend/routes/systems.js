@@ -83,6 +83,10 @@ router.patch('/systems/:system', verifyDiscordToken, async (req, res) => {
         // If "Tickets" is updated and enabled, post the panel immediately
         if (system === 'tickets' && enabled && config.panelChannelId) {
             try {
+                if (!client.isReady()) {
+                    console.warn('[Bot] Cannot post ticket panel: Bot is not ready/logged in yet.');
+                    return res.json({ success: true, message: `${system} saved, but bot is still connecting to Discord. Panel will NOT be posted automatically this time.` });
+                }
                 const channel = await client.channels.fetch(config.panelChannelId);
                 if (channel) {
                     const embed = new EmbedBuilder()
