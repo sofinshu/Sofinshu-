@@ -1,28 +1,30 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const { EmbedBuilder } = require('discord.js');
-const client = require('./bot'); // STEP 1: Import the shared client
+const { client, WelcomeSettings } = require('./bot'); // STEP 1: Import the shared client and models
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080; // Changed default to 8080 for broader compatibility
 
 // Middleware
 app.use(express.json());
 
-// Database Connection (Mongoose Example)
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/discord-dashboard';
-mongoose.connect(MONGODB_URI)
-    .then(() => console.log('[Server] MongoDB connected'))
-    .catch(err => console.error('[Server] MongoDB error:', err));
+console.log('[Server] Starting unified backend...');
 
-// STEP 3: Define database model for Welcome Settings
-const WelcomeSchema = new mongoose.Schema({
-    serverId: String,
-    channelId: String,
-    message: String,
-    enabled: Boolean
-});
-const WelcomeSettings = mongoose.model('WelcomeSettings', WelcomeSchema);
+// Database Connection
+const MONGODB_URI = process.env.MONGODB_URI;
+if (!MONGODB_URI) {
+    console.error('[Server] CRITICAL: MONGODB_URI is not defined in environment variables!');
+    // Don't exit yet, let's see if we can still start the web server for health checks
+} else {
+    mongoose.connect(MONGODB_URI)
+        .then(() => console.log('[Server] MongoDB connected successfully'))
+        .catch(err => {
+            console.error('[Server] MongoDB connection error:', err.message);
+        });
+}
+
+// Model re-definition removed to prevent OverwriteModelError
 
 // STEP 2: API ROUTE - SEND EMBED TO CHANNEL
 app.post('/api/send-embed', async (req, res) => {

@@ -55,4 +55,4 @@ client.once('ready', () => {
 });
 
 // STEP 1: Export the client instance so server.js can share it
-module.exports = client;
+module.exports = { client, WelcomeSettings };
