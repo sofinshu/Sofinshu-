@@ -400,88 +400,93 @@
         <span class="ss-switch">⇄</span>
       </div>
 
-      <div class="sidebar-section">Overview</div>
+      <div class="sidebar-section">Management (V1-V2 Free)</div>
       <div class="sidebar-item active" data-panel="overview" onclick="switchPanel('overview')">
-        <span>📊</span> Analytics
+        <span>📊</span> Analytics <span class="v-badge">V1</span>
       </div>
-
-      <div class="sidebar-section">Management</div>
       <div class="sidebar-item" data-panel="staff" onclick="switchPanel('staff')">
-        <span>👥</span> Staff Roster
+        <span>👥</span> Staff Roster <span class="v-badge">V1</span>
       </div>
-      <div class="sidebar-item" data-panel="shifts" onclick="switchPanel('shifts')">
-        <span>⏱️</span> Shift Logs
+      <div class="sidebar-item" id="nav-shifts" data-panel="shifts" onclick="switchPanel('shifts')">
+        <span>⏱️</span> Shift Logs <span class="v-badge">V1</span>
       </div>
-      <div class="sidebar-item" data-panel="warnings" onclick="switchPanel('warnings')">
-        <span>⚠️</span> Warnings
+      <div class="sidebar-item" id="nav-warnings" data-panel="warnings" onclick="switchPanel('warnings')">
+        <span>⚠️</span> Warnings <span class="v-badge">V1</span>
       </div>
-      <div class="sidebar-item" data-panel="moderation" onclick="switchPanel('moderation')">
-        <span>🔨</span> Moderation
+      <div class="sidebar-item" id="nav-moderation" data-panel="moderation" onclick="switchPanel('moderation')">
+        <span>🔨</span> Moderation <span class="v-badge">V2</span>
       </div>
-      <div class="sidebar-item" data-panel="leaderboard" onclick="switchPanel('leaderboard')">
-        <span>🏆</span> Leaderboard
-      </div>
-      <div class="sidebar-item" data-panel="economy" onclick="switchPanel('economy')">
-        <span>💰</span> Economy & Shop
-      </div>
-      <div class="sidebar-item" data-panel="ticketlogs" onclick="switchPanel('ticketlogs')">
-        <span>🎫</span> Ticket Logs
-      </div>
-      <div class="sidebar-item" data-panel="activitylog" onclick="switchPanel('activitylog')">
-        <span>📖</span> Activity Log
-      </div>
-      <div class="sidebar-item" data-panel="promohistory" onclick="switchPanel('promohistory')">
-        <span>🚀</span> Promo History
+      <div class="sidebar-item" id="nav-leaderboard" data-panel="leaderboard" onclick="switchPanel('leaderboard')">
+        <span>🏆</span> Leaderboard <span class="v-badge">V2</span>
       </div>
 
-      <div class="sidebar-section">Auto Systems</div>
-      <div class="sidebar-item" data-panel="automod" onclick="switchPanel('automod')">
-        <span>🛡️</span> Auto-Moderation
+      <div class="sidebar-section">Auto Systems (V3-V5 Premium)</div>
+      <div class="sidebar-item" id="nav-promotions" data-panel="promotions" onclick="switchPanel('promotions')">
+        <span>🚀</span> Auto-Promo <span class="v-badge premium">V3</span>
       </div>
-      <div class="sidebar-item" data-panel="welcome" onclick="switchPanel('welcome')">
-        <span>👋</span> Welcome System
+      <div class="sidebar-item" id="nav-tickets" data-panel="tickets" onclick="switchPanel('tickets')">
+        <span>🎫</span> Ticket System <span class="v-badge premium">V4</span>
       </div>
-      <div class="sidebar-item" data-panel="leveling" onclick="switchPanel('leveling')">
-        <span>⭐</span> Leveling & XP
+      <div class="sidebar-item" id="nav-giveaways" data-panel="giveaways" onclick="switchPanel('giveaways')">
+        <span>🎉</span> Giveaways <span class="v-badge premium">V4</span>
       </div>
-      <div class="sidebar-item" data-panel="autorole" onclick="switchPanel('autorole')">
-        <span>🎭</span> Auto-Role
+      <div class="sidebar-item" id="nav-applications" data-panel="applications" onclick="switchPanel('applications')">
+        <span>📋</span> Applications <span class="v-badge premium">V5</span>
       </div>
-      <div class="sidebar-item" data-panel="logging" onclick="switchPanel('logging')">
-        <span>📋</span> Server Logging
+      <div class="sidebar-item" id="nav-automod" data-panel="automod" onclick="switchPanel('automod')">
+        <span>🛡️</span> Auto-Mod <span class="v-badge premium">V3</span>
       </div>
-      <div class="sidebar-item" data-panel="antispam" onclick="switchPanel('antispam')">
-        <span>🚫</span> Anti-Spam
+      <div class="sidebar-item" id="nav-welcome" data-panel="welcome" onclick="switchPanel('welcome')">
+        <span>👋</span> Welcomer <span class="v-badge premium">V3</span>
       </div>
-      <div class="sidebar-item" data-panel="tickets" onclick="switchPanel('tickets')">
-        <span>🎫</span> Ticket System
+
+      <div class="sidebar-section">Enterprise (V6-V8)</div>
+      <div class="sidebar-item" id="nav-economy" data-panel="economy" onclick="switchPanel('economy')">
+        <span>💰</span> Economy & Shop <span class="v-badge enterprise">V6</span>
       </div>
-      <div class="sidebar-item" data-panel="customcommands" onclick="switchPanel('customcommands')">
-        <span>🤖</span> Custom Commands
+      <div class="sidebar-item" id="nav-staffrewards" data-panel="staffrewards" onclick="switchPanel('staffrewards')">
+        <span>🏆</span> Staff Rewards <span class="v-badge enterprise">V7</span>
+        <div class="sidebar-item" id="nav-branding" data-panel="branding" onclick="switchPanel('branding')">
+        <span>✨</span> Custom Branding <span class="v-badge enterprise">V8</span>
       </div>
-      <div class="sidebar-item" data-panel="staffrewards" onclick="switchPanel('staffrewards')">
-        <span>🏆</span> Staff Rewards
+      <div class="sidebar-item" id="nav-activitylog" data-panel="activitylog" onclick="switchPanel('activitylog')">
+        <span>📖</span> Activity Log <span class="v-badge enterprise">V6</span>
       </div>
-      <div class="sidebar-item" data-panel="alerts" onclick="switchPanel('alerts')">
-        <span>🔔</span> Activity Alerts
+      <div class="sidebar-item" id="nav-ticketlogs" data-panel="ticketlogs" onclick="switchPanel('ticketlogs')">
+        <span>🎫</span> Ticket Logs <span class="v-badge enterprise">V6</span>
       </div>
-      <div class="sidebar-item" data-panel="applications" onclick="switchPanel('applications')">
-        <span>📋</span> Applications
+
+      <div class="sidebar-section">Auto Systems (V3-V5 Premium)</div>
+      <div class="sidebar-item" id="nav-automod" data-panel="automod" onclick="switchPanel('automod')">
+        <span>🛡️</span> Auto-Moderation <span class="v-badge premium">V3</span>
       </div>
-      <div class="sidebar-item" data-panel="giveaways" onclick="switchPanel('giveaways')">
-        <span>🎉</span> Giveaways
+      <div class="sidebar-item" id="nav-welcome" data-panel="welcome" onclick="switchPanel('welcome')">
+        <span>👋</span> Welcome System <span class="v-badge premium">V3</span>
       </div>
-      <div class="sidebar-section">Configuration</div>
-      <div class="sidebar-item" data-panel="branding" onclick="switchPanel('branding')">
-        <span>✨</span> Custom Branding
+      <div class="sidebar-item" id="nav-leveling" data-panel="leveling" onclick="switchPanel('leveling')">
+        <span>⭐</span> Leveling & XP <span class="v-badge premium">V4</span>
       </div>
-      <div class="sidebar-item" data-panel="settings" onclick="switchPanel('settings')">
+      <div class="sidebar-item" id="nav-autorole" data-panel="autorole" onclick="switchPanel('autorole')">
+        <span>🎭</span> Auto-Role <span class="v-badge premium">V4</span>
+      </div>
+      <div class="sidebar-item" id="nav-logging" data-panel="logging" onclick="switchPanel('logging')">
+        <span>📋</span> Server Logging <span class="v-badge premium">V5</span>
+      </div>
+      <div class="sidebar-item" id="nav-antispam" data-panel="antispam" onclick="switchPanel('antispam')">
+        <span>🚫</span> Anti-Spam <span class="v-badge premium">V5</span>
+      </div>
+      <div class="sidebar-item" id="nav-customcommands" data-panel="customcommands" onclick="switchPanel('customcommands')">
+        <span>🤖</span> Custom Commands <span class="v-badge premium">V5</span>
+      </div>
+      <div class="sidebar-item" id="nav-alerts" data-panel="alerts" onclick="switchPanel('alerts')">
+        <span>🔔</span> Activity Alerts <span class="v-badge premium">V5</span>
+      </div>
+
+      <div class="sidebar-section">System</div>
+      <div class="sidebar-item" id="nav-settings" data-panel="settings" onclick="switchPanel('settings')">
         <span>⚙️</span> Settings
       </div>
-      <div class="sidebar-item" data-panel="promotions" onclick="switchPanel('promotions')">
-        <span>🚀</span> Auto-Promo
-      </div>
-      <div class="sidebar-item" data-panel="subscription" onclick="switchPanel('subscription')">
+      <div class="sidebar-item" id="nav-subscription" data-panel="subscription" onclick="switchPanel('subscription')">
         <span>💎</span> Subscription Plan
       </div>
     </aside>

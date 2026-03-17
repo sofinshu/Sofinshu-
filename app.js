@@ -113,7 +113,28 @@ function animateStat(id, target) {
 async function loadCommands() {
     try {
         const res = await fetch('extracted_commands.json');
-        allCommands = await res.json();
+        const rawCommands = await res.json();
+        
+        // Dynamically map Free/Premium/Enterprise to v1-v8
+        allCommands = rawCommands.map(c => {
+            let tier = (c.tier || 'v1').toLowerCase();
+            const name = (c.name || c.command || '').toLowerCase();
+            
+            if (tier === 'free') {
+                if (name.includes('mod') || name.includes('ban') || name.includes('kick') || name.includes('warn')) tier = 'v2';
+                else tier = 'v1';
+            } else if (tier === 'premium') {
+                if (name.includes('promo')) tier = 'v3';
+                else if (name.includes('ticket') || name.includes('giveaway')) tier = 'v4';
+                else tier = 'v5';
+            } else if (tier === 'enterprise') {
+                if (name.includes('eco') || name.includes('balance') || name.includes('pay')) tier = 'v6';
+                else if (name.includes('achieve') || name.includes('reward')) tier = 'v7';
+                else tier = 'v8';
+            }
+            return { ...c, tier };
+        });
+
         renderCommands();
     } catch (e) {
         console.error('Commands load failed:', e);
@@ -1249,10 +1270,54 @@ function goHome() {
     switchPage('landingPage');
 }
 
+const SYSTEM_TIERS = {
+    overview: 'v1', staff: 'v1', shifts: 'v1', warnings: 'v1', // V1-V2 (Free)
+    moderation: 'v2', leaderboard: 'v2', settings: 'v1', subscription: 'v1',
+    promotions: 'v3', tickets: 'v4', giveaways: 'v4', applications: 'v5', // V3-V5 (Premium)
+    automod: 'v3', welcome: 'v3', leveling: 'v4', autorole: 'v4', logging: 'v5',
+    antispam: 'v5', customcommands: 'v5', alerts: 'v5',
+    economy: 'v6', staffrewards: 'v7', branding: 'v8', // V6-V8 (Enterprise)
+    activitylog: 'v6', ticketlogs: 'v6', promohistory: 'v6'
+};
+
 function switchPanel(panel) {
+    const currentTier = currentGuild?.tier || 'free';
+    const requiredTier = SYSTEM_TIERS[panel] || 'v1';
+    
+    // Tier mapping: v1/v2 = free, v3/v4/v5 = premium, v6/v7/v8 = enterprise
+    const isPremium = currentTier === 'premium' || currentTier === 'enterprise' || currentTier.startsWith('v3') || currentTier.startsWith('v4') || currentTier.startsWith('v5') || currentTier.startsWith('v6') || currentTier.startsWith('v7') || currentTier.startsWith('v8');
+    const isEnterprise = currentTier === 'enterprise' || currentTier.startsWith('v6') || currentTier.startsWith('v7') || currentTier.startsWith('v8');
+
+    let locked = false;
+    if (requiredTier.startsWith('v3') || requiredTier.startsWith('v4') || requiredTier.startsWith('v5')) {
+        if (!isPremium) locked = true;
+    } else if (requiredTier.startsWith('v6') || requiredTier.startsWith('v7') || requiredTier.startsWith('v8')) {
+        if (!isEnterprise) locked = true;
+    }
+
     document.querySelectorAll('.dash-panel').forEach(p => p.style.display = 'none');
     const el = document.getElementById(`panel-${panel}`);
-    if (el) el.style.display = 'block';
+    
+    // Clear old lock if exists
+    const oldLock = el?.querySelector('.tier-lock-overlay');
+    if (oldLock) oldLock.remove();
+
+    if (el) {
+        el.style.display = 'block';
+        if (locked) {
+            const overlay = document.createElement('div');
+            overlay.className = 'tier-lock-overlay';
+            const tierName = requiredTier.startsWith('v6') ? 'Enterprise' : 'Premium';
+            overlay.innerHTML = `
+                <div style="font-size:3rem;margin-bottom:20px">💎</div>
+                <h2 style="font-size:1.8rem;font-weight:900;margin-bottom:10px">${tierName} Feature</h2>
+                <p style="color:var(--t2);margin-bottom:30px;max-width:400px">The <strong>${panel.toUpperCase()}</strong> system is part of our ${tierName} plan (V${requiredTier.slice(1)}+).</p>
+                <button class="btn btn-primary" onclick="switchPanel('subscription')">Upgrade Now</button>
+            `;
+            el.appendChild(overlay);
+        }
+    }
+
     document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
     const item = document.querySelector(`[data-panel="${panel}"]`);
     if (item) item.classList.add('active');
@@ -1288,6 +1353,8 @@ function switchPanel(panel) {
     document.getElementById('dashTitle').textContent = title;
     document.getElementById('dashSub').textContent = sub;
 
+    if (locked) return; // Don't load data for locked panels
+
     // Lazy-load system settings and log panels when opened
     const guildId = currentGuild?.id;
     if (!guildId) return;
@@ -1317,7 +1384,6 @@ function switchPanel(panel) {
     if (panel === 'promohistory') loadPromoHistory(guildId);
     if (panel === 'customcommands') loadCustomCommands(guildId);
     if (panel === 'staffrewards') loadStaffRewards(guildId);
-    if (panel === 'moderation') loadModerationActions(guildId);
 }
 
 // ══════════════════════════════════════
