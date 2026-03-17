@@ -47,8 +47,38 @@ class InteractionHandler {
 
         // Handle Slash Commands
         if (interaction.isChatInputCommand()) {
-            const command = this.commands.get(interaction.commandName);
-            if (!command) return;
+            let commandName = interaction.commandName;
+            let subcommandName = null;
+
+            try {
+                subcommandName = interaction.options.getSubcommand(false);
+            } catch (e) {
+                // No subcommand
+            }
+
+            // Resolve actual command object
+            // Priority 1: Top-level command (e.g., /ban)
+            // Priority 2: Grouped command (e.g., /mod ban -> resolve 'ban' or 'mod_ban')
+            let command = this.commands.get(commandName);
+            
+            if (!command && subcommandName) {
+                // Try searching for the subcommand directly or with prefix
+                command = this.commands.get(subcommandName) || this.commands.get(`${commandName}_${subcommandName}`);
+            }
+
+            if (!command) {
+                // Fallback: Check if it's a registered command that's just not implemented yet
+                const fullCmdName = subcommandName ? `${commandName}_${subcommandName}` : commandName;
+                const tier = this.client.moduleManager?.getCommandTier(fullCmdName) || 'free';
+
+                const embed = new StrataEmbedBuilder()
+                    .setTheme('info')
+                    .setTitle('Command System')
+                    .setDescription(`The command \`/${fullCmdName}\` is registered in the **STRATA V1-V8 Registry**.\n\nThis command is currently being modernized. Please use the [Dashboard](https://strata-oksu.vercel.app) to manage this system in the meantime.`)
+                    .addFields({ name: 'Tier Required', value: `\`${tier.toUpperCase()}\``, inline: true });
+
+                return interaction.reply({ embeds: [embed], ephemeral: true });
+            }
 
             // Tier requirements execution
             if (command.tier && command.tier !== 'free') {
@@ -66,8 +96,8 @@ class InteractionHandler {
             try {
                 await command.execute(interaction, this.client);
             } catch (error) {
-                console.error(`[InteractionHandler] Command Error (${command.data.name}):`, error);
-                const msg = { content: '❌ Error explicitly thrown by command logic.', ephemeral: true };
+                console.error(`[InteractionHandler] Command Error (${command.data?.name || commandName}):`, error);
+                const msg = { content: '❌ An error occurred while executing this command protocol.', ephemeral: true };
                 interaction.replied || interaction.deferred ? await interaction.editReply(msg).catch(()=>null) : await interaction.reply(msg).catch(()=>null);
             }
             return;

@@ -16,6 +16,7 @@ const client = new Client({
 // Initialize Modular Framework
 const interactionHandler = new InteractionHandler(client);
 const moduleManager = new ModuleManager(client, interactionHandler);
+client.moduleManager = moduleManager;
 
 // Load Modules asynchronously when the bot is getting ready
 client.once('ready', async () => {
@@ -395,143 +396,8 @@ client.on('guildMemberUpdate', async (oldMember, newMember) => {
 });
 
 // --- CENTRAL INTERACTION HANDLER ---
-client.on('interactionCreate', async (interaction) => {
-    // Log every interaction received to help debug "application did not respond"
-    console.log(`[Bot] Received interaction: ${interaction.type} (${interaction.commandName || interaction.customId}) from ${interaction.user.tag}`);
-
-    // Handle Button Interactions (e.g., Tickets, Giveaways)
-    if (interaction.isButton()) {
-        const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-
-        // TICKETS
-        if (interaction.customId === 'open_ticket') {
-            try {
-                await interaction.deferReply({ ephemeral: true });
-
-                const guildId = interaction.guild.id.toString();
-                console.log(`[Bot] Ticket button clicked in guild: ${guildId}`);
-                
-                // Try to find the config - check both string and number formats for compatibility
-                let settings = db.prepare('SELECT config_json FROM system_configs WHERE guild_id = ? AND system_type = ?').get(guildId, 'tickets');
-                
-                // If not found, try with just the ID (in case it was stored differently)
-                if (!settings) {
-                    settings = db.prepare('SELECT config_json FROM system_configs WHERE guild_id = ? AND system_type = ?').get(interaction.guild.id, 'tickets');
-                }
-                
-                // Debug: log what's being queried
-                if (!settings) {
-                    console.error(`[Bot] Ticket config missing for guild ${guildId}`);
-                    // Debug: list what guilds ARE in the DB
-                    const existing = db.prepare('SELECT guild_id FROM system_configs WHERE system_type = ?').all('tickets');
-                    console.log(`[Bot] Available ticket configs for guilds:`, existing.map(e => e.guild_id));
-                    return interaction.editReply('❌ Ticket system is not configured in the dashboard for this server.');
-                }
-
-                const config = JSON.parse(settings.config_json);
-                
-                // Create the ticket channel
-                const channel = await interaction.guild.channels.create({
-                    name: `🎫-${interaction.user.username}`,
-                    type: 0, // GuildText
-                    parent: config.categoryId || null,
-                    permissionOverwrites: [
-                        { id: interaction.guild.id, deny: ['ViewChannel'] },
-                        { id: interaction.user.id, allow: ['ViewChannel', 'SendMessages'] },
-                        { id: config.supportRoleId, allow: ['ViewChannel', 'SendMessages'] }
-                    ].filter(o => o.id)
-                });
-
-                const welcomeEmbed = new EmbedBuilder()
-                    .setAuthor({ name: 'ULTRA-SUPPORT PROTOCOL', iconURL: 'https://i.imgur.com/vH9YkYm.png' })
-                    .setTitle('🚀 NEW TICKET INITIALIZED')
-                    .setDescription(`Greetings **${interaction.user.tag}**,\n\n${config.openMessage || 'A specialized support agent will assist you shortly.'}`)
-                    .addFields(
-                        { name: '👤 Originator', value: interaction.user.toString(), inline: true },
-                        { name: '🛡️ Support Tier', value: `<@&${config.supportRoleId || 'Support'}>`, inline: true },
-                        { name: '📂 Subject', value: 'Server Query', inline: true }
-                    )
-                    .setColor(0x6c63ff)
-                    .setImage('https://i.imgur.com/Atu9E8I.png') // Fixed Purple Banner
-                    .setFooter({ text: 'STRATA TICKET CORE • PLEASE WAIT FOR STAFF RESPONSE', iconURL: client.user.displayAvatarURL() });
-
-                const row = new ActionRowBuilder().addComponents(
-                    new ButtonBuilder()
-                        .setCustomId('close_ticket')
-                        .setLabel('Close Connection')
-                        .setEmoji('🔒')
-                        .setStyle(ButtonStyle.Danger)
-                );
-
-                await channel.send({ content: `${interaction.user.toString()} | <@&${config.supportRoleId || ''}>`, embeds: [welcomeEmbed], components: [row] });
-                await interaction.editReply(`✅ **Secure connection established:** ${channel.toString()}`);
-            } catch (error) {
-                console.error('[Bot] Error creating ticket:', error);
-                await interaction.editReply('❌ Failed to create ticket. Verify bot permissions.');
-            }
-        }
-
-        // CLOSE TICKET
-        if (interaction.customId === 'close_ticket') {
-            try {
-                await interaction.reply({ content: '⚠️ **Closing protocol initiated...** This channel will be purged in 5 seconds.', ephemeral: false });
-                setTimeout(() => interaction.channel.delete().catch(() => null), 5000);
-            } catch (e) {
-                console.error('[Bot] Ticket Close Error:', e);
-            }
-        }
-
-        // GIVEAWAYS (Simple Entry Logic)
-        if (interaction.customId.startsWith('enter_giveaway_')) {
-            const giveawayId = interaction.customId.split('_').pop();
-            try {
-                // In a real app, this would check a DB. For now, we'll simulate the response.
-                await interaction.reply({ content: '🎉 **Entry Confirmed!** You have been added to the pool. Good luck!', ephemeral: true });
-            } catch (e) {
-                console.error('[Bot] Giveaway Entry Error:', e);
-            }
-        }
-    }
-
-    // Handle Slash Commands (Chat Input)
-    if (interaction.isChatInputCommand()) {
-        const { commandName } = interaction;
-        const { EmbedBuilder } = require('discord.js');
-
-        try {
-            if (commandName === 'ping') {
-                const embed = new EmbedBuilder()
-                    .setTitle('🏓 Connectivity Check')
-                    .addFields(
-                        { name: 'Gateway', value: `\`${Math.round(client.ws.ping)}ms\``, inline: true },
-                        { name: 'API Latency', value: `\`${Date.now() - interaction.createdTimestamp}ms\``, inline: true }
-                    )
-                    .setColor(0x6c63ff);
-                await interaction.reply({ embeds: [embed] });
-            } else if (commandName === 'help') {
-                const embed = new EmbedBuilder()
-                    .setAuthor({ name: 'Strata Assistant', iconURL: client.user.displayAvatarURL() })
-                    .setTitle('Information & Support')
-                    .setDescription('Welcome to **Strata**, your ultimate community management partner. Use the dashboard to customize your server experience.')
-                    .addFields(
-                        { name: '🔗 Main Dashboard', value: '`https://strata-oksu.vercel.app`', inline: false },
-                        { name: '📚 Commands', value: 'Use `/system` commands for management.', inline: true },
-                        { name: '💡 Support', value: 'Join our [Discord Server](https://discord.gg/smNwftEhKe)', inline: true }
-                    )
-                    .setImage('https://i.imgur.com/vH9YkYm.png')
-                    .setColor(0x6c63ff);
-                await interaction.reply({ embeds: [embed], ephemeral: true });
-            } else {
-                await interaction.reply({
-                    content: `The command \`/${commandName}\` is registered but not implemented in this unified version.`,
-                    ephemeral: true
-                });
-            }
-        } catch (error) {
-            console.error(`[Bot] Error executing /${commandName}:`, error);
-        }
-    }
-});
+// Managed by InteractionHandler.js and ModuleManager.js
+// No additional manual interaction handlers needed here.
 client.once('ready', () => {
     console.log(`[Bot] Logged in as ${client.user.tag}`);
     console.log(`[Bot] Serving ${client.guilds.cache.size} guilds:`);

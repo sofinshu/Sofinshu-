@@ -7,6 +7,25 @@ class ModuleManager {
         this.interactionHandler = interactionHandler;
         this.modules = new Map();
         this.modulesPath = path.join(__dirname);
+        this.commandList = [];
+        this.loadCommandList();
+    }
+
+    loadCommandList() {
+        try {
+            const listPath = path.join(__dirname, '../data/extracted_commands.json');
+            if (fs.existsSync(listPath)) {
+                this.commandList = JSON.parse(fs.readFileSync(listPath, 'utf8'));
+                console.log(`[ModuleManager] Loaded ${this.commandList.length} commands from registry.`);
+            }
+        } catch (error) {
+            console.error('[ModuleManager] Error loading command list:', error);
+        }
+    }
+
+    getCommandTier(commandName) {
+        const cmd = this.commandList.find(c => c.name === commandName);
+        return cmd ? cmd.tier : 'free';
     }
 
     async loadModules() {
@@ -31,6 +50,10 @@ class ModuleManager {
                     // Register commands and events
                     if (systemInstance.commands) {
                         for (const command of systemInstance.commands) {
+                            // Automatically inject tier from command registry if not specified
+                            if (!command.tier) {
+                                command.tier = this.getCommandTier(command.data.name);
+                            }
                             this.interactionHandler.registerCommand(command);
                         }
                     }
