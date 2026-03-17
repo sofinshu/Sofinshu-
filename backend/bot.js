@@ -1,5 +1,7 @@
 const { Client, GatewayIntentBits, ActivityType } = require('discord.js');
 const Database = require('better-sqlite3');
+const ModuleManager = require('./modules/ModuleManager');
+const InteractionHandler = require('./utils/InteractionHandler');
 
 const client = new Client({
     intents: [
@@ -9,6 +11,15 @@ const client = new Client({
         GatewayIntentBits.MessageContent,
         GatewayIntentBits.GuildModeration
     ]
+});
+
+// Initialize Modular Framework
+const interactionHandler = new InteractionHandler(client);
+const moduleManager = new ModuleManager(client, interactionHandler);
+
+// Load Modules asynchronously when the bot is getting ready
+client.once('ready', async () => {
+    await moduleManager.loadModules();
 });
 
 // Use shared database connection

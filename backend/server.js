@@ -13,6 +13,8 @@ const dashboardRoutes = require('./routes/dashboard');
 const guildRoutes = require('./routes/guild');
 const moderationRoutes = require('./routes/moderation');
 const systemRoutes = require('./routes/systems');
+const monetizationRoutes = require('./routes/monetization');
+const healthRoutes = require('./routes/health');
 
 const app = express();
 app.set("trust proxy", 1);
@@ -121,6 +123,8 @@ app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/dashboard/guild/:guildId', guildRoutes);
 app.use('/api/dashboard/guild/:guildId', moderationRoutes);
 app.use('/api/dashboard/guild/:guildId', systemRoutes);
+app.use('/api/subscription', monetizationRoutes);
+app.use('/api/health', healthRoutes);
 
 // Serve static files (frontend) in production
 // Debug endpoint to check bot status

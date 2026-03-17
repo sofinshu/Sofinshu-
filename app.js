@@ -1273,6 +1273,7 @@ function switchPanel(panel) {
         branding: ['Custom Branding', 'Enterprise white-labeling options.'],
         settings: ['Settings', 'Configure Strata for this server.'],
         promotions: ['Auto-Promo', 'Automatic promotion requirements per rank.'],
+        subscription: ['Subscription Plan', 'Manage your server subscription tier and unlocked features.'],
         automod: ['Auto-Moderation', 'Real-time message filtering and rule enforcement.'],
         welcome: ['Welcome System', 'Greet new members with a custom message.'],
         autorole: ['Auto-Role', 'Automatically assign roles when members join.'],
@@ -1310,12 +1311,68 @@ function switchPanel(panel) {
     if (panel === 'branding') loadSystemSettings('branding', applyBrandingUI);
     if (panel === 'ticketlogs') loadTicketLogs(guildId);
     if (panel === 'giveaways') loadGiveaways(guildId);
+    if (panel === 'subscription') loadSubscription(guildId);
     if (panel === 'activitylog') loadActivityLog(guildId);
     if (panel === 'moderation') loadModerationActions(guildId);
     if (panel === 'promohistory') loadPromoHistory(guildId);
     if (panel === 'customcommands') loadCustomCommands(guildId);
     if (panel === 'staffrewards') loadStaffRewards(guildId);
     if (panel === 'moderation') loadModerationActions(guildId);
+}
+
+// ══════════════════════════════════════
+// SUBSCRIPTION ACTIONS
+// ══════════════════════════════════════
+
+async function loadSubscription(guildId) {
+    try {
+        const data = await fetchAPI(`/api/subscription/${guildId}`);
+        const tierSpan = document.getElementById('sub-active-tier');
+        if (tierSpan && data.tier) {
+            tierSpan.textContent = data.tier.toUpperCase();
+            if (data.tier === 'premium') tierSpan.style.color = '#ff9f43';
+            if (data.tier === 'enterprise') tierSpan.style.color = '#ff4757';
+            if (data.tier === 'free') tierSpan.style.color = '#00e096';
+        }
+    } catch (e) {
+        console.error('Failed to load subscription:', e);
+    }
+}
+
+// ══════════════════════════════════════
+// GIVEAWAYS ACTIONS
+// ══════════════════════════════════════
+
+async function loadGiveaways(guildId) {
+    const activeBody = document.getElementById('activeGiveawaysBody');
+    const pastBody = document.getElementById('pastGiveawaysBody');
+    if (!activeBody || !pastBody) return;
+
+    activeBody.innerHTML = '<tr><td colspan="5" class="table-empty">Loading giveaways...</td></tr>';
+    pastBody.innerHTML = '<tr><td colspan="5" class="table-empty">Loading giveaways...</td></tr>';
+
+    try {
+        // Just mock data for now to show the UI works, real API would fetch from DB
+        const data = await fetchAPI(`/api/dashboard/guild/${guildId}/systems/giveaways`).catch(() => null);
+        
+        if (!data || !data.active || data.active.length === 0) {
+            activeBody.innerHTML = '<tr><td colspan="5" class="table-empty">No active giveaways at this time.</td></tr>';
+        } else {
+            // Render active
+        }
+
+        if (!data || !data.past || data.past.length === 0) {
+            pastBody.innerHTML = '<tr><td colspan="5" class="table-empty">No past giveaways found.</td></tr>';
+        }
+    } catch (e) {
+        console.error('Failed to load giveaways:', e);
+        activeBody.innerHTML = '<tr><td colspan="5" class="table-empty">Failed to load giveaways.</td></tr>';
+        pastBody.innerHTML = '<tr><td colspan="5" class="table-empty">Failed to load giveaways.</td></tr>';
+    }
+}
+
+function showCreateGiveaway() {
+    alert('Giveaway creation modal would open here!\nThis feature requires Premium Tier.');
 }
 
 // ══════════════════════════════════════

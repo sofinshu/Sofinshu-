@@ -468,6 +468,9 @@
       <div class="sidebar-item" data-panel="applications" onclick="switchPanel('applications')">
         <span>📋</span> Applications
       </div>
+      <div class="sidebar-item" data-panel="giveaways" onclick="switchPanel('giveaways')">
+        <span>🎉</span> Giveaways
+      </div>
       <div class="sidebar-section">Configuration</div>
       <div class="sidebar-item" data-panel="branding" onclick="switchPanel('branding')">
         <span>✨</span> Custom Branding
@@ -477,6 +480,9 @@
       </div>
       <div class="sidebar-item" data-panel="promotions" onclick="switchPanel('promotions')">
         <span>🚀</span> Auto-Promo
+      </div>
+      <div class="sidebar-item" data-panel="subscription" onclick="switchPanel('subscription')">
+        <span>💎</span> Subscription Plan
       </div>
     </aside>
 
@@ -1733,6 +1739,32 @@
             style="padding:15px;background:rgba(255,255,255,0.02);border:1px dashed rgba(255,255,255,0.1);text-align:center;cursor:pointer;border-radius:10px"
             onclick="addRoleReward()">
             <span style="color:var(--primary-color);font-weight:600">+ Add New Role Reward</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- SUBSCRIPTIONS -->
+      <div class="dash-panel" id="panel-subscription" style="display:none">
+        <div class="sys-module-header">
+          <div>
+            <div class="card-title" style="margin:0">💎 Server Subscription</div>
+            <div class="card-desc" style="margin:6px 0 0">Manage your active tier to unlock Premium and Enterprise modules natively in STRATA.</div>
+          </div>
+        </div>
+        <div class="sys-modules">
+          <div class="sys-module" style="background: rgba(108, 99, 255, 0.05); border: 1px solid rgba(108, 99, 255, 0.2)">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <div>
+                <h3 style="margin:0; font-size:1.2rem; display:flex; gap:10px; align-items:center">
+                  Current Plan: <span id="sub-active-tier" style="color:#00e096; text-transform:uppercase; font-weight:800">FREE</span>
+                </h3>
+                <p style="margin:10px 0 0; color:#5c5c78; font-size:13px">Upgrade to unlock native modular systems across the entire dashboard.</p>
+              </div>
+              <div style="display:flex;gap:10px">
+                 <button class="btn btn-primary" onclick="window.open('https://discord.gg/smNwftEhKe', '_blank')">Upgrade to Premium</button>
+                 <button class="btn btn-outline" style="border-color:#ff4757; color:#ff4757" onclick="window.open('https://discord.gg/smNwftEhKe', '_blank')">Upgrade to Enterprise</button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
