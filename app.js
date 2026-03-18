@@ -2387,3 +2387,153 @@ function fmtDuration(minutes) {
     return h > 0 ? `${h}h ${m}m` : `${m}m`;
 }
 
+// ══════════════════════════════════════
+// DYNAMIC SYSTEM SAVING & LOADING
+// ══════════════════════════════════════
+
+async function loadSystemSettings(system, applyFn) {
+    const guildId = currentGuild?.id;
+    if (!guildId) return;
+    try {
+        const data = await fetchAPI(`/api/dashboard/guild/${guildId}/systems/${system}`);
+        if (applyFn && typeof applyFn === 'function') applyFn(data);
+    } catch (e) {
+        console.error(`Failed to load ${system} settings:`, e);
+    }
+}
+
+async function saveSystemSettings(system, gatherFn) {
+    const guildId = currentGuild?.id;
+    if (!guildId) return;
+    const btn = event?.currentTarget;
+    if (btn) btn.disabled = true;
+    try {
+        const payload = gatherFn();
+        const res = await fetch(`${CONFIG.API_BASE}/api/dashboard/guild/${guildId}/systems/${system}`, {
+            method: 'PATCH',
+            headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        if (!res.ok) throw new Error();
+        const data = await res.json();
+        toast(data.message || `${system.toUpperCase()} settings saved successfully!`);
+    } catch (e) {
+        toast(`Failed to save ${system} settings.`);
+    } finally {
+        if (btn) btn.disabled = false;
+    }
+}
+
+// ── TICKETS ──
+function applyTicketsUI(data) {
+    document.getElementById('tk-enabled').checked = data.enabled || false;
+    document.getElementById('tk-panel-ch').value = data.panelChannelId || '';
+    document.getElementById('tk-category').value = data.categoryId || '';
+    document.getElementById('tk-support-role').value = data.supportRoleId || '';
+    document.getElementById('tk-message').value = data.openMessage || '';
+    document.getElementById('tk-transcripts').checked = data.transcriptsEnabled !== false;
+    document.getElementById('tk-transcript-ch').value = data.transcriptChannelId || '';
+}
+
+function gatherTickets() {
+    return {
+        enabled: document.getElementById('tk-enabled').checked,
+        panelChannelId: document.getElementById('tk-panel-ch').value,
+        categoryId: document.getElementById('tk-category').value,
+        supportRoleId: document.getElementById('tk-support-role').value,
+        openMessage: document.getElementById('tk-message').value,
+        transcriptsEnabled: document.getElementById('tk-transcripts').checked,
+        transcriptChannelId: document.getElementById('tk-transcript-ch').value
+    };
+}
+
+// ── AUTO-MOD ──
+function applyAutoModUI(data) {
+    document.getElementById('am-profanity').checked = data.blockProfanity || false;
+    document.getElementById('am-links').checked = data.blockLinks || false;
+    document.getElementById('am-mentions').checked = data.antiMentionSpam || false;
+    document.getElementById('am-invites').checked = data.blockInvites || false;
+    document.getElementById('am-timeout').checked = data.autoTimeout || false;
+    document.getElementById('am-log').checked = data.logViolations || false;
+
+    // Optional detailed fields
+    const bw = document.getElementById('am-banned-words'); if (bw) bw.value = (data.bannedWords || []).join(', ');
+    const ad = document.getElementById('am-allowed-domains'); if (ad) ad.value = (data.allowedDomains || []).join(', ');
+    const mm = document.getElementById('am-max-mentions'); if (mm) mm.value = data.maxMentions || 5;
+    const td = document.getElementById('am-timeout-dur'); if (td) td.value = data.timeoutDuration || 10;
+    const lc = document.getElementById('am-log-channel'); if (lc) lc.value = data.logChannel || '';
+}
+
+function saveAutoMod() {
+    saveSystemSettings('automod', () => {
+        const payload = {
+            enabled: true,
+            blockProfanity: document.getElementById('am-profanity').checked,
+            blockLinks: document.getElementById('am-links').checked,
+            antiMentionSpam: document.getElementById('am-mentions').checked,
+            blockInvites: document.getElementById('am-invites').checked,
+            autoTimeout: document.getElementById('am-timeout').checked,
+            logViolations: document.getElementById('am-log').checked
+        };
+        const bw = document.getElementById('am-banned-words'); if (bw) payload.bannedWords = bw.value.split(',').map(s=>s.trim()).filter(Boolean);
+        const ad = document.getElementById('am-allowed-domains'); if (ad) payload.allowedDomains = ad.value.split(',').map(s=>s.trim()).filter(Boolean);
+        const mm = document.getElementById('am-max-mentions'); if (mm) payload.maxMentions = parseInt(mm.value) || 5;
+        const td = document.getElementById('am-timeout-dur'); if (td) payload.timeoutDuration = parseInt(td.value) || 10;
+        const lc = document.getElementById('am-log-channel'); if (lc) payload.logChannel = lc.value;
+        return payload;
+    });
+}
+
+// ── AUTO-PROMO ──
+async function loadPromotions(guildId) {
+    if (!guildId) return;
+    try {
+        const data = await fetchAPI(`/api/dashboard/guild/${guildId}/promotions`);
+        const list = document.getElementById('promoRankList');
+        if (!list) return;
+        
+        let html = '';
+        if (Array.isArray(data) && data.length > 0) {
+            data.forEach((p, idx) => {
+                html += `
+                <div class="sys-module" style="margin-bottom:15px">
+                    <div class="module-title">Rank Role ID: ${escHtml(p.roleId)}</div>
+                    <div style="display:flex;gap:15px;margin-top:10px">
+                        <div class="form-row"><label>Req Points</label><input type="number" class="form-input" value="${p.reqPoints}"></div>
+                        <div class="form-row"><label>Req Shifts</label><input type="number" class="form-input" value="${p.reqShifts}"></div>
+                    </div>
+                </div>`;
+            });
+        }
+        if (!html) html = '<div class="table-empty" style="padding:20px 0;">No promotion requirements configured for this server. Ensure you have rank-roles setup.</div>';
+        list.innerHTML = html;
+        
+        // Load announcement channel from general settings if exists
+        const settings = await fetchAPI(`/api/dashboard/guild/${guildId}/settings`).catch(()=>({}));
+        if (settings && settings.promoAnnouncementChannelId) {
+            const chSelect = document.getElementById('settingPromoChannel');
+            if (chSelect) chSelect.value = settings.promoAnnouncementChannelId;
+        }
+    } catch (e) {
+        console.error('Failed to load promotions:', e);
+    }
+}
+
+async function saveAutoPromo() {
+    const guildId = currentGuild?.id;
+    if (!guildId) return;
+    toast('Saving auto-promotion settings...');
+    
+    try {
+        const channelId = document.getElementById('settingPromoChannel')?.value || '';
+        await fetch(`${CONFIG.API_BASE}/api/dashboard/guild/${guildId}/settings`, {
+            method: 'PATCH',
+            headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ promoAnnouncementChannelId: channelId })
+        });
+        toast('✅ Auto-Promotion settings saved!');
+    } catch (e) {
+        toast('❌ Failed to save auto-promotion settings.');
+    }
+}
+

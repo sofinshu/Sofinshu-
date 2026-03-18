@@ -1135,8 +1135,12 @@
       <div class="dash-panel" id="panel-promotions" style="display:none">
         <div class="dash-card">
           <div class="card-title">🚀 Auto-Promotion System</div>
-          <p class="card-desc">Configure automatic promotions. Staff are promoted when they meet all requirements for a
-            rank.</p>
+          <div class="sys-module-header">
+            <div>
+              <div class="card-desc" style="margin:6px 0 0">Configure automatic promotions. Staff are promoted when they meet all requirements for a rank.</div>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="saveAutoPromo()">Save Settings</button>
+          </div>
           <div class="form-row" style="margin-bottom:20px;max-width:400px">
             <label>Promotion Announcement Channel</label>
             <select id="settingPromoChannel" class="form-input">
@@ -1145,6 +1149,59 @@
           </div>
           <div id="promoRankList" class="promo-list">
             <div class="table-empty">Loading promotion requirements...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TICKET SYSTEM -->
+      <div class="dash-panel" id="panel-tickets" style="display:none">
+        <div class="sys-module-header">
+          <div>
+            <div class="card-title" style="margin:0">🎫 Ticket System Config</div>
+            <div class="card-desc" style="margin:6px 0 0">Configure your ticket categories, transcripts, and support panel.</div>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="saveSystemSettings('tickets', gatherTickets)">Save Settings</button>
+        </div>
+        <div class="sys-modules">
+          <div class="sys-module">
+            <div class="module-row">
+              <div>
+                <div class="module-title">Enable Ticket System</div>
+                <div class="module-desc">Activate the ticket system on your server.</div>
+              </div>
+              <label class="toggle"><input type="checkbox" id="tk-enabled"><span class="toggle-slider"></span></label>
+            </div>
+          </div>
+          <div class="sys-module">
+            <div class="form-row">
+              <label>Ticket Panel Channel</label>
+              <select id="tk-panel-ch" class="form-input"><option value="">Select a channel...</option></select>
+            </div>
+            <div class="form-row" style="margin-top:14px">
+              <label>Ticket Category (Parent folder)</label>
+              <input type="text" id="tk-category" class="form-input" placeholder="Category ID">
+            </div>
+            <div class="form-row" style="margin-top:14px">
+              <label>Support Staff Role</label>
+              <input type="text" id="tk-support-role" class="form-input" placeholder="Role ID">
+            </div>
+            <div class="form-row" style="margin-top:14px">
+              <label>Panel Message</label>
+              <textarea id="tk-message" class="form-input" rows="3" placeholder="Welcome to your ticket! A staff member will assist you shortly."></textarea>
+            </div>
+          </div>
+          <div class="sys-module">
+            <div class="module-row">
+              <div>
+                <div class="module-title">Ticket Transcripts</div>
+                <div class="module-desc">Automatically log closed tickets to a channel.</div>
+              </div>
+              <label class="toggle"><input type="checkbox" id="tk-transcripts"><span class="toggle-slider"></span></label>
+            </div>
+            <div class="form-row" style="margin-top:14px">
+              <label>Transcript Channel</label>
+              <select id="tk-transcript-ch" class="form-input"><option value="">Select a channel...</option></select>
+            </div>
           </div>
         </div>
       </div>
