@@ -61,7 +61,7 @@
       <div class="hero-content">
         <div class="hero-badge">
           <span class="badge-dot"></span>
-          271 Slash Commands · 8 Tiers · Real Data
+          271 Commands · 10 Categories · v4.0 Professional
         </div>
         <h1>The <span class="gradient-text">Ultimate Discord</span><br>Staff Management Bot</h1>
         <p class="hero-desc">Automate promotions, track shifts, manage tickets, and empower your staff team — all with
@@ -266,10 +266,11 @@
         </div>
         <div class="tier-filters" id="tierFilters">
           <button class="tier-btn active" data-tier="all">All</button>
-          <button class="tier-btn" data-tier="v1">Free</button>
-          <button class="tier-btn" data-tier="v2">Tier 2</button>
-          <button class="tier-btn" data-tier="v3">Premium</button>
-          <button class="tier-btn" data-tier="v6">Enterprise</button>
+          <button class="tier-btn" data-tier="management">Management</button>
+          <button class="tier-btn" data-tier="auto">Auto Systems</button>
+          <button class="tier-btn" data-tier="security">Security</button>
+          <button class="tier-btn" data-tier="utility">Utility</button>
+          <button class="tier-btn" data-tier="premium">Premium</button>
         </div>
       </div>
       <div id="cmdGrid" class="cmd-grid">
@@ -436,8 +437,20 @@
       <div class="sidebar-item" id="nav-automod" data-panel="automod" onclick="switchPanel('automod')">
         <span>🛡️</span> Auto-Mod <span class="v-badge premium">V3</span>
       </div>
+      <div class="sidebar-item" id="nav-antispam" data-panel="antispam" onclick="switchPanel('antispam')">
+        <span>🛡️</span> Anti-Spam <span class="v-badge premium">V5</span>
+      </div>
       <div class="sidebar-item" id="nav-welcome" data-panel="welcome" onclick="switchPanel('welcome')">
         <span>👋</span> Welcomer <span class="v-badge premium">V3</span>
+      </div>
+      <div class="sidebar-item" id="nav-autorole" data-panel="autorole" onclick="switchPanel('autorole')">
+        <span>🎭</span> Auto-Role <span class="v-badge premium">V4</span>
+      </div>
+      <div class="sidebar-item" id="nav-leveling" data-panel="leveling" onclick="switchPanel('leveling')">
+        <span>⭐</span> Leveling & XP <span class="v-badge premium">V4</span>
+      </div>
+      <div class="sidebar-item" id="nav-logging" data-panel="logging" onclick="switchPanel('logging')">
+        <span>📜</span> Server Logging <span class="v-badge premium">V5</span>
       </div>
 
       <div class="sidebar-section">Enterprise (V6-V8)</div>
@@ -446,6 +459,9 @@
       </div>
       <div class="sidebar-item" id="nav-staffrewards" data-panel="staffrewards" onclick="switchPanel('staffrewards')">
         <span>🏆</span> Staff Rewards <span class="v-badge enterprise">V7</span>
+      </div>
+      <div class="sidebar-item" id="nav-alerts" data-panel="alerts" onclick="switchPanel('alerts')">
+        <span>🔔</span> Activity Alerts <span class="v-badge premium">V5</span>
       </div>
       <div class="sidebar-item" id="nav-branding" data-panel="branding" onclick="switchPanel('branding')">
         <span>✨</span> Custom Branding <span class="v-badge enterprise">V8</span>
@@ -486,121 +502,7 @@
         </div>
       </div>
 
-      <!-- TICKET LOGS -->
-      <div class="dash-panel" id="panel-ticketlogs" style="display:none">
-        <div class="sys-module-header" style="margin-bottom:20px">
-          <div>
-            <div class="card-title" style="margin:0">🎫 Ticket Logs & History</div>
-            <div class="card-desc" style="margin:6px 0 0">View all support tickets, feedback, and staff reports.</div>
-          </div>
-          <div style="display:flex;gap:10px">
-            <select id="tk-filter-type" class="form-input btn-sm" style="width:140px" onchange="loadTicketLogs(currentGuild.id)">
-              <option value="">All Types</option>
-              <option value="support">Support</option>
-              <option value="feedback">Feedback</option>
-              <option value="report_staff">Staff Report</option>
-            </select>
-            <select id="tk-filter-status" class="form-input btn-sm" style="width:140px" onchange="loadTicketLogs(currentGuild.id)">
-              <option value="all">All Status</option>
-              <option value="open">Open</option>
-              <option value="claimed">Claimed</option>
-              <option value="closed">Closed</option>
-            </select>
-            <button class="btn btn-ghost btn-sm" onclick="loadTicketLogs(currentGuild.id)">↻</button>
-          </div>
-        </div>
 
-        <div class="table-container">
-          <table>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Category</th>
-                <th>Status</th>
-                <th>Originator</th>
-                <th>Staff</th>
-                <th>Date</th>
-              </tr>
-            </thead>
-            <tbody id="ticketLogsBody">
-              <tr><td colspan="6" class="table-empty">Loading tickets...</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- ECONOMY & SHOP -->
-      <div class="dash-panel" id="panel-economy" style="display:none">
-        <div class="sys-module-header">
-          <div>
-            <div class="card-title" style="margin:0">💰 Economy & Shop System</div>
-            <div class="card-desc" style="margin:6px 0 0">Manage server currency, rewards, and view point transactions.</div>
-          </div>
-          <button class="btn btn-primary btn-sm" onclick="saveEconomy()">Save Settings</button>
-        </div>
-
-        <div class="sys-modules">
-          <div class="sys-module">
-            <div class="module-title" style="font-size:1rem;margin-bottom:15px">Currency Settings</div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
-              <div class="form-row">
-                <label>Currency Name</label>
-                <input type="text" id="eco-name" class="form-input" placeholder="e.g. Credits">
-              </div>
-              <div class="form-row">
-                <label>Currency Symbol</label>
-                <input type="text" id="eco-symbol" class="form-input" placeholder="e.g. 💰">
-              </div>
-            </div>
-            <div class="form-row" style="margin-top:16px">
-              <label>Point Multiplier</label>
-              <input type="number" id="eco-multiplier" class="form-input" step="0.1" min="0" placeholder="1.0" style="max-width:200px">
-              <div class="card-desc" style="margin-top:4px">Global multiplier for points earned through activity.</div>
-            </div>
-          </div>
-
-          <div class="sys-module">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px">
-              <div class="module-title" style="font-size:1rem;margin:0">🎭 Automatic Role Rewards</div>
-              <button class="btn btn-ghost btn-sm" onclick="showAddRoleReward()">+ Add Reward</button>
-            </div>
-            <div class="table-container">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Role Name</th>
-                    <th>Required Points</th>
-                    <th>Role ID</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody id="roleRewardsBody">
-                  <tr><td colspan="4" class="table-empty">No role rewards configured.</td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          <div class="sys-module">
-            <div class="module-title" style="font-size:1rem;margin-bottom:15px">💸 Recent Transactions</div>
-            <div class="table-container">
-              <table>
-                <thead>
-                  <tr>
-                    <th>User</th>
-                    <th>Amount</th>
-                    <th>Reason</th>
-                    <th>Date</th>
-                  </tr>
-                </thead>
-                <tbody id="ecoTransactionsBody">
-                  <tr><td colspan="4" class="table-empty">No recent transactions.</td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
 
       <!-- OVERVIEW -->
       <div class="dash-panel" id="panel-overview">
@@ -832,74 +734,7 @@
         </div>
       </div>
 
-      <!-- TICKET LOGS -->
-      <div class="dash-panel" id="panel-ticketlogs-alt" style="display:none">
-        <div class="dash-card">
-          <div class="card-title">🎫 Operational Ticket Logs</div>
-          <div class="table-filters" style="display:flex; gap:10px; margin-bottom:15px;">
-            <select id="ticketLogTypeFilter" class="form-input" style="width:150px"
-              onchange="loadTicketLogs(currentGuild?.id)">
-              <option value="">All Types</option>
-              <option value="report_staff">Staff Reports</option>
-              <option value="feedback">Feedback</option>
-            </select>
-            <select id="ticketLogStatusFilter" class="form-input" style="width:150px"
-              onchange="loadTicketLogs(currentGuild?.id)">
-              <option value="all">All Statuses</option>
-              <option value="open">Open / Pending</option>
-              <option value="claimed">Claimed</option>
-              <option value="closed">Closed</option>
-            </select>
-            <button class="btn btn-secondary" onclick="loadTicketLogs(currentGuild?.id)">🔄 Refresh</button>
-          </div>
-          <div class="table-wrap">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>Ticket ID</th>
-                  <th>Originator</th>
-                  <th>Type</th>
-                  <th>Status</th>
-                  <th>Details</th>
-                  <th>Date</th>
-                </tr>
-              </thead>
-              <tbody id="ticketlogsBody">
-                <tr>
-                  <td colspan="6" class="table-empty">Loading tickets...</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
 
-      <!-- ACTIVITY LOG -->
-      <div class="dash-panel" id="panel-activitylog" style="display:none">
-        <div class="dash-card">
-          <div class="card-title">📖 Server Activity Log</div>
-          <div class="table-filters" style="margin-bottom:15px;">
-            <button class="btn btn-secondary" onclick="loadActivityLog(currentGuild?.id)">🔄 Refresh Latest</button>
-          </div>
-          <div class="table-wrap">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>Time</th>
-                  <th>User ID</th>
-                  <th>Action Type</th>
-                  <th>Details</th>
-                </tr>
-              </thead>
-              <tbody id="activitylogBody">
-                <tr>
-                  <td colspan="4" class="table-empty">Loading activity...</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
 
       <!-- PROMO HISTORY -->
       <div class="dash-panel" id="panel-promohistory" style="display:none">
@@ -943,36 +778,6 @@
                 </tr>
               </tbody>
             </table>
-          </div>
-        </div>
-      </div>
-      <!-- ALERTS -->
-      <div class="dash-panel" id="panel-alerts" style="display:none">
-        <div class="dash-card">
-          <div class="card-title">🔔 Server Activity Alerts</div>
-          <p style="color:#9b9bb3;font-size:14px;margin-bottom:20px;">Automatically ping a role when server activity
-            plummets or spikes beyond thresholds. Available for all tiers.</p>
-          <div class="settings-form">
-            <div class="form-row">
-              <label>Enable Activity Alerts</label>
-              <div class="toggle"><input type="checkbox" id="settingAlertEnabled"><span class="slider"></span></div>
-            </div>
-            <div class="form-row">
-              <label>Alert Channel ID</label>
-              <select id="settingAlertChannel" class="form-input">
-                <option value="">Loading channels...</option>
-              </select>
-            </div>
-            <div class="form-row">
-              <label>Pingable Role ID</label>
-              <input type="text" id="settingAlertRole" placeholder="e.g. 1234567890123" class="form-input">
-            </div>
-            <div class="form-row">
-              <label>Activity Drop Threshold %</label>
-              <input type="number" id="settingAlertThreshold" placeholder="50" class="form-input">
-            </div>
-            <button class="btn btn-primary" onclick="saveSystemSettings('alerts', gatherAlerts)"
-              style="margin-top:10px">Save Alerts Configuration</button>
           </div>
         </div>
       </div>
@@ -1024,53 +829,12 @@
               <button class="btn btn-secondary" style="width:fit-content" onclick="addAppQuestion()">+ Add
                 Question</button>
             </div>
-            <button class="btn btn-primary" onclick="saveSystemSettings('applications', gatherApps)"
+            <button class="btn btn-primary" onclick="saveApps()"
               style="margin-top:20px">Save Application System</button>
           </div>
         </div>
       </div>
 
-      <!-- BRANDING -->
-      <div class="dash-panel" id="panel-branding" style="display:none">
-        <div class="dash-card">
-          <div class="card-title" style="display:flex;align-items:center;gap:10px">✨ Custom Branding <span
-              class="premium-badge" style="background:#ff475715;color:#ff4757;border-color:#ff475740">ENTERPRISE</span>
-          </div>
-          <p style="color:#9b9bb3;font-size:14px;margin-bottom:20px;">Completely white-label the bot. Change bot embed
-            colors, names, and watermarks to match your own community branding.</p>
-
-          <div id="brandingTierLock"
-            style="display:none;padding:40px;text-align:center;background:rgba(255,255,255,0.02);border-radius:10px;border:1px dashed #5c5c78;margin-bottom:20px">
-            <div style="font-size:40px;margin-bottom:10px">👑</div>
-            <h3 style="color:#fff;margin-bottom:10px">Enterprise Feature</h3>
-            <p style="color:#9b9bb3">Custom Branding requires the Enterprise / Tier 6 license.</p>
-          </div>
-
-          <div class="settings-form" id="brandingUIBox">
-            <div class="form-row">
-              <label>Primary Embed Brand Hex Code</label>
-              <div style="display:flex;gap:10px;align-items:center">
-                <input type="color" id="settingBrandColorPick"
-                  style="height:42px;width:50px;background:transparent;border:none;cursor:pointer" value="#6c63ff"
-                  onchange="document.getElementById('settingBrandColor').value=this.value">
-                <input type="text" id="settingBrandColor" placeholder="#FFFFFF" class="form-input"
-                  oninput="document.getElementById('settingBrandColorPick').value=this.value">
-              </div>
-            </div>
-            <div class="form-row">
-              <label>Global Footer Text</label>
-              <input type="text" id="settingBrandFooter" placeholder="e.g. MyServer Network • Administration"
-                class="form-input">
-            </div>
-            <div class="form-row">
-              <label>Global Footer Icon URL</label>
-              <input type="text" id="settingBrandIcon" placeholder="https://..." class="form-input">
-            </div>
-            <button class="btn btn-primary" onclick="saveSystemSettings('branding', gatherBranding)"
-              style="margin-top:10px">Save Branding Profile</button>
-          </div>
-        </div>
-      </div>
 
       <!-- SETTINGS -->
       <div class="dash-panel" id="panel-settings" style="display:none">
@@ -1135,59 +899,6 @@
           </div>
           <div id="promoRankList" class="promo-list">
             <div class="table-empty">Loading promotion requirements...</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- TICKET SYSTEM -->
-      <div class="dash-panel" id="panel-tickets" style="display:none">
-        <div class="sys-module-header">
-          <div>
-            <div class="card-title" style="margin:0">🎫 Ticket System Config</div>
-            <div class="card-desc" style="margin:6px 0 0">Configure your ticket categories, transcripts, and support panel.</div>
-          </div>
-          <button class="btn btn-primary btn-sm" onclick="saveSystemSettings('tickets', gatherTickets)">Save Settings</button>
-        </div>
-        <div class="sys-modules">
-          <div class="sys-module">
-            <div class="module-row">
-              <div>
-                <div class="module-title">Enable Ticket System</div>
-                <div class="module-desc">Activate the ticket system on your server.</div>
-              </div>
-              <label class="toggle"><input type="checkbox" id="tk-enabled"><span class="toggle-slider"></span></label>
-            </div>
-          </div>
-          <div class="sys-module">
-            <div class="form-row">
-              <label>Ticket Panel Channel</label>
-              <select id="tk-panel-ch" class="form-input"><option value="">Select a channel...</option></select>
-            </div>
-            <div class="form-row" style="margin-top:14px">
-              <label>Ticket Category (Parent folder)</label>
-              <input type="text" id="tk-category" class="form-input" placeholder="Category ID">
-            </div>
-            <div class="form-row" style="margin-top:14px">
-              <label>Support Staff Role</label>
-              <input type="text" id="tk-support-role" class="form-input" placeholder="Role ID">
-            </div>
-            <div class="form-row" style="margin-top:14px">
-              <label>Panel Message</label>
-              <textarea id="tk-message" class="form-input" rows="3" placeholder="Welcome to your ticket! A staff member will assist you shortly."></textarea>
-            </div>
-          </div>
-          <div class="sys-module">
-            <div class="module-row">
-              <div>
-                <div class="module-title">Ticket Transcripts</div>
-                <div class="module-desc">Automatically log closed tickets to a channel.</div>
-              </div>
-              <label class="toggle"><input type="checkbox" id="tk-transcripts"><span class="toggle-slider"></span></label>
-            </div>
-            <div class="form-row" style="margin-top:14px">
-              <label>Transcript Channel</label>
-              <select id="tk-transcript-ch" class="form-input"><option value="">Select a channel...</option></select>
-            </div>
           </div>
         </div>
       </div>

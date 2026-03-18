@@ -11,8 +11,23 @@ class CommandRegistry {
     loadFromRegistry() {
         try {
             const listPath = path.join(__dirname, '../data/extracted_commands.json');
+            const v4Path = path.join(__dirname, '../data/v4_slash_commands.json');
+            
             if (fs.existsSync(listPath)) {
                 this.commands = JSON.parse(fs.readFileSync(listPath, 'utf8'));
+            }
+
+            if (fs.existsSync(v4Path)) {
+                const v4Cmds = JSON.parse(fs.readFileSync(v4Path, 'utf8'));
+                // Replace or add v4 commands
+                for (const v4 of v4Cmds) {
+                    const idx = this.commands.findIndex(c => c.name === v4.name);
+                    if (idx !== -1) {
+                        this.commands[idx] = { ...this.commands[idx], ...v4 };
+                    } else {
+                        this.commands.push(v4);
+                    }
+                }
             }
         } catch (error) {
             console.error('[CommandRegistry] Error loading commands:', error);
@@ -20,78 +35,31 @@ class CommandRegistry {
     }
 
     /**
-     * Organize 271 commands into logical groups to stay within Discord limits
+     * Organize v4.0 Minimal Slash Commands
      */
     getGroupedCommands() {
-        const groups = {
-            'mod': { desc: 'Moderation systems', cmds: [] },
-            'staff': { desc: 'Staff management', cmds: [] },
-            'points': { desc: 'Economy and points', cmds: [] },
-            'ticket': { desc: 'Support tickets', cmds: [] },
-            'apply': { desc: 'Application system', cmds: [] },
-            'auto': { desc: 'Automation systems', cmds: [] },
-            'shift': { desc: 'Work shifts', cmds: [] },
-            'achievement': { desc: 'Achievements', cmds: [] },
-            'giveaway': { desc: 'Giveaways', cmds: [] },
-            'system': { desc: 'Core bot systems', cmds: [] }
-        };
-
-        const result = [];
-        const topLevelThreshold = ['ping', 'help', 'ban', 'kick', 'warn', 'timeout', 'purge', 'balance', 'leaderboard', 'shift_start', 'shift_end'];
+        const v4SlashCommands = [
+            'help', 'ping', 'invite_link', 'report_issue', 'dashboard',
+            'shift_start', 'shift_end', 'shift_stats', 'promote', 'demote',
+            'staff_list', 'staff_profile', 'staff_rank', 'staff_stats_agg', // stats_agg for #14
+            'points', 'check_points', 'warn', 'warnings', 'clear_warnings', 'premium'
+        ];
         
-        // Track which commands we've handled
+        const result = [];
         const handledNames = new Set();
 
-        // 1. Add top-level high-frequency commands
-        for (const name of topLevelThreshold) {
+        // Register the 20 Minimal Slash Commands
+        for (const name of v4SlashCommands) {
+            // Find command data in registry
             const cmd = this.commands.find(c => c.name === name);
             if (cmd) {
                 result.push({
                     name: cmd.name,
                     description: cmd.desc || `Execute ${cmd.name} command`,
-                    tier: cmd.tier
+                    options: cmd.options || []
                 });
                 handledNames.add(name);
             }
-        }
-
-        // 2. Put the rest into subcommands
-        for (const cmd of this.commands) {
-            if (handledNames.has(cmd.name)) continue;
-
-            let assigned = false;
-            for (const [prefix, group] of Object.entries(groups)) {
-                if (cmd.name.startsWith(prefix)) {
-                    group.cmds.push(cmd);
-                    assigned = true;
-                    break;
-                }
-            }
-
-            if (!assigned) {
-                groups['system'].cmds.push(cmd);
-            }
-        }
-
-        // 3. Convert groups to SlashCommandBuilders
-        for (const [name, group] of Object.entries(groups)) {
-            if (group.cmds.length === 0) continue;
-
-            const builder = new SlashCommandBuilder()
-                .setName(name)
-                .setDescription(group.desc);
-
-            // Discord limits to 25 subcommands per command. 
-            // If we have more, we need to create deeper nesting or more groups.
-            // For now, take the first 25 of each category.
-            group.cmds.slice(0, 25).forEach(sc => {
-                builder.addSubcommand(sub => 
-                    sub.setName(sc.name.replace(`${name}_`, ''))
-                        .setDescription(sc.desc || `Execute ${sc.name}`)
-                );
-            });
-
-            result.push(builder.toJSON());
         }
 
         return result;

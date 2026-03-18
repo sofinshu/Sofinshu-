@@ -113,27 +113,38 @@ function animateStat(id, target) {
 // ── COMMANDS ──
 async function loadCommands() {
     try {
-        const res = await fetch('extracted_commands.json');
+        const res = await fetch('backend/data/extracted_commands.json'); // Direct path to the complete one
         const rawCommands = await res.json();
         
-        // Dynamically map Free/Premium/Enterprise to v1-v8
         allCommands = rawCommands.map(c => {
-            let tier = (c.tier || 'v1').toLowerCase();
             const name = (c.name || c.command || '').toLowerCase();
-            
-            if (tier === 'free') {
-                if (name.includes('mod') || name.includes('ban') || name.includes('kick') || name.includes('warn')) tier = 'v2';
-                else tier = 'v1';
-            } else if (tier === 'premium') {
-                if (name.includes('promo')) tier = 'v3';
-                else if (name.includes('ticket') || name.includes('giveaway')) tier = 'v4';
-                else tier = 'v5';
-            } else if (tier === 'enterprise') {
-                if (name.includes('eco') || name.includes('balance') || name.includes('pay')) tier = 'v6';
-                else if (name.includes('achieve') || name.includes('reward')) tier = 'v7';
-                else tier = 'v8';
+            const desc = (c.desc || c.description || '').toLowerCase();
+            let tier = (c.tier || 'free').toLowerCase();
+            let category = 'utility';
+
+            // Category Mapping Logic based on v4.0 Spec
+            if (name.includes('shift') || name.includes('staff') || name.includes('rank') || name.includes('promo')) {
+                category = 'management';
+                if (tier === 'free') tier = 'v1';
+            } else if (name.includes('ticket') || name.includes('giveaway') || name.includes('auto')) {
+                category = 'auto';
+                tier = 'v4';
+            } else if (name.includes('warn') || name.includes('ban') || name.includes('kick') || name.includes('mod')) {
+                category = 'security';
+                tier = 'v2';
+            } else if (name.includes('eco') || name.includes('point') || name.includes('balance') || name.includes('pay')) {
+                category = 'premium';
+                tier = 'v6';
             }
-            return { ...c, tier };
+
+            // Ensure categories match the buttons
+            if (category === 'management') c.vTier = 'v1';
+            else if (category === 'auto') c.vTier = 'v4';
+            else if (category === 'security') c.vTier = 'v2';
+            else if (category === 'premium') c.vTier = 'v6';
+            else c.vTier = 'v1';
+
+            return { ...c, category, vTier: c.vTier };
         });
 
         renderCommands();
@@ -149,30 +160,33 @@ function renderCommands() {
     if (!grid) return;
 
     const query = (document.getElementById('cmdSearch')?.value || '').toLowerCase().trim();
-    const activeTier = document.querySelector('.tier-btn.active')?.dataset.tier || 'all';
+    const activeCat = document.querySelector('.tier-btn.active')?.dataset.tier || 'all';
 
     const filtered = allCommands.filter(c => {
         const name = (c.name || c.command || '').toLowerCase();
         const desc = (c.desc || c.description || '').toLowerCase();
-        const tier = c.tier || 'v1';
+        const cat = c.category || 'utility';
         const matchQ = !query || name.includes(query) || desc.includes(query);
-        const matchT = activeTier === 'all' || tier === activeTier;
-        return matchQ && matchT;
+        const matchC = activeCat === 'all' || cat === activeCat;
+        return matchQ && matchC;
     });
 
     const tierColors = { v1: '#6c63ff', v2: '#00b7ff', v3: '#ff47d8', v4: '#ffa502', v5: '#00e096', v6: '#ff4757', v7: '#ffd700', v8: '#00f2ff' };
-    const tierLabels = { v1: 'Free', v2: 'Tier 2', v3: 'Premium', v4: 'Tier 4', v5: 'Tier 5', v6: 'Enterprise', v7: 'Tier 7', v8: 'Zenith' };
+    const categoryLabels = { management: 'Management', auto: 'Auto Systems', security: 'Security', utility: 'Utility', premium: 'Premium' };
 
     const slice = filtered.slice(0, visibleCommandCount);
     grid.innerHTML = slice.length
         ? slice.map(c => {
-            const tier = c.tier || 'v1';
-            const color = tierColors[tier] || '#6c63ff';
-            const label = tierLabels[tier] || tier.toUpperCase();
+            const vTier = c.vTier || 'v1';
+            const color = tierColors[vTier] || '#6c63ff';
+            const catLabel = categoryLabels[c.category] || 'General';
             return `<div class="cmd-card">
                 <div class="cmd-name">/${c.name || c.command}</div>
                 <div class="cmd-desc">${c.desc || c.description || 'No description.'}</div>
-                <span class="cmd-tier" style="background:${color}18;color:${color};border:1px solid ${color}30">${label}</span>
+                <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:auto">
+                    <span class="cmd-tier" style="background:${color}18;color:${color};border:1px solid ${color}30">${vTier.toUpperCase()}</span>
+                    <span class="cmd-tier" style="background:rgba(255,255,255,0.05);color:#9b9bb3;border:1px solid rgba(255,255,255,0.1)">${catLabel}</span>
+                </div>
             </div>`;
         }).join('')
         : '<div class="cmd-loading">No commands match your search.</div>';
@@ -1657,19 +1671,30 @@ function saveSystemSettings(system, gatherFn) {
 
 // ── ALERTS ──
 function applyAlertsUI(d) {
-    chk('settingAlertEnabled', d.enabled);
+    chk('al-enabled', d.enabled);
     val('settingAlertChannel', d.channelId);
-    val('settingAlertRole', d.roleId);
-    val('settingAlertThreshold', d.threshold);
+    val('al-roles', (d.alertRoles || []).join(', '));
+    const t = d.thresholds || {};
+    val('al-threshold-low', t.lowActivity);
+    val('al-threshold-warn', t.highWarnings || t.warningSurge);
+    val('al-threshold-tickets', t.ticketSpike);
 }
 
 function gatherAlerts() {
     return {
-        enabled: getChk('settingAlertEnabled'),
+        enabled: getChk('al-enabled'),
         channelId: getVal('settingAlertChannel'),
-        roleId: getVal('settingAlertRole'),
-        threshold: getNum('settingAlertThreshold')
+        alertRoles: (getVal('al-roles') || '').split(',').map(s => s.trim()).filter(Boolean),
+        thresholds: {
+            lowActivity: getNum('al-threshold-low'),
+            highWarnings: getNum('al-threshold-warn'),
+            ticketSpike: getNum('al-threshold-tickets')
+        }
     };
+}
+
+function saveAlerts() {
+    saveSystem('alerts', gatherAlerts());
 }
 
 // ── APPLICATIONS ──
@@ -1708,12 +1733,70 @@ function addAppQuestion(value = '') {
 function gatherApps() {
     return {
         enabled: getChk('settingAppEnabled'),
-        panelTitle: getVal('settingAppTitle'),
-        applyChannelId: getVal('settingAppChannel'),
+        title: getVal('settingAppTitle'),
+        channelId: getVal('settingAppChannel'),
         reviewChannelId: getVal('settingAppReview'),
         reviewerRoleId: getVal('settingAppRole'),
         questions: Array.from(document.querySelectorAll('.app-question-input')).map(input => input.value.trim()).filter(Boolean)
     };
+}
+
+function saveApps() {
+    saveSystem('applications', gatherApps());
+}
+
+
+// ── AUTO-PROMO ──
+async function loadPromotions(guildId) {
+    if (!guildId) return;
+    try {
+        const data = await fetchAPI(`/api/dashboard/guild/${guildId}/promotions`);
+        const list = document.getElementById('promoRankList');
+        if (!list) return;
+        
+        let html = '';
+        if (Array.isArray(data) && data.length > 0) {
+            data.forEach((p, idx) => {
+                html += `
+                <div class="sys-module" style="margin-bottom:15px">
+                    <div class="module-title">Rank Role ID: ${escHtml(p.roleId)}</div>
+                    <div style="display:flex;gap:15px;margin-top:10px">
+                        <div class="form-row"><label>Req Points</label><input type="number" class="form-input" value="${p.reqPoints}"></div>
+                        <div class="form-row"><label>Req Shifts</label><input type="number" class="form-input" value="${p.reqShifts}"></div>
+                    </div>
+                </div>`;
+            });
+        }
+        if (!html) html = '<div class="table-empty" style="padding:20px 0;">No promotion requirements configured for this server. Ensure you have rank-roles setup.</div>';
+        list.innerHTML = html;
+        
+        // Load announcement channel from general settings if exists
+        const settings = await fetchAPI(`/api/dashboard/guild/${guildId}/settings`).catch(()=>({}));
+        if (settings && settings.promoAnnouncementChannelId) {
+            const chSelect = document.getElementById('settingPromoChannel');
+            if (chSelect) chSelect.value = settings.promoAnnouncementChannelId;
+        }
+    } catch (e) {
+        console.error('Failed to load promotions:', e);
+    }
+}
+
+async function saveAutoPromo() {
+    const guildId = currentGuild?.id;
+    if (!guildId) return;
+    toast('Saving auto-promotion settings...');
+    
+    try {
+        const channelId = document.getElementById('settingPromoChannel')?.value || '';
+        await fetch(`${CONFIG.API_BASE}/api/dashboard/guild/${guildId}/settings`, {
+            method: 'PATCH',
+            headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ promoAnnouncementChannelId: channelId })
+        });
+        toast('✅ Auto-Promotion settings saved!');
+    } catch (e) {
+        toast('❌ Failed to save auto-promotion settings.');
+    }
 }
 
 // ── CUSTOM BRANDING ──
@@ -1727,18 +1810,23 @@ function applyBrandingUI(d) {
     document.getElementById('brandingTierLock').style.display = 'none';
     document.getElementById('brandingUIBox').style.display = 'block';
 
-    val('settingBrandColor', d.color || '#6c63ff');
-    val('settingBrandColorPick', d.color || '#6c63ff');
-    val('settingBrandFooter', d.footer);
-    val('settingBrandIcon', d.iconURL);
+    val('brand-name', d.botName);
+    val('brand-color', d.embedColor || '#6c63ff');
+    val('brand-avatar', d.avatarURL);
+    val('brand-footer', d.footerText);
 }
 
 function gatherBranding() {
     return {
-        color: getVal('settingBrandColor'),
-        footer: getVal('settingBrandFooter'),
-        iconURL: getVal('settingBrandIcon')
+        botName: getVal('brand-name'),
+        embedColor: getVal('brand-color'),
+        avatarURL: getVal('brand-avatar'),
+        footerText: getVal('brand-footer')
     };
+}
+
+function saveBranding() {
+    saveSystem('branding', gatherBranding());
 }
 
 
@@ -1857,7 +1945,8 @@ function saveLeveling() {
 function applyEconomyUI(d) {
     val('eco-name', d.currencyName || 'Credits');
     val('eco-symbol', d.currencySymbol || '💰');
-    val('eco-multiplier', d.multiplier || 1.0);
+    val('eco-mult-shift', d.multiplier || 1.0);
+    val('eco-mult-event', d.multiplier || 1.0);
 }
 
 function saveEconomy() {
@@ -1865,7 +1954,7 @@ function saveEconomy() {
         enabled: true,
         currencyName: getVal('eco-name'),
         currencySymbol: getVal('eco-symbol'),
-        multiplier: parseFloat(getVal('eco-multiplier')) || 1.0
+        multiplier: parseFloat(getVal('eco-mult-shift')) || 1.0
     });
 }
 
@@ -2449,319 +2538,6 @@ function fmtDuration(minutes) {
 // DYNAMIC SYSTEM SAVING & LOADING
 // ══════════════════════════════════════
 
-async function loadSystemSettings(system, applyFn) {
-    const guildId = currentGuild?.id;
-    if (!guildId) return;
-    try {
-        const data = await fetchAPI(`/api/dashboard/guild/${guildId}/systems/${system}`);
-        if (applyFn && typeof applyFn === 'function') applyFn(data);
-    } catch (e) {
-        console.error(`Failed to load ${system} settings:`, e);
-    }
-}
-
-async function saveSystemSettings(system, gatherFn) {
-    const guildId = currentGuild?.id;
-    if (!guildId) return;
-    const btn = event?.currentTarget;
-    if (btn) btn.disabled = true;
-    try {
-        const payload = gatherFn();
-        const res = await fetch(`${CONFIG.API_BASE}/api/dashboard/guild/${guildId}/systems/${system}`, {
-            method: 'PATCH',
-            headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        });
-        if (!res.ok) throw new Error();
-        const data = await res.json();
-        toast(data.message || `${system.toUpperCase()} settings saved successfully!`);
-    } catch (e) {
-        toast(`Failed to save ${system} settings.`);
-    } finally {
-        if (btn) btn.disabled = false;
-    }
-}
-
-// ── TICKETS ──
-function applyTicketsUI(data) {
-    document.getElementById('tk-enabled').checked = data.enabled || false;
-    document.getElementById('tk-panel-ch').value = data.panelChannelId || '';
-    document.getElementById('tk-category').value = data.categoryId || '';
-    document.getElementById('tk-support-role').value = data.supportRoleId || '';
-    document.getElementById('tk-message').value = data.openMessage || '';
-    document.getElementById('tk-transcripts').checked = data.transcriptsEnabled !== false;
-    document.getElementById('tk-transcript-ch').value = data.transcriptChannelId || '';
-}
-
-function gatherTickets() {
-    return {
-        enabled: document.getElementById('tk-enabled').checked,
-        panelChannelId: document.getElementById('tk-panel-ch').value,
-        categoryId: document.getElementById('tk-category').value,
-        supportRoleId: document.getElementById('tk-support-role').value,
-        openMessage: document.getElementById('tk-message').value,
-        transcriptsEnabled: document.getElementById('tk-transcripts').checked,
-        transcriptChannelId: document.getElementById('tk-transcript-ch').value
-    };
-}
-
-// ── AUTO-MOD ──
-function applyAutoModUI(data) {
-    document.getElementById('am-profanity').checked = data.blockProfanity || false;
-    document.getElementById('am-links').checked = data.blockLinks || false;
-    document.getElementById('am-mentions').checked = data.antiMentionSpam || false;
-    document.getElementById('am-invites').checked = data.blockInvites || false;
-    document.getElementById('am-timeout').checked = data.autoTimeout || false;
-    document.getElementById('am-log').checked = data.logViolations || false;
-
-    // Optional detailed fields
-    const bw = document.getElementById('am-banned-words'); if (bw) bw.value = (data.bannedWords || []).join(', ');
-    const ad = document.getElementById('am-allowed-domains'); if (ad) ad.value = (data.allowedDomains || []).join(', ');
-    const mm = document.getElementById('am-max-mentions'); if (mm) mm.value = data.maxMentions || 5;
-    const td = document.getElementById('am-timeout-dur'); if (td) td.value = data.timeoutDuration || 10;
-    const lc = document.getElementById('am-log-channel'); if (lc) lc.value = data.logChannel || '';
-}
-
-function saveAutoMod() {
-    saveSystemSettings('automod', () => {
-        const payload = {
-            enabled: true,
-            blockProfanity: document.getElementById('am-profanity').checked,
-            blockLinks: document.getElementById('am-links').checked,
-            antiMentionSpam: document.getElementById('am-mentions').checked,
-            blockInvites: document.getElementById('am-invites').checked,
-            autoTimeout: document.getElementById('am-timeout').checked,
-            logViolations: document.getElementById('am-log').checked
-        };
-        const bw = document.getElementById('am-banned-words'); if (bw) payload.bannedWords = bw.value.split(',').map(s=>s.trim()).filter(Boolean);
-        const ad = document.getElementById('am-allowed-domains'); if (ad) payload.allowedDomains = ad.value.split(',').map(s=>s.trim()).filter(Boolean);
-        const mm = document.getElementById('am-max-mentions'); if (mm) payload.maxMentions = parseInt(mm.value) || 5;
-        const td = document.getElementById('am-timeout-dur'); if (td) payload.timeoutDuration = parseInt(td.value) || 10;
-        const lc = document.getElementById('am-log-channel'); if (lc) payload.logChannel = lc.value;
-        return payload;
-    });
-}
-
-// ── AUTO-PROMO ──
-async function loadPromotions(guildId) {
-    if (!guildId) return;
-    try {
-        const data = await fetchAPI(`/api/dashboard/guild/${guildId}/promotions`);
-        const list = document.getElementById('promoRankList');
-        if (!list) return;
-        
-        let html = '';
-        if (Array.isArray(data) && data.length > 0) {
-            data.forEach((p, idx) => {
-                html += `
-                <div class="sys-module" style="margin-bottom:15px">
-                    <div class="module-title">Rank Role ID: ${escHtml(p.roleId)}</div>
-                    <div style="display:flex;gap:15px;margin-top:10px">
-                        <div class="form-row"><label>Req Points</label><input type="number" class="form-input" value="${p.reqPoints}"></div>
-                        <div class="form-row"><label>Req Shifts</label><input type="number" class="form-input" value="${p.reqShifts}"></div>
-                    </div>
-                </div>`;
-            });
-        }
-        if (!html) html = '<div class="table-empty" style="padding:20px 0;">No promotion requirements configured for this server. Ensure you have rank-roles setup.</div>';
-        list.innerHTML = html;
-        
-        // Load announcement channel from general settings if exists
-        const settings = await fetchAPI(`/api/dashboard/guild/${guildId}/settings`).catch(()=>({}));
-        if (settings && settings.promoAnnouncementChannelId) {
-            const chSelect = document.getElementById('settingPromoChannel');
-            if (chSelect) chSelect.value = settings.promoAnnouncementChannelId;
-        }
-    } catch (e) {
-        console.error('Failed to load promotions:', e);
-    }
-}
-
-async function saveAutoPromo() {
-    const guildId = currentGuild?.id;
-    if (!guildId) return;
-    toast('Saving auto-promotion settings...');
-    
-    try {
-        const channelId = document.getElementById('settingPromoChannel')?.value || '';
-        await fetch(`${CONFIG.API_BASE}/api/dashboard/guild/${guildId}/settings`, {
-            method: 'PATCH',
-            headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ promoAnnouncementChannelId: channelId })
-        });
-        toast('✅ Auto-Promotion settings saved!');
-    } catch (e) {
-        toast('❌ Failed to save auto-promotion settings.');
-    }
-}
-
-// ── SERVER LOGGING ──
-function applyLoggingUI(data) {
-    document.getElementById('log-members').checked = data.memberLog || false;
-    document.getElementById('log-members-ch').value = data.memberLogChannel || '';
-    document.getElementById('log-messages').checked = data.messageLog || false;
-    document.getElementById('log-messages-ch').value = data.messageLogChannel || '';
-    document.getElementById('log-mod').checked = data.modLog || false;
-    document.getElementById('log-mod-ch').value = data.modLogChannel || '';
-    document.getElementById('log-roles').checked = data.roleLog || false;
-    document.getElementById('log-roles-ch').value = data.roleLogChannel || '';
-    document.getElementById('log-voice').checked = data.voiceLog || false;
-    document.getElementById('log-voice-ch').value = data.voiceLogChannel || '';
-}
-
-function gatherLogging() {
-    return {
-        memberLog: document.getElementById('log-members').checked,
-        memberLogChannel: document.getElementById('log-members-ch').value,
-        messageLog: document.getElementById('log-messages').checked,
-        messageLogChannel: document.getElementById('log-messages-ch').value,
-        modLog: document.getElementById('log-mod').checked,
-        modLogChannel: document.getElementById('log-mod-ch').value,
-        roleLog: document.getElementById('log-roles').checked,
-        roleLogChannel: document.getElementById('log-roles-ch').value,
-        voiceLog: document.getElementById('log-voice').checked,
-        voiceLogChannel: document.getElementById('log-voice-ch').value
-    };
-}
-
-function saveLogging() {
-    saveSystemSettings('logging', gatherLogging);
-}
-
-// ── APPLICATIONS ──
-let appQuestions = [];
-
-function applyApplicationsUI(data) {
-    document.getElementById('settingAppEnabled').checked = data.enabled || false;
-    document.getElementById('settingAppTitle').value = data.title || 'Staff Application';
-    document.getElementById('settingAppChannel').value = data.channelId || '';
-    document.getElementById('settingAppReview').value = data.reviewChannelId || '';
-    document.getElementById('settingAppRole').value = data.reviewerRoleId || '';
-    
-    appQuestions = data.questions || [];
-    renderAppQuestions();
-}
-
-function renderAppQuestions() {
-    const list = document.getElementById('appQuestionsList');
-    if (!list) return;
-    list.innerHTML = '';
-    
-    appQuestions.forEach((q, idx) => {
-        const div = document.createElement('div');
-        div.style.display = 'flex';
-        div.style.gap = '10px';
-        div.innerHTML = `
-            <input type="text" class="form-input" placeholder="Question Text" value="${escHtml(q)}" onchange="appQuestions[${idx}] = this.value">
-            <button class="btn btn-secondary btn-sm" onclick="appQuestions.splice(${idx}, 1); renderAppQuestions()">×</button>
-        `;
-        list.appendChild(div);
-    });
-}
-
-function addAppQuestion() {
-    appQuestions.push('');
-    renderAppQuestions();
-}
-
-function gatherApps() {
-    return {
-        enabled: document.getElementById('settingAppEnabled').checked,
-        title: document.getElementById('settingAppTitle').value,
-        channelId: document.getElementById('settingAppChannel').value,
-        reviewChannelId: document.getElementById('settingAppReview').value,
-        reviewerRoleId: document.getElementById('settingAppRole').value,
-        questions: appQuestions.filter(q => q.trim().length > 0)
-    };
-}
-
-// ── ACTIVITY ALERTS ──
-function applyAlertsUI(data) {
-    document.getElementById('al-enabled').checked = data.enabled || false;
-    document.getElementById('settingAlertChannel').value = data.channelId || '';
-    document.getElementById('al-roles').value = (data.alertRoles || []).join(', ');
-    
-    const t = data.thresholds || {};
-    document.getElementById('al-threshold-low').value = t.lowActivity || 20;
-    document.getElementById('al-threshold-warn').value = t.highWarnings || 5;
-    document.getElementById('al-threshold-tickets').value = t.ticketSpike || 10;
-}
-
-function gatherAlerts() {
-    return {
-        enabled: document.getElementById('al-enabled').checked,
-        channelId: document.getElementById('settingAlertChannel').value,
-        alertRoles: document.getElementById('al-roles').value.split(',').map(s => s.trim()).filter(Boolean),
-        thresholds: {
-            lowActivity: parseInt(document.getElementById('al-threshold-low').value) || 20,
-            highWarnings: parseInt(document.getElementById('al-threshold-warn').value) || 5,
-            ticketSpike: parseInt(document.getElementById('al-threshold-tickets').value) || 10
-        }
-    };
-}
-
-function saveAlerts() {
-    saveSystemSettings('alerts', gatherAlerts);
-}
-
-// ── ECONOMY ──
-function applyEconomyUI(data) {
-    document.getElementById('eco-name').value = data.currencyName || 'Points';
-    document.getElementById('eco-symbol').value = data.currencySymbol || '💰';
-    document.getElementById('eco-mult-shift').value = data.multiplierShift || 1.0;
-    document.getElementById('eco-mult-event').value = data.multiplierEvent || 1.0;
-}
-
-function gatherEconomy() {
-    return {
-        currencyName: document.getElementById('eco-name').value,
-        currencySymbol: document.getElementById('eco-symbol').value,
-        multiplierShift: parseFloat(document.getElementById('eco-mult-shift').value) || 1.0,
-        multiplierEvent: parseFloat(document.getElementById('eco-mult-event').value) || 1.0
-    };
-}
-
-function saveEconomy() {
-    saveSystemSettings('economy', gatherEconomy);
-}
-
-// ── BRANDING ──
-function applyBrandingUI(data) {
-    document.getElementById('brand-name').value = data.botName || '';
-    document.getElementById('brand-color').value = data.embedColor || '#6c63ff';
-    document.getElementById('brand-avatar').value = data.avatarURL || '';
-    document.getElementById('brand-footer').value = data.footerText || '';
-}
-
-function gatherBranding() {
-    return {
-        botName: document.getElementById('brand-name').value,
-        embedColor: document.getElementById('brand-color').value,
-        avatarURL: document.getElementById('brand-avatar').value,
-        footerText: document.getElementById('brand-footer').value
-    };
-}
-
-async function saveBranding() {
-    const guildId = currentGuild?.id;
-    if (!guildId) return;
-    const btn = event?.currentTarget;
-    if (btn) btn.disabled = true;
-    try {
-        const payload = gatherBranding();
-        const res = await fetch(`${CONFIG.API_BASE}/api/dashboard/guild/${guildId}/branding`, {
-            method: 'PATCH',
-            headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        });
-        if (!res.ok) throw new Error();
-        toast('Custom Branding saved successfully! 🎨');
-    } catch (e) {
-        toast('Failed to save Branding settings.');
-    } finally {
-        if (btn) btn.disabled = false;
-    }
-}
 
 // ── AUDIT & HISTORY LOGS ──
 async function loadActivityLog(guildId) {
