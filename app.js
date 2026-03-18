@@ -44,6 +44,7 @@ let currentGuild = null;
 let activeChart = null;
 let allCommands = [];
 let visibleCommandCount = 30;
+let isDemoMode = false;
 
 // ── INIT ──
 document.addEventListener('DOMContentLoaded', async () => {
@@ -428,10 +429,14 @@ async function loadDashboardData() {
         const warnings = (Array.isArray(botWarnings.value) && botWarnings.value.length ? botWarnings.value : null)
                       || (strataWarnings.status === 'fulfilled' && Array.isArray(strataWarnings.value) ? strataWarnings.value : []);
 
-        renderOverview(overview, staff, shifts, warnings);
-        renderStaff(staff);
-        renderShifts(shifts);
-        renderWarnings(warnings);
+        if (isDemoMode) {
+            populateDemoData(overview, staff, shifts, warnings);
+        } else {
+            renderOverview(overview, staff, shifts, warnings);
+            renderStaff(staff);
+            renderShifts(shifts);
+            renderWarnings(warnings);
+        }
         loadLeaderboard(guildId);
         loadSettings(guildId);
         loadPromotions(guildId);
@@ -440,6 +445,54 @@ async function loadDashboardData() {
     } catch (e) {
         console.error(e);
         toast('Error loading data');
+    }
+}
+
+function toggleDemoData() {
+    isDemoMode = !isDemoMode;
+    const btn = document.getElementById('btnDemoData');
+    if (btn) {
+        btn.textContent = isDemoMode ? '🔌 Exit Demo Mode' : '💡 View Sample Data';
+        btn.classList.toggle('btn-primary', isDemoMode);
+    }
+    loadDashboardData();
+}
+
+function populateDemoData() {
+    // Generate high-quality mock data for visualization
+    const mockOverview = {
+        stats: { staffCount: 12, shiftCount: 342, warnCount: 8, totalPoints: 12450 }
+    };
+    const mockStaff = [
+        { id: '1', username: 'sofinshu', rank: 'admin', points: 4500, shifts: 120, onShift: true, avatar: '' },
+        { id: '2', username: 'Zephyr', rank: 'manager', points: 3200, shifts: 85, onShift: false, avatar: '' },
+        { id: '3', username: 'Nexus', rank: 'moderator', points: 2100, shifts: 54, onShift: true, avatar: '' },
+        { id: '4', username: 'Solaris', rank: 'staff', points: 1200, shifts: 30, onShift: false, avatar: '' },
+        { id: '5', username: 'Luna', rank: 'trial', points: 450, shifts: 12, onShift: false, avatar: '' }
+    ];
+    const mockShifts = Array.from({ length: 20 }, (_, i) => ({
+        startTime: new Date(Date.now() - i * 86400000).toISOString(),
+        duration: 240 + Math.random() * 120
+    }));
+    const mockWarnings = [
+        { userId: '99', reason: 'Spamming', severity: 'medium', createdAt: new Date().toISOString() },
+        { userId: '88', reason: 'Inappropriate Language', severity: 'low', createdAt: new Date().toISOString() }
+    ];
+
+    renderOverview(mockOverview, mockStaff, mockShifts, mockWarnings);
+    renderStaff(mockStaff);
+    renderShifts(mockShifts);
+    renderWarnings(mockWarnings);
+    
+    // Stage 4 Analytics also needs populating
+    if (typeof renderShiftTrends === 'function') {
+        renderShiftTrends(mockShifts);
+        renderTicketDistribution([
+            { category: 'support' }, { category: 'feedback' }, { category: 'report_staff' },
+            { category: 'support' }, { category: 'support' }
+        ]);
+        renderWarningSeverity([{ actionType: 'warn' }, { actionType: 'timeout' }, { actionType: 'ban' }]);
+        renderMilestones(mockShifts, [{ status: 'closed' }, { status: 'closed' }], []);
     }
 }
 
@@ -2784,6 +2837,7 @@ async function loadRoleRewards(guildId) {
 let advCharts = {};
 
 async function loadAdvancedAnalytics(guildId) {
+    if (isDemoMode) return; // Already populated by populateDemoData()
     const milestoneList = document.getElementById('milestoneList');
     if (milestoneList) milestoneList.innerHTML = '<div class="table-empty">Processing server data...</div>';
 

@@ -480,7 +480,10 @@
           <div class="dash-title" id="dashTitle">Analytics</div>
           <div class="dash-sub" id="dashSub">Real-time overview of your server.</div>
         </div>
-        <button class="btn btn-ghost btn-sm" onclick="loadDashboardData()">↻ Refresh</button>
+        <div style="display:flex;gap:10px">
+          <button class="btn btn-outline btn-sm" id="btnDemoData" onclick="toggleDemoData()">💡 View Sample Data</button>
+          <button class="btn btn-ghost btn-sm" onclick="loadDashboardData()">↻ Refresh</button>
+        </div>
       </div>
 
       <!-- TICKET LOGS -->
