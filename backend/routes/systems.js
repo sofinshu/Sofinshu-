@@ -9,7 +9,7 @@ const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('
 const router = express.Router({ mergeParams: true });
 
 // Available systems
-const SYSTEMS = ['automod', 'welcome', 'goodbye', 'autorole', 'logging', 'antispam', 'tickets', 'leveling', 'economy', 'giveaways'];
+const SYSTEMS = ['automod', 'welcome', 'goodbye', 'autorole', 'logging', 'antispam', 'tickets', 'leveling', 'economy', 'giveaways', 'applications', 'alerts'];
 
 // Get system configuration
 router.get('/systems/:system', verifyDiscordToken, (req, res) => {
@@ -377,6 +377,24 @@ function getDefaultSystemConfig(system) {
             announcementChannelId: '',
             defaultDurationMinutes: 1440, // 24 hours
             mentionRole: ''
+        },
+        applications: {
+            enabled: false,
+            title: 'Staff Application',
+            channelId: '',
+            reviewChannelId: '',
+            reviewerRoleId: '',
+            questions: []
+        },
+        alerts: {
+            enabled: false,
+            channelId: '',
+            alertRoles: [],
+            thresholds: {
+                lowActivity: 20,
+                highWarnings: 5,
+                ticketSpike: 10
+            }
         }
     };
 

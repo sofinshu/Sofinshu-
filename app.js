@@ -2537,3 +2537,112 @@ async function saveAutoPromo() {
     }
 }
 
+// ── SERVER LOGGING ──
+function applyLoggingUI(data) {
+    document.getElementById('log-members').checked = data.memberLog || false;
+    document.getElementById('log-members-ch').value = data.memberLogChannel || '';
+    document.getElementById('log-messages').checked = data.messageLog || false;
+    document.getElementById('log-messages-ch').value = data.messageLogChannel || '';
+    document.getElementById('log-mod').checked = data.modLog || false;
+    document.getElementById('log-mod-ch').value = data.modLogChannel || '';
+    document.getElementById('log-roles').checked = data.roleLog || false;
+    document.getElementById('log-roles-ch').value = data.roleLogChannel || '';
+    document.getElementById('log-voice').checked = data.voiceLog || false;
+    document.getElementById('log-voice-ch').value = data.voiceLogChannel || '';
+}
+
+function gatherLogging() {
+    return {
+        memberLog: document.getElementById('log-members').checked,
+        memberLogChannel: document.getElementById('log-members-ch').value,
+        messageLog: document.getElementById('log-messages').checked,
+        messageLogChannel: document.getElementById('log-messages-ch').value,
+        modLog: document.getElementById('log-mod').checked,
+        modLogChannel: document.getElementById('log-mod-ch').value,
+        roleLog: document.getElementById('log-roles').checked,
+        roleLogChannel: document.getElementById('log-roles-ch').value,
+        voiceLog: document.getElementById('log-voice').checked,
+        voiceLogChannel: document.getElementById('log-voice-ch').value
+    };
+}
+
+function saveLogging() {
+    saveSystemSettings('logging', gatherLogging);
+}
+
+// ── APPLICATIONS ──
+let appQuestions = [];
+
+function applyApplicationsUI(data) {
+    document.getElementById('settingAppEnabled').checked = data.enabled || false;
+    document.getElementById('settingAppTitle').value = data.title || 'Staff Application';
+    document.getElementById('settingAppChannel').value = data.channelId || '';
+    document.getElementById('settingAppReview').value = data.reviewChannelId || '';
+    document.getElementById('settingAppRole').value = data.reviewerRoleId || '';
+    
+    appQuestions = data.questions || [];
+    renderAppQuestions();
+}
+
+function renderAppQuestions() {
+    const list = document.getElementById('appQuestionsList');
+    if (!list) return;
+    list.innerHTML = '';
+    
+    appQuestions.forEach((q, idx) => {
+        const div = document.createElement('div');
+        div.style.display = 'flex';
+        div.style.gap = '10px';
+        div.innerHTML = `
+            <input type="text" class="form-input" placeholder="Question Text" value="${escHtml(q)}" onchange="appQuestions[${idx}] = this.value">
+            <button class="btn btn-secondary btn-sm" onclick="appQuestions.splice(${idx}, 1); renderAppQuestions()">×</button>
+        `;
+        list.appendChild(div);
+    });
+}
+
+function addAppQuestion() {
+    appQuestions.push('');
+    renderAppQuestions();
+}
+
+function gatherApps() {
+    return {
+        enabled: document.getElementById('settingAppEnabled').checked,
+        title: document.getElementById('settingAppTitle').value,
+        channelId: document.getElementById('settingAppChannel').value,
+        reviewChannelId: document.getElementById('settingAppReview').value,
+        reviewerRoleId: document.getElementById('settingAppRole').value,
+        questions: appQuestions.filter(q => q.trim().length > 0)
+    };
+}
+
+// ── ACTIVITY ALERTS ──
+function applyAlertsUI(data) {
+    document.getElementById('al-enabled').checked = data.enabled || false;
+    document.getElementById('settingAlertChannel').value = data.channelId || '';
+    document.getElementById('al-roles').value = (data.alertRoles || []).join(', ');
+    
+    const t = data.thresholds || {};
+    document.getElementById('al-threshold-low').value = t.lowActivity || 20;
+    document.getElementById('al-threshold-warn').value = t.highWarnings || 5;
+    document.getElementById('al-threshold-tickets').value = t.ticketSpike || 10;
+}
+
+function gatherAlerts() {
+    return {
+        enabled: document.getElementById('al-enabled').checked,
+        channelId: document.getElementById('settingAlertChannel').value,
+        alertRoles: document.getElementById('al-roles').value.split(',').map(s => s.trim()).filter(Boolean),
+        thresholds: {
+            lowActivity: parseInt(document.getElementById('al-threshold-low').value) || 20,
+            highWarnings: parseInt(document.getElementById('al-threshold-warn').value) || 5,
+            ticketSpike: parseInt(document.getElementById('al-threshold-tickets').value) || 10
+        }
+    };
+}
+
+function saveAlerts() {
+    saveSystemSettings('alerts', gatherAlerts);
+}
+

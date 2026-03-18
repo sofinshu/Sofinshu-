@@ -1666,6 +1666,55 @@
         </div>
       </div>
 
+      <!-- ACTIVITY ALERTS -->
+      <div class="dash-panel" id="panel-alerts" style="display:none">
+        <div class="sys-module-header">
+          <div>
+            <div class="card-title" style="margin:0">🔔 Activity Alerts</div>
+            <div class="card-desc" style="margin:6px 0 0">Automatically ping staff roles when specific thresholds are met (e.g. low activity, warning spikes).</div>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="saveAlerts()">Save Changes</button>
+        </div>
+        <div class="sys-modules">
+          <div class="sys-module">
+            <div class="module-row">
+              <div>
+                <div class="module-title">Enable Alerts</div>
+                <div class="module-desc">Activate the automated alert system.</div>
+              </div>
+              <label class="toggle"><input type="checkbox" id="al-enabled"><span class="toggle-slider"></span></label>
+            </div>
+            <div class="form-row" style="margin-top:12px">
+              <label>Alert Notification Channel</label>
+              <select id="settingAlertChannel" class="form-input">
+                <option value="">Select a channel...</option>
+              </select>
+            </div>
+          </div>
+          <div class="sys-module">
+            <div class="module-title" style="font-size:1rem;margin-bottom:15px">Alert Thresholds</div>
+            <div class="form-row">
+              <label>Low Activity Trigger <span style="font-size:12px;color:#5c5c78">(pings if staff activity drops below X%)</span></label>
+              <input type="number" id="al-threshold-low" class="form-input" placeholder="20" min="1" max="100">
+            </div>
+            <div class="form-row" style="margin-top:14px">
+              <label>Warning Surge Trigger <span style="font-size:12px;color:#5c5c78">(pings if more than X warnings issued in 1h)</span></label>
+              <input type="number" id="al-threshold-warn" class="form-input" placeholder="5" min="1">
+            </div>
+            <div class="form-row" style="margin-top:14px">
+              <label>Ticket Spike Trigger <span style="font-size:12px;color:#5c5c78">(pings if more than X tickets opened in 1h)</span></label>
+              <input type="number" id="al-threshold-tickets" class="form-input" placeholder="10" min="1">
+            </div>
+          </div>
+          <div class="sys-module">
+            <div class="form-row">
+              <label>Roles to Ping <span style="font-size:12px;color:#5c5c78">(comma-separated Role IDs)</span></label>
+              <textarea id="al-roles" class="form-input" rows="2" placeholder="RoleID1, RoleID2..."></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- TICKET SYSTEM -->
       <div class="dash-panel" id="panel-tickets" style="display:none">
         <div class="sys-module-header">
