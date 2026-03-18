@@ -1854,6 +1854,136 @@
         </div>
       </div>
 
+      <!-- ECONOMY & SHOP -->
+      <div class="dash-panel" id="panel-economy" style="display:none">
+        <div class="sys-module-header">
+          <div>
+            <div class="card-title" style="margin:0">💰 Economy & Point Multipliers</div>
+            <div class="card-desc" style="margin:6px 0 0">Configure your server's currency and reward multipliers.</div>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="saveEconomy()">Save Changes</button>
+        </div>
+        <div class="sys-modules">
+          <div class="sys-module">
+            <div class="module-title" style="font-size:1rem;margin-bottom:15px">Currency Settings</div>
+            <div class="form-row">
+              <label>Currency Name (e.g. Credits, Points, Gold)</label>
+              <input type="text" id="eco-name" class="form-input" placeholder="Points" style="max-width:300px">
+            </div>
+            <div class="form-row" style="margin-top:14px">
+              <label>Currency Symbol / Emoji</label>
+              <input type="text" id="eco-symbol" class="form-input" placeholder="💰" style="max-width:100px">
+            </div>
+          </div>
+          <div class="sys-module">
+             <div class="module-title" style="font-size:1rem;margin-bottom:15px">Global Multipliers</div>
+             <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+               <div class="form-row">
+                 <label>Shift Point Multiplier</label>
+                 <input type="number" id="eco-mult-shift" class="form-input" value="1.0" step="0.1" min="0.1">
+               </div>
+               <div class="form-row">
+                 <label>Event Point Multiplier</label>
+                 <input type="number" id="eco-mult-event" class="form-input" value="1.0" step="0.1" min="0.1">
+               </div>
+             </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CUSTOM BRANDING -->
+      <div class="dash-panel" id="panel-branding" style="display:none">
+        <div class="sys-module-header">
+          <div>
+            <div class="card-title" style="margin:0">🎨 Enterprise Custom Branding</div>
+            <div class="card-desc" style="margin:6px 0 0">White-label Strata with your server's own identity.</div>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="saveBranding()">Save Changes</button>
+        </div>
+        <div class="sys-modules">
+          <div class="sys-module">
+            <div class="form-row">
+              <label>Custom Bot Name (Display Only)</label>
+              <input type="text" id="brand-name" class="form-input" placeholder="e.g. Atlas Management">
+            </div>
+            <div class="form-row" style="margin-top:14px">
+              <label>Custom Embed Color (Hex Code)</label>
+              <input type="color" id="brand-color" class="form-input" style="height:44px;padding:4px">
+            </div>
+            <div class="form-row" style="margin-top:14px">
+              <label>Vanity Bot Avatar URL</label>
+              <input type="text" id="brand-avatar" class="form-input" placeholder="https://...">
+            </div>
+            <div class="form-row" style="margin-top:14px">
+              <label>Custom Footer Text</label>
+              <input type="text" id="brand-footer" class="form-input" placeholder="Custom branding footer...">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ACTIVITY LOG -->
+      <div class="dash-panel" id="panel-activitylog" style="display:none">
+        <div class="sys-module-header">
+          <div>
+            <div class="card-title" style="margin:0">📑 Global Activity Log</div>
+            <div class="card-desc" style="margin:6px 0 0">Real-time audit log of all system and staff actions.</div>
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="loadActivityLog(currentGuild.id)">🔄 Refresh</button>
+        </div>
+        <div class="table-wrap" style="margin-top:20px">
+          <table class="dash-table">
+            <thead>
+              <tr>
+                <th>Timestamp</th>
+                <th>Staff/System</th>
+                <th>Action</th>
+                <th>Details</th>
+              </tr>
+            </thead>
+            <tbody id="activitylogBody">
+               <!-- Logs will be loaded here -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TICKET LOGS -->
+      <div class="dash-panel" id="panel-ticketlogs" style="display:none">
+        <div class="sys-module-header">
+          <div>
+            <div class="card-title" style="margin:0">🎫 Ticket Archive & Transcripts</div>
+            <div class="card-desc" style="margin:6px 0 0">View past support interactions and staff reports.</div>
+          </div>
+          <div style="display:flex;gap:10px">
+            <select id="ticketLogTypeFilter" class="form-input btn-sm" style="width:140px" onchange="loadTicketLogs(currentGuild.id)">
+              <option value="">All Types</option>
+              <option value="report_staff">Staff Reports</option>
+              <option value="feedback">Feedback</option>
+              <option value="support">Support</option>
+            </select>
+            <button class="btn btn-secondary btn-sm" onclick="loadTicketLogs(currentGuild.id)">🔄 Refresh</button>
+          </div>
+        </div>
+        <div class="table-wrap" style="margin-top:20px">
+          <table class="dash-table">
+            <thead>
+              <tr>
+                <th>Ticket ID</th>
+                <th>Member</th>
+                <th>Category</th>
+                <th>Status</th>
+                <th>Staff/Details</th>
+                <th>Created</th>
+              </tr>
+            </thead>
+            <tbody id="ticketlogsBody">
+               <!-- Tickets will be loaded here -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
       <!-- SUBSCRIPTIONS -->
       <div class="dash-panel" id="panel-subscription" style="display:none">
         <div class="sys-module-header">

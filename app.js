@@ -2646,3 +2646,132 @@ function saveAlerts() {
     saveSystemSettings('alerts', gatherAlerts);
 }
 
+// ── ECONOMY ──
+function applyEconomyUI(data) {
+    document.getElementById('eco-name').value = data.currencyName || 'Points';
+    document.getElementById('eco-symbol').value = data.currencySymbol || '💰';
+    document.getElementById('eco-mult-shift').value = data.multiplierShift || 1.0;
+    document.getElementById('eco-mult-event').value = data.multiplierEvent || 1.0;
+}
+
+function gatherEconomy() {
+    return {
+        currencyName: document.getElementById('eco-name').value,
+        currencySymbol: document.getElementById('eco-symbol').value,
+        multiplierShift: parseFloat(document.getElementById('eco-mult-shift').value) || 1.0,
+        multiplierEvent: parseFloat(document.getElementById('eco-mult-event').value) || 1.0
+    };
+}
+
+function saveEconomy() {
+    saveSystemSettings('economy', gatherEconomy);
+}
+
+// ── BRANDING ──
+function applyBrandingUI(data) {
+    document.getElementById('brand-name').value = data.botName || '';
+    document.getElementById('brand-color').value = data.embedColor || '#6c63ff';
+    document.getElementById('brand-avatar').value = data.avatarURL || '';
+    document.getElementById('brand-footer').value = data.footerText || '';
+}
+
+function gatherBranding() {
+    return {
+        botName: document.getElementById('brand-name').value,
+        embedColor: document.getElementById('brand-color').value,
+        avatarURL: document.getElementById('brand-avatar').value,
+        footerText: document.getElementById('brand-footer').value
+    };
+}
+
+async function saveBranding() {
+    const guildId = currentGuild?.id;
+    if (!guildId) return;
+    const btn = event?.currentTarget;
+    if (btn) btn.disabled = true;
+    try {
+        const payload = gatherBranding();
+        const res = await fetch(`${CONFIG.API_BASE}/api/dashboard/guild/${guildId}/branding`, {
+            method: 'PATCH',
+            headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        if (!res.ok) throw new Error();
+        toast('Custom Branding saved successfully! 🎨');
+    } catch (e) {
+        toast('Failed to save Branding settings.');
+    } finally {
+        if (btn) btn.disabled = false;
+    }
+}
+
+// ── AUDIT & HISTORY LOGS ──
+async function loadActivityLog(guildId) {
+    const tbody = document.getElementById('activitylogBody');
+    if (!tbody) return;
+    tbody.innerHTML = '<tr><td colspan="4" class="table-empty">Loading audit logs...</td></tr>';
+    try {
+        const logs = await fetchAPI(`/api/dashboard/guild/${guildId}/activity`);
+        if (!Array.isArray(logs) || logs.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" class="table-empty">No activity recorded yet.</td></tr>';
+            return;
+        }
+        tbody.innerHTML = logs.map(l => `
+            <tr>
+                <td style="font-size:12px;color:#5c5c78">${fmtDate(new Date(l.createdAt))}</td>
+                <td><span class="badge badge-secondary">${escHtml(l.userId || 'System')}</span></td>
+                <td><strong>${escHtml(l.actionType.replace(/_/g, ' ').toUpperCase())}</strong></td>
+                <td style="color:var(--t2);font-size:13px">${escHtml(JSON.stringify(l.metadata || {}))}</td>
+            </tr>
+        `).join('');
+    } catch (e) {
+        tbody.innerHTML = '<tr><td colspan="4" class="table-empty">Failed to load activity logs.</td></tr>';
+    }
+}
+
+async function loadTicketLogs(guildId) {
+    const tbody = document.getElementById('ticketlogsBody');
+    if (!tbody) return;
+    const typeFilter = document.getElementById('ticketLogTypeFilter')?.value || '';
+    tbody.innerHTML = '<tr><td colspan="6" class="table-empty">Loading ticket archive...</td></tr>';
+    try {
+        let url = `/api/dashboard/guild/${guildId}/tickets`;
+        if (typeFilter) url += `?category=${typeFilter}`;
+        const tickets = await fetchAPI(url);
+        if (!Array.isArray(tickets) || tickets.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="table-empty">No archived tickets found.</td></tr>';
+            return;
+        }
+        tbody.innerHTML = tickets.map(t => `
+            <tr>
+                <td style="font-family:monospace;font-size:12px">#${escHtml(t.ticketId)}</td>
+                <td>${escHtml(t.creatorUsername || 'Unknown')}</td>
+                <td><span class="badge badge-outline">${escHtml(t.category)}</span></td>
+                <td><span class="badge badge-${t.status === 'closed' ? 'secondary' : 'primary'}">${t.status}</span></td>
+                <td style="font-size:13px;color:var(--t2)">${t.closedByUsername ? 'Closed by ' + escHtml(t.closedByUsername) : 'In progress'}</td>
+                <td style="font-size:12px;color:#5c5c78">${fmtDate(new Date(t.createdAt))}</td>
+            </tr>
+        `).join('');
+    } catch (e) {
+        tbody.innerHTML = '<tr><td colspan="6" class="table-empty">Failed to load ticket logs.</td></tr>';
+    }
+}
+
+async function loadPromoHistory(guildId) {
+    // Shared with Promo History panel if exists, or just logic for it
+    try {
+        const data = await fetchAPI(`/api/dashboard/guild/${guildId}/promotions/history`);
+        // If there's a panel for it, render it. 
+    } catch (e) {}
+}
+
+async function loadEcoTransactions(guildId) {
+    // Placeholder for enterprise economy tracking
+    console.log('Loading economy transactions for ' + guildId);
+}
+
+async function loadRoleRewards(guildId) {
+    // Redirect to staff rewards loader as they share data
+    loadStaffRewards(guildId);
+}
+

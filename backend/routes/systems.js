@@ -9,7 +9,7 @@ const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('
 const router = express.Router({ mergeParams: true });
 
 // Available systems
-const SYSTEMS = ['automod', 'welcome', 'goodbye', 'autorole', 'logging', 'antispam', 'tickets', 'leveling', 'economy', 'giveaways', 'applications', 'alerts'];
+const SYSTEMS = ['automod', 'welcome', 'goodbye', 'autorole', 'logging', 'antispam', 'tickets', 'leveling', 'economy', 'giveaways', 'applications', 'alerts', 'branding'];
 
 // Get system configuration
 router.get('/systems/:system', verifyDiscordToken, (req, res) => {
@@ -395,6 +395,12 @@ function getDefaultSystemConfig(system) {
                 highWarnings: 5,
                 ticketSpike: 10
             }
+        },
+        branding: {
+            botName: '',
+            embedColor: '#6c63ff',
+            avatarURL: '',
+            footerText: ''
         }
     };
 
