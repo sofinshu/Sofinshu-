@@ -456,30 +456,12 @@
         <span>🎫</span> Ticket Logs <span class="v-badge enterprise">V6</span>
       </div>
 
-      <div class="sidebar-section">Auto Systems (V3-V5 Premium)</div>
-      <div class="sidebar-item" id="nav-automod" data-panel="automod" onclick="switchPanel('automod')">
-        <span>🛡️</span> Auto-Moderation <span class="v-badge premium">V3</span>
+      <div class="sidebar-section">Insight & Data (Stage 4)</div>
+      <div class="sidebar-item" id="nav-analytics-adv" data-panel="analytics-adv" onclick="switchPanel('analytics-adv')">
+        <span>📈</span> Advanced Analytics <span class="v-badge">V4</span>
       </div>
-      <div class="sidebar-item" id="nav-welcome" data-panel="welcome" onclick="switchPanel('welcome')">
-        <span>👋</span> Welcome System <span class="v-badge premium">V3</span>
-      </div>
-      <div class="sidebar-item" id="nav-leveling" data-panel="leveling" onclick="switchPanel('leveling')">
-        <span>⭐</span> Leveling & XP <span class="v-badge premium">V4</span>
-      </div>
-      <div class="sidebar-item" id="nav-autorole" data-panel="autorole" onclick="switchPanel('autorole')">
-        <span>🎭</span> Auto-Role <span class="v-badge premium">V4</span>
-      </div>
-      <div class="sidebar-item" id="nav-logging" data-panel="logging" onclick="switchPanel('logging')">
-        <span>📋</span> Server Logging <span class="v-badge premium">V5</span>
-      </div>
-      <div class="sidebar-item" id="nav-antispam" data-panel="antispam" onclick="switchPanel('antispam')">
-        <span>🚫</span> Anti-Spam <span class="v-badge premium">V5</span>
-      </div>
-      <div class="sidebar-item" id="nav-customcommands" data-panel="customcommands" onclick="switchPanel('customcommands')">
-        <span>🤖</span> Custom Commands <span class="v-badge premium">V5</span>
-      </div>
-      <div class="sidebar-item" id="nav-alerts" data-panel="alerts" onclick="switchPanel('alerts')">
-        <span>🔔</span> Activity Alerts <span class="v-badge premium">V5</span>
+      <div class="sidebar-item" id="nav-dataexport" data-panel="dataexport" onclick="switchPanel('dataexport')">
+        <span>📥</span> Data Export <span class="v-badge">V4</span>
       </div>
 
       <div class="sidebar-section">System</div>
@@ -2006,6 +1988,84 @@
                  <button class="btn btn-outline" style="border-color:#ff4757; color:#ff4757" onclick="window.open('https://discord.gg/smNwftEhKe', '_blank')">Upgrade to Enterprise</button>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ADVANCED ANALYTICS (STAGE 4) -->
+      <div class="dash-panel" id="panel-analytics-adv" style="display:none">
+        <div class="sys-module-header" style="margin-bottom:20px">
+          <div>
+            <div class="card-title" style="margin:0">📈 Advanced Server Analytics</div>
+            <div class="card-desc" style="margin:6px 0 0">Deep insights into staff performance, ticket trends, and activity heatmaps.</div>
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="loadAdvancedAnalytics(currentGuild.id)">🔄 Refresh Data</button>
+        </div>
+
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap:20px">
+          <div class="sys-module" style="padding:20px">
+            <div class="module-title" style="font-size:1rem;margin-bottom:15px">🕰️ Shift Activity Trends</div>
+            <div style="height:300px">
+              <canvas id="shiftTrendChart"></canvas>
+            </div>
+          </div>
+
+          <div class="sys-module" style="padding:20px">
+            <div class="module-title" style="font-size:1rem;margin-bottom:15px">🎫 Ticket Category Distribution</div>
+            <div style="height:300px">
+              <canvas id="ticketDistChart"></canvas>
+            </div>
+          </div>
+
+          <div class="sys-module" style="padding:20px">
+            <div class="module-title" style="font-size:1rem;margin-bottom:15px">⚠️ Warning Severity Analysis</div>
+            <div style="height:300px">
+              <canvas id="warningSevChart"></canvas>
+            </div>
+          </div>
+
+          <div class="sys-module" style="padding:20px">
+            <div class="module-title" style="font-size:1rem;margin-bottom:15px">🎖️ Staff Activity Milestones</div>
+            <div id="milestoneList" style="display:flex; flex-direction:column; gap:15px">
+              <div class="table-empty">Loading performance metrics...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DATA EXPORT (STAGE 4) -->
+      <div class="dash-panel" id="panel-dataexport" style="display:none">
+        <div class="sys-module-header" style="margin-bottom:20px">
+          <div>
+            <div class="card-title" style="margin:0">📥 Data Export & Reporting</div>
+            <div class="card-desc" style="margin:6px 0 0">Download your server's operational data for external audits or backup.</div>
+          </div>
+        </div>
+
+        <div class="sys-modules" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:20px">
+          <div class="sys-module" style="text-align:center; padding:30px">
+            <div style="font-size:2.5rem; margin-bottom:15px">👥</div>
+            <h3>Staff Roster</h3>
+            <p class="card-desc" style="margin-bottom:20px">Complete list of staff members, ranks, and total points.</p>
+            <button class="btn btn-primary" style="width:100%" onclick="exportData('staff')">Download CSV</button>
+          </div>
+          <div class="sys-module" style="text-align:center; padding:30px">
+            <div style="font-size:2.5rem; margin-bottom:15px">⏱️</div>
+            <h3>Shift Logs</h3>
+            <p class="card-desc" style="margin-bottom:20px">All clock-in/out records including durations and breaks.</p>
+            <button class="btn btn-primary" style="width:100%" onclick="exportData('shifts')">Download CSV</button>
+          </div>
+          <div class="sys-module" style="text-align:center; padding:30px">
+            <div style="font-size:2.5rem; margin-bottom:15px">🎫</div>
+            <h3>Ticket Archive</h3>
+            <p class="card-desc" style="margin-bottom:20px">Full history of closed tickets and transcripts.</p>
+            <button class="btn btn-primary" style="width:100%" onclick="exportData('tickets')">Download CSV</button>
+          </div>
+          <div class="sys-module" style="text-align:center; padding:30px">
+            <div style="font-size:2.5rem; margin-bottom:15px">⚠️</div>
+            <h3>Warning History</h3>
+            <p class="card-desc" style="margin-bottom:20px">Complete audit trail of all warnings issued and revoked.</p>
+            <button class="btn btn-primary" style="width:100%" onclick="exportData('warnings')">Download CSV</button>
           </div>
         </div>
       </div>
